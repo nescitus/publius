@@ -1,4 +1,4 @@
-Publius is a dead simple bitboard chess engine for didactic purposes
+Publius is a dead simple bitboard chess engine for didactic purposes. Basically a boilerplate chess engine to build upon, no strings attached.
 
 Functionalities up to date
 
@@ -20,3 +20,11 @@ Functionalities up to date
 
 Additional commands:
 - in addition to "position startpos" there is "position kivipete" to test perft
+
+Things to add if you want to contribute
+1. bench command
+2. static exchange evaluator
+3. a function to check whether a move is pseudolegal
+4. with (2) and (3) in place staged move generator
+5. comments
+6. more sensible piece/square tables
