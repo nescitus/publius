@@ -9,7 +9,7 @@
 void UciLoop(void) {
 
     Position pos[1];
-    pos->Set(START_POS);
+    pos->Set(startFen);
     TT.Allocate(16);
 
     std::string line;
@@ -55,11 +55,11 @@ void OnPositionCommand(std::istringstream& stream, Position* pos) {
     stream >> token;
 
     if (token == "startpos") {
-        fen = START_POS;
+        fen = startFen;
         stream >> token;
     } 
     else if (token == "kiwipete") {
-        fen = KIWIPETE;
+        fen = kiwipeteFen;
         stream >> token;
     }
     else if (token == "fen") {

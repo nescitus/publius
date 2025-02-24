@@ -176,7 +176,7 @@ Bitboard Position::CalculateHashKey() {
         key ^= Mask.enPassantKey[FileOf(enPassantSq)];
 
     if (sideToMove == Black)
-        key ^= SIDE_RANDOM;
+        key ^= sideRandom;
 
     return key;
 }
@@ -184,7 +184,7 @@ Bitboard Position::CalculateHashKey() {
 void Position::SwitchSide() {
 
      sideToMove = ~sideToMove;
-     boardHash ^= SIDE_RANDOM;
+     boardHash ^= sideRandom;
 }
 
 void Position::ClearEnPassant() {

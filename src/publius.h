@@ -1,5 +1,5 @@
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 2273 lines
+// 2400 lines
 
 #pragma once
 
@@ -36,7 +36,7 @@ enum Square {
 	A8, B8, C8, D8, E8, F8, G8, H8
 };
 
-#define	sqNone (H8 + 1)
+static constexpr Square sqNone = (Square)64;
 
 inline Square operator++(Square& d) { return d = Square(int(d) + 1); }            // step through squares
 inline Square operator+(Square d1, int d2) { return Square(int(d1) + int(d2)); }  // add vector to square
@@ -66,10 +66,10 @@ enum eCastleFlag { wShortCastle = 1, wLongCastle = 2, bShortCastle = 4, bLongCas
 enum eHashEntry { None, lowerBound, upperBound, exactEntry };
 enum eMoveFlag { moveQuiet, moveHash, moveNoisy};
 
-#define SIDE_RANDOM     (~((Bitboard)0))
+static constexpr auto sideRandom = ~((Bitboard)0);
 
-#define START_POS       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -"
-#define KIWIPETE        "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"
+static constexpr auto startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -";
+static constexpr auto kiwipeteFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
 
 // bitboard
 
