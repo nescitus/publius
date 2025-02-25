@@ -1,12 +1,13 @@
 #include <assert.h>
 #include <stdio.h>
+#include "color.h"
+#include "square.h"
 #include "publius.h"
 #include "bitboard.h"
 #include "bitgen.h"
 #include "eval.h"
 #include "mask.h"
 #include "piece.h"
-#include "square.h"
 
 // TODO: Params class 
 int mgTable[2][6][64];

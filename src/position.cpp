@@ -1,9 +1,10 @@
+#include "color.h"
+#include "square.h"
 #include "publius.h"
 #include "bitboard.h"
 #include "bitgen.h"
 #include "mask.h"
 #include "piece.h"
-#include "square.h"
 
 void Position::Clear() {
 

@@ -1,3 +1,5 @@
+#include "color.h"
+#include "square.h"
 #include "publius.h"
 #include "history.h"
 #include "move.h"

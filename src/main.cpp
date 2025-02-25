@@ -1,3 +1,5 @@
+#include "color.h"
+#include "square.h"
 #include "publius.h"
 #include "timer.h"
 #include "uci.h"

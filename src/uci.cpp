@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "color.h"
+#include "square.h"
 #include "publius.h"
 #include "timer.h"
 #include "history.h"

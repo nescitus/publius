@@ -1,6 +1,8 @@
 // Publius 1.0. Didactic bitboard chess engine by Pawel Koziol
 
 #include <stdio.h>
+#include "color.h"
+#include "square.h"
 #include "publius.h"
 #include "timer.h"
 #include "history.h"

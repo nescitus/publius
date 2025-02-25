@@ -9,6 +9,8 @@
 #  include <unistd.h>
 #  include <sys/time.h>
 #endif
+#include "color.h"
+#include "square.h"
 #include "publius.h"
 #include "move.h"
 
