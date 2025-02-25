@@ -16,6 +16,7 @@ public:
 	Bitboard Knight(Square s);
 	Bitboard Bish(Bitboard o, Square s);
 	Bitboard Rook(Bitboard o, Square s);
+	Bitboard Queen(Bitboard o, Square s);
 	Bitboard King(Square s);
 };
 

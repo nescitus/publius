@@ -68,6 +68,10 @@ Bitboard MoveGenerator::Rook(Bitboard o, Square s) {
          | WestOf(FillOcclWest(b, ~o));
 }
 
+Bitboard MoveGenerator::Queen(Bitboard o, Square s) {
+    return Bish(o, s) | Rook(o, s);
+}
+
 Bitboard MoveGenerator::King(Square s) { 
 	return kingAttacks[s]; 
 };

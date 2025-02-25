@@ -1,14 +1,24 @@
 #pragma once
 
-void EvalSinglePiece(Position* pos, evalData* e, Color color, int piece);
+void EvalBasic(evalData* e, Color color, int piece, int sq);
+void EvalPawn(Position* pos, evalData* e, Color color);
+void EvalKnight(Position* pos, evalData* e, Color color);
+void EvalBishop(Position* pos, evalData* e, Color color);
+void EvalRook(Position* pos, evalData* e, Color color);
+void EvalQueen(Position* pos, evalData* e, Color color);
+void EvalKing(Position* pos, evalData* e, Color color);
+void EvalAttacks(evalData* e, Color color);
 int GetDrawMul(Position* pos, Color strong, Color weak);
 
 const int mgPieceValue[6] = { 100, 400, 400, 600, 1300, 0 };
 const int egPieceValue[6] = { 100, 400, 400, 600, 1200, 0 };
 const int phaseTable[6]   = {   0,   1,   1,   2,   4,  0 };
 
-const int passedBonus[2][8] = { { 0, 10, 10, 30, 50, 80, 120, 0},
-                                { 0, 120, 80, 50, 30, 10, 10, 0} };
+const int passedBonusMg[2][8] = { { 0, 10, 10, 30, 50, 80, 120, 0},
+                                  { 0, 120, 80, 50, 30, 10, 10, 0} };
+
+const int passedBonusEg[2][8] = { { 0, 12, 12, 37, 62, 100, 150, 0 },
+                                  { 0, 150, 100, 62, 37, 12, 12, 0 } };
 
 const int mgPawnPst[64] = {
  //A1                              H1
