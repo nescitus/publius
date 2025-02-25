@@ -324,6 +324,9 @@ void TryInterrupting(void)
 
 int Timeout() 
 {
+#ifdef USE_TUNING
+    return false;
+#endif
     return (!State.isPondering && 
             !Timer.IsInfiniteMode() && 
             Timer.TimeHasElapsed());

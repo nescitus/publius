@@ -83,6 +83,12 @@ void EvalPawn(Position* pos, evalData* e, Color color) {
         Square sq = PopFirstBit(&b);
         EvalBasic(e, color, Pawn, sq);
 
+        // Isolated pawn
+
+        if (!(Mask.adjacent[FileOf(sq)] & pos->Map(color, Pawn))) {
+            e->Add(color, -10, -20);
+        }
+
         // passed pawn
 
         if (!(Mask.passed[color][sq] & pos->Map(~color, Pawn))) {
@@ -153,14 +159,14 @@ void EvalRook(Position* pos, evalData* e, Color color) {
         file = FillNorth(b) | FillSouth(b);
 
         if (file & pos->Map(color, Pawn)) {
-            e->Add(color, -5, -5);     // rook on a closed file
+            e->Add(color, -6, -6);     // rook on a closed file
         }
         else
         {
             if (file & pos->Map(~color, Pawn))
-                e->Add(color, 5, 5);   // rook on a semi-open file
+                e->Add(color, 6, 6);   // rook on a semi-open file
             else
-                e->Add(color, 10, 10); // rook on an open file
+                e->Add(color, 12, 12); // rook on an open file
         }
     }
 }
@@ -196,7 +202,7 @@ void EvalKing(Position* pos, evalData* e, Color color) {
     while (b) {
         Square sq = PopFirstBit(&b);
         EvalBasic(e, color, King, sq);
-
+        
         // king's pawn shield
         // (pawns closer to the king are counted twice)
 
@@ -219,12 +225,16 @@ void EvalBasic(evalData *e, Color color, int piece, int sq) {
 
 void EvalAttacks(evalData* e, Color color) {
 
-    int result = 16 * e->queenAttacks[color] * e->rookAttacks[color];
+    int result = 2 * e->queenAttacks[color] * e->rookAttacks[color] * e->minorAttacks[color];
+    result += 17 * e->queenAttacks[color] * e->rookAttacks[color];
     result += 12 * e->queenAttacks[color] * e->minorAttacks[color];
-    result +=  8 * e->rookAttacks[color] * e->minorAttacks[color];
-    result += 4 * e->minorAttacks[color] * e->minorAttacks[color];
+    result +=  9 * e->rookAttacks[color] * e->minorAttacks[color];
+    result += 3 * e->minorAttacks[color] * e->minorAttacks[color];
+    result += 1 * e->queenAttacks[color];
+    result += 3 * e->rookAttacks[color];
+    result -= 3 * e->minorAttacks[color];
 
-    e->Add(color, 4 * result, 0);
+    e->Add(color, 400 * result / 100, 0);
 }
 
 int GetDrawMul(Position *pos, Color strong, Color weak) {
