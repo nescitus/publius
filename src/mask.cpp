@@ -1,4 +1,6 @@
 #include "publius.h"
+#include "bitboard.h"
+#include "mask.h"
 
 void cMask::Init() {
 

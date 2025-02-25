@@ -1,5 +1,5 @@
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 2400 lines
+// 2428 lines
 
 #pragma once
 
@@ -13,15 +13,6 @@ typedef unsigned long long Bitboard;
 enum Color { White, Black, colorNone };
 inline Color operator~(Color c) { return Color(c ^ Black); }          // switch color
 inline Color operator++(Color& d) { return d = Color(int(d) + 1); }   // step through colors
-
-// piece type
-
-enum PieceType { Pawn, Knight, Bishop, Rook, Queen, King, noPieceType };
-
-Color ColorOfPiece(int piece);                     // given a piece value, return its color
-int TypeOfPiece(int piece);                        // given a piece value, return its type
-int CreatePiece(Color pieceColor, int pieceType);  // get unique id of a piece (denoting, say, white knight), range 0-11
-static const int noPiece = 12;                     // constant just outside this range to denote no piece
 
 // square
 
@@ -42,12 +33,6 @@ inline Square operator++(Square& d) { return d = Square(int(d) + 1); }          
 inline Square operator+(Square d1, int d2) { return Square(int(d1) + int(d2)); }  // add vector to square
 inline Square operator-(Square d1, int d2) { return Square(int(d1) - int(d2)); }  // substract vector from square
 inline Square operator^(Square d1, int d2) { return Square(int(d1) ^ d2); }       // needed for en passant
-
-Square MakeSquare(int rank, int file);
-int RankOf(Square square);
-int FileOf(Square square);
-Square InvertSquare(Square square);
-Square RelativeSq(Color color, Square square);
 
 // limits
 
@@ -71,90 +56,6 @@ static constexpr auto sideRandom = ~((Bitboard)0);
 static constexpr auto startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -";
 static constexpr auto kiwipeteFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
 
-// bitboard
-
-static const Bitboard excludeA = 0xfefefefefefefefe;
-static const Bitboard excludeH = 0x7f7f7f7f7f7f7f7f;
-
-Bitboard Paint(Square s);
-Bitboard Paint(Square s1, Square s2);
-Bitboard Paint(Square s1, Square s2, Square s3);
-
-Square FirstOne(Bitboard b);
-int PopCnt(Bitboard b);
-Square PopFirstBit(Bitboard * b);
-
-Bitboard NorthOf(Bitboard b);
-Bitboard SouthOf(Bitboard b);
-Bitboard WestOf(Bitboard b);
-Bitboard EastOf(Bitboard b);
-Bitboard NWOf(Bitboard b);
-Bitboard NEOf(Bitboard b);
-Bitboard SEOf(Bitboard b);
-Bitboard SWOf(Bitboard b);
-
-Bitboard SidesOf(Bitboard b);
-Bitboard ForwardOf(Bitboard b, Color c);
-Bitboard FrontSpan(Bitboard b, Color c);
-
-Bitboard FillNorth(Bitboard b);
-Bitboard FillSouth(Bitboard b);
-Bitboard GetWPAttacks(Bitboard b);
-Bitboard GetBPAttacks(Bitboard b);
-
-Bitboard FillOcclSouth(Bitboard b, Bitboard o);
-Bitboard FillOcclNorth(Bitboard b, Bitboard o);
-Bitboard FillOcclEast(Bitboard b, Bitboard o);
-Bitboard FillOcclNE(Bitboard b, Bitboard o);
-Bitboard FillOcclSE(Bitboard b, Bitboard o);
-Bitboard FillOcclWest(Bitboard b, Bitboard o);
-Bitboard FillOcclNW(Bitboard b, Bitboard o);
-Bitboard FillOcclSW(Bitboard b, Bitboard o);
-
-// bitgen
-
-class MoveGenerator {
-private:
-	Bitboard pawnAttacks[2][64];
-	Bitboard knightAttacks[64];
-	Bitboard kingAttacks[64];
-    void InitPawnAttacks(Square square, Bitboard b);
-    void InitKnightAttacks(Square square, Bitboard b);
-    void InitKingAttacks(Square square, Bitboard b);
-public:
-	void Init(void);
-	Bitboard Pawn(Color c, Square s);
-	Bitboard Knight(Square s);
-	Bitboard Bish(Bitboard o, Square s);
-	Bitboard Rook(Bitboard o, Square s);
-	Bitboard King(Square s);
-};
-
-extern MoveGenerator GenerateMoves;
-
-// mask
-
-class cMask {
-private:
-    void InitHashKeys();
-    void InitRanks();
-    void InitPassedMask();
-    void InitAdjacentMask();
-    void InitSupportMask();
-public:
-	Bitboard pieceKey[12][64];
-	Bitboard castleKey[16];
-	Bitboard enPassantKey[8];
-	Bitboard rank[8];
-    Bitboard file[8];
-    Bitboard passed[2][64];
-    Bitboard support[2][64];
-    Bitboard adjacent[8];
-	void Init();
-};
-
-extern cMask Mask;
-
 // stack
 
 typedef struct {
@@ -164,10 +65,10 @@ typedef struct {
 	Square enPassantSq;
 	int reversibleMoves;
 	Bitboard boardHash;
-} Stack;
+} UndoStack;
 
 static const int stackSize = 2048;
-extern Stack undoStack[stackSize];
+extern UndoStack undoStack[stackSize];
 
 // position
 
@@ -248,22 +149,6 @@ public:
 	int phase; // game phase (24 for starting position)
 };
 
-// history
-
-class cHistory {
-private:
-    int killer[PlyLimit];
-	int history[12][64];
-	void Trim(void);
-public:
-	void Clear(void);
-	void Update(Position *pos, int mv, int d, int ply);
-	int Get(Position *pos, int mv);
-    int GetKiller(int ply);
-};
-
-extern cHistory History;
-
 // list
 
 class MoveList {
@@ -274,7 +159,7 @@ private:
 	int get;
 public:
 	void Clear();
-	void AddMove(Square f, Square t, int flag);
+	void AddMove(Square fromSquare, Square toSquare, int flag);
 	int GetInd();
 	int GetMove();
 	bool HasMore();
@@ -289,86 +174,23 @@ void FillQuietList(Position *pos, MoveList *list);
 void FillNoisyList(Position *pos, MoveList *list);
 void FillCompleteList(Position *pos, MoveList *list);
 
-// transposition table
-
-typedef struct {
-	Bitboard key;
-	short move;
-	short score;
-	unsigned char flags;
-	unsigned char depth;
-} hashRecord;
-
-class TransTable {
-private:
-	hashRecord * table;
-	int tableSize;
-public:
-	void Clear(void);
-	void Allocate(int mbsize);
-	bool Retrieve(Bitboard key, int *move, int *score, int *flag, int alpha, int beta, int depth, int ply);
-	void Store(Bitboard key, int move, int score, int flags, int depth, int ply);
-	void Exit(void);
-};
-
-extern TransTable TT;
-
 int Clip(int v, int l);
-
-// move
-
-int GetTypeOfMove(int mv);
-int GetPromotedPiece(int mv);
-Square GetFromSquare(int mv);
-Square GetToSquare(int mv);
-int CreateMove(Square f, Square t, int flag);
-bool IsMovePromotion(int mv);
-bool IsMoveNoisy(Position *pos, int move);
 
 void TryInterrupting(void);
 void DisplayPv(int score);
 
 int Evaluate(Position *pos, evalData * e);
-void EvalSinglePiece(Position *pos, evalData * e, Color c, int piece);
-int GetDrawMul(Position *pos, Color strong, Color weak);
 
 void InitLmr();
 void InitPst(void);
 int InputAvailable(void);
-void Iterate(Position *pos);
-std::string MoveToString(int move);
 Bitboard Random64(void);
 void ResetEngine(void);
-
-int Widen(Position *pos, int d, int lastScore);
-int Search(Position *pos, int ply, int a, int b, int d, bool wasNull);
-int Quiesce(Position *pos, int ply, int a, int b);
-int GetMoveType(Position *pos, int move, int ttMove);
-void ClearPvLine();
-void PrintRootInfo(int elapsed, int nps);
-
-int StringToMove(Position *pos, const std::string& moveString);
-void Think(Position *pos);
-int Timeout(void);
-void RefreshPv(int ply, int move);
 
 // diagnostics
 
 void PrintBoard(Position *pos);
-int Perft(Position* pos, int ply, int depth, bool isNoisy);
-
-// uci
-
-void UciLoop(void);
-bool ParseCommand(std::istringstream& stream, Position *pos);
-void OnUciCommand();
-void OnPositionCommand(std::istringstream& stream, Position *pos);
-void OnGoCommand(std::istringstream& stream, Position *pos);
-void OnSetOptionCommand(std::istringstream& stream);
-void OnPerftCommand(std::istringstream& stream, Position* p);
-
-std::string ToLower(const std::string& str);
-bool IsSameOrLowercase(const std::string& str1, const std::string& str2);
+Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy);
 
 extern int pvLine[PlyLimit + 2][PlyLimit + 2];
 extern int pvSize[PlyLimit + 2];

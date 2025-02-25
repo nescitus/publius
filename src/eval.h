@@ -1,5 +1,7 @@
 #pragma once
 
+void EvalSinglePiece(Position* pos, evalData* e, Color color, int piece);
+int GetDrawMul(Position* pos, Color strong, Color weak);
 
 const int mgPieceValue[6] = { 100, 400, 400, 600, 1300, 0 };
 const int egPieceValue[6] = { 100, 400, 400, 600, 1200, 0 };

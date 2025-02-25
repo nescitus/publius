@@ -1,5 +1,10 @@
 
 #include "publius.h"
+#include "bitgen.h"
+#include "mask.h"
+#include "piece.h"
+#include "square.h"
+#include "move.h"
 
 void Position::DoMove(int move, int ply) {
 

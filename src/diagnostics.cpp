@@ -1,4 +1,5 @@
 #include "publius.h"
+#include "move.h"
 
 void PrintBoard(Position* pos) {
 
@@ -25,12 +26,12 @@ void PrintBoard(Position* pos) {
         << std::endl;
 }
 
-int Perft(Position* pos, int ply, int depth, bool isNoisy) {
+Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
 
     int move = 0;
     MoveList list;
-    int localCount = 0;
-    int moveCount = 0;
+    Bitboard localCount = 0;
+    Bitboard moveCount = 0;
 
     list.Clear();
     FillCompleteList(pos, &list);

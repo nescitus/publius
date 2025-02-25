@@ -1,6 +1,7 @@
 // Publius 1.0. Didactic bitboard chess engine by Pawel Koziol
 
 #include "publius.h"
+#include "bitboard.h"
 
 const int bitTable[64] = {
     0,  1,  2,  7,  3, 13,  8, 19,

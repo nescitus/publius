@@ -1,4 +1,6 @@
 #include "publius.h"
+#include "move.h"
+#include "piece.h"
 
 void Position::UndoMove(int move, int ply) {
 

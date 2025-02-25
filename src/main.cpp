@@ -1,5 +1,10 @@
 #include "publius.h"
 #include "timer.h"
+#include "uci.h"
+#include "mask.h"
+#include "history.h"
+#include "trans.h"
+#include "bitgen.h"
 #include <stdio.h>
 
 sTimer Timer;

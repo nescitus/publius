@@ -1,6 +1,10 @@
 // Publius 1.0. Didactic bitboard chess engine by Pawel Koziol
 
 #include "publius.h"
+#include "bitboard.h"
+#include "mask.h"
+#include "bitgen.h"
+#include "piece.h"
 
 void AddPromotions(MoveList * list, Square fromSquare, Square toSquare) {
 

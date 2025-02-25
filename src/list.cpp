@@ -1,4 +1,7 @@
 #include "publius.h"
+#include "history.h"
+#include "move.h"
+#include "piece.h"
 
 void MoveList::SwapMoves(int i, int j) {
 
@@ -10,9 +13,9 @@ void MoveList::SwapMoves(int i, int j) {
     values[j] = tmpVal;
 }
 
-void MoveList::AddMove(Square f, Square t, int flag) {
+void MoveList::AddMove(Square fromSquare, Square toSquare, int flag) {
 
-	moves[ind] = (flag << 12) | (t << 6) | f;
+	moves[ind] = (flag << 12) | (toSquare << 6) | fromSquare;
 	ind++;
 }
 

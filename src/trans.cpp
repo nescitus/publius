@@ -1,4 +1,5 @@
 #include "publius.h"
+#include "trans.h"
 
 void TransTable::Allocate(int mbsize) {
 

@@ -1,4 +1,5 @@
 #include "publius.h"
+#include "square.h"
 
 // given rank and file, define square
 

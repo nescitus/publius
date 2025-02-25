@@ -2,6 +2,8 @@
 
 #include "publius.h"
 #include "eval.h"
+#include "piece.h"
+#include "square.h"
 
 void InitPst(void) {
 

@@ -1,4 +1,5 @@
 #include "publius.h"
+#include "piece.h"
 
 Color ColorOfPiece(int piece) {
 	return (Color)(piece & 1);

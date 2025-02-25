@@ -1,9 +1,10 @@
 #include "publius.h"
+#include "move.h"
+#include "search.h"
 
 int Quiesce(Position *pos, int ply, int alpha, int beta) {
 
-  int best, move;
-  int score;
+  int best, move, score;
   evalData e;
   MoveList list;
 

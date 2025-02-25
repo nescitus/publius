@@ -1,7 +1,12 @@
 #include <assert.h>
 #include <stdio.h>
 #include "publius.h"
+#include "bitboard.h"
+#include "bitgen.h"
 #include "eval.h"
+#include "mask.h"
+#include "piece.h"
+#include "square.h"
 
 // TODO: Params class 
 int mgTable[2][6][64];
@@ -64,19 +69,19 @@ int Evaluate(Position *pos, evalData *e) {
   return pos->GetSide() == White ? score : -score;
 }
 
-void EvalSinglePiece(Position *pos, evalData *e, Color side, int piece) {
+void EvalSinglePiece(Position *pos, evalData *e, Color color, int piece) {
 
     Bitboard b, file;
 
-    b = pos->Map(side, piece);
+    b = pos->Map(color, piece);
     
     while (b) {
         Square sq = PopFirstBit(&b);
         e->phase += phaseTable[piece];
-        e->mg[side] += mgPieceValue[piece];
-        e->eg[side] += egPieceValue[piece];
-        e->mg[side] += mgTable[side][piece][sq];
-        e->eg[side] += egTable[side][piece][sq];
+        e->mg[color] += mgPieceValue[piece];
+        e->eg[color] += egPieceValue[piece];
+        e->mg[color] += mgTable[color][piece][sq];
+        e->eg[color] += egTable[color][piece][sq];
 
         Bitboard mobility;
 
@@ -84,64 +89,64 @@ void EvalSinglePiece(Position *pos, evalData *e, Color side, int piece) {
 
             // passed pawn
 
-            if (!(Mask.passed[side][sq] & pos->Map(~side, Pawn))) {
-                e->mg[side] += passedBonus[side][RankOf(sq)];
-                e->eg[side] += (passedBonus[side][RankOf(sq)] * 5) / 4;
+            if (!(Mask.passed[color][sq] & pos->Map(~color, Pawn))) {
+                e->mg[color] += passedBonus[color][RankOf(sq)];
+                e->eg[color] += (passedBonus[color][RankOf(sq)] * 5) / 4;
             }
         }
 
         if (piece == Knight) {
             mobility = GenerateMoves.Knight(sq) &~pos->Occupied();
-            e->mg[side] += 4 * ( PopCnt(mobility) - 4);
-            e->eg[side] += 4 * ( PopCnt(mobility) - 4);
+            e->mg[color] += 4 * ( PopCnt(mobility) - 4);
+            e->eg[color] += 4 * ( PopCnt(mobility) - 4);
         }
 
         if (piece == Bishop) {
             mobility = GenerateMoves.Bish(pos->Occupied(), sq);
-            e->mg[side] += 5 * (PopCnt(mobility) - 6);
-            e->eg[side] += 5 * (PopCnt(mobility) - 6);
+            e->mg[color] += 5 * (PopCnt(mobility) - 6);
+            e->eg[color] += 5 * (PopCnt(mobility) - 6);
         }
 
         if (piece == Rook) {
             mobility = GenerateMoves.Rook(pos->Occupied(), sq);
-            e->mg[side] += 2 * (PopCnt(mobility) - 7);
-            e->eg[side] += 4 * (PopCnt(mobility) - 7);
+            e->mg[color] += 2 * (PopCnt(mobility) - 7);
+            e->eg[color] += 4 * (PopCnt(mobility) - 7);
 
             file = FillNorth(b) | FillSouth(b);
 
             // rook on a closed file
-            if (file & pos->Map(side, Pawn)) {
-                e->mg[side] -= 5;
-                e->eg[side] -= 5;
+            if (file & pos->Map(color, Pawn)) {
+                e->mg[color] -= 5;
+                e->eg[color] -= 5;
             }
             else
             {
                 // rook on a semi-open file
-                if (file & pos->Map(~side, Pawn)) {
-                    e->mg[side] += 5;
-                    e->eg[side] += 5;
+                if (file & pos->Map(~color, Pawn)) {
+                    e->mg[color] += 5;
+                    e->eg[color] += 5;
                 }
                 // rook on an open file
                 else
                 {
-                    e->mg[side] += 10;
-                    e->eg[side] += 10;
+                    e->mg[color] += 10;
+                    e->eg[color] += 10;
                 }
             }
         }
 
         if (piece == Queen) {
             mobility = GenerateMoves.Bish(pos->Occupied(), sq) | GenerateMoves.Rook(pos->Occupied(), sq);
-            e->mg[side] += 1 * (PopCnt(mobility) - 13);
-            e->eg[side] += 2 * (PopCnt(mobility) - 13);
+            e->mg[color] += 1 * (PopCnt(mobility) - 13);
+            e->eg[color] += 2 * (PopCnt(mobility) - 13);
         }
 
         if (piece == King) {
             mobility = GenerateMoves.King(sq);
-            e->mg[side] += 8 * PopCnt(mobility & pos->Map(side, Pawn));
+            e->mg[color] += 8 * PopCnt(mobility & pos->Map(color, Pawn));
 
-            mobility = ForwardOf(mobility, side);
-            e->mg[side] += 8 * PopCnt(mobility & pos->Map(side, Pawn));
+            mobility = ForwardOf(mobility, color);
+            e->mg[color] += 8 * PopCnt(mobility & pos->Map(color, Pawn));
         }
     }
 }

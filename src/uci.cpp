@@ -3,6 +3,11 @@
 #include <string.h>
 #include "publius.h"
 #include "timer.h"
+#include "history.h"
+#include "trans.h"
+#include "move.h"
+#include "search.h"
+#include "uci.h"
 #include <iostream>
 #include <sstream>
 

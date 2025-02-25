@@ -1,4 +1,6 @@
 #include "publius.h"
+#include "move.h"
+#include "history.h"
 
 void cHistory::Clear(void) 
 {

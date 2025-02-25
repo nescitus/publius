@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include "publius.h"
 #include "timer.h"
+#include "history.h"
+#include "search.h"
 
 int rootDepth;
 

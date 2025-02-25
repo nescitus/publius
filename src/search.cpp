@@ -3,9 +3,13 @@
 #include "math.h"
 #include "publius.h"
 #include "timer.h"
+#include "history.h"
+#include "trans.h"
+#include "move.h"
+#include "search.h"
 
 // stack to hold information necessary to undo moves
-Stack undoStack[stackSize];
+UndoStack undoStack[stackSize];
 
 // array keeping principal variation, used also to retrieve best move and ponder move
 int pvLine[PlyLimit + 2][PlyLimit + 2];

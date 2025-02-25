@@ -1,6 +1,8 @@
 // Publius 1.0. Didactic bitboard chess engine by Pawel Koziol
 
 #include "publius.h"
+#include "bitboard.h"
+#include "bitgen.h"
 
 void MoveGenerator::Init() {
 
