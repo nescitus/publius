@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <iostream>
+#include <sstream>
 #include "color.h"
 #include "square.h"
 #include "publius.h"
@@ -11,8 +12,6 @@
 #include "search.h"
 #include "uci.h"
 #include "eval.h"
-#include <iostream>
-#include <sstream>
 
 void UciLoop(void) {
 
@@ -49,7 +48,7 @@ bool ParseCommand(std::istringstream& stream, Position* pos) {
 
 void OnUciCommand() {
 
-    std::cout << "id name Publius 0.011" << std::endl;
+    std::cout << "id name Publius 0.012" << std::endl;
     std::cout << "id author Pawel Koziol" << std::endl;
     std::cout << "option name Hash type spin default 16 min 1 max 4096" << std::endl;
     std::cout << "option name Clear Hash type button" << std::endl;

@@ -81,9 +81,12 @@ void MoveList::ScoreMoves(Position * pos, int ply, int ttMove) {
                 }
                 // quiet move
                 else {
-                    // killer move
-                    if (moves[i] == History.GetKiller(ply))
+                    // first killer move
+                    if (moves[i] == History.GetKiller1(ply))
                         values[i] = IntLimit / 2;
+                    // second killer move
+                    else if (moves[i] == History.GetKiller2(ply))
+                        values[i] = IntLimit / 2 - 1;
                     // normal move
                     else
                         values[i] = History.Get(pos, moves[i]);

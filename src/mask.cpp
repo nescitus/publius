@@ -69,10 +69,6 @@ void MaskData::InitAdjacentMask() {
 
 void MaskData::InitSupportMask() {
 
-    for (int f = 0; f < 8; f++) {
-        adjacent[f] = WestOf(file[f]) | EastOf(file[f]);
-    }
-
     for (Square sq = A1; sq < 64; ++sq) {
         support[White][sq] = SidesOf(sq);
         support[White][sq] |= FillSouth(support[White][sq]);

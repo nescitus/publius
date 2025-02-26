@@ -11,7 +11,8 @@ void HistoryData::Clear(void)
             history[piece][square] = 0;
 
     for (int ply = 0; ply < PlyLimit; ply++) {
-        killer[ply] = 0;
+        killer1[ply] = 0;
+        killer2[ply] = 0;
     }
 }
 
@@ -24,26 +25,39 @@ void HistoryData::Trim(void)
 
 void HistoryData::Update(Position *pos, int move, int depth, int ply) 
 {
+    // history is updated only on quiet moves
     if (IsMoveNoisy(pos, move)) {
         return;
     }
 
-    killer[ply] = move;
+    // update killer move
+    if (move != killer2[ply]) {
+        killer2[ply] = killer1[ply];
+        killer1[ply] = move;
+    }
 
+    // gather data for updating history score
     Square fromSquare = GetFromSquare(move);
     Square toSquare = GetToSquare(move);
     int piece = pos->GetPiece(fromSquare);
 
+    // update history score
     history[piece][toSquare] += Inc(depth);
 
+    // prevent histoy scores from growing too high
     if (history[piece][toSquare] > HistLimit) {
         Trim();
     }
 }
 
-int HistoryData::GetKiller(int ply) 
+int HistoryData::GetKiller1(const int ply) 
 {
-    return killer[ply];
+    return killer1[ply];
+}
+
+int HistoryData::GetKiller2(const int ply)
+{
+    return killer2[ply];
 }
 
 int HistoryData::Get(Position *pos, int move) 
