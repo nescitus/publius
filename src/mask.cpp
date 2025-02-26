@@ -48,6 +48,14 @@ void MaskData::InitRanks() {
     file[fileF] = 0x2020202020202020ULL;
     file[fileG] = 0x4040404040404040ULL;
     file[fileH] = 0x8080808080808080ULL;
+
+    // relative rank
+
+    for (int i = 0; i < 8; i++) {
+        rr[White][i] = rank[i];
+        rr[Black][i] = rank[7 - i];
+    }
+
 }
 
 void MaskData::InitPassedMask() {

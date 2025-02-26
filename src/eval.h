@@ -7,7 +7,7 @@ void EvalBishop(Position* pos, EvalData* e, Color color);
 void EvalRook(Position* pos, EvalData* e, Color color);
 void EvalQueen(Position* pos, EvalData* e, Color color);
 void EvalKing(Position* pos, EvalData* e, Color color);
-void EvalAttacks(EvalData* e, Color color);
+void EvalKingAttacks(EvalData* e, Color color);
 int GetDrawMul(Position* pos, Color strong, Color weak);
 
 const int mgPieceValue[6] = {  93, 400, 401, 599, 1250, 0 };
@@ -21,16 +21,16 @@ const int passedBonusEg[2][8] = { { 0, 11, 11, 37, 62, 102, 155, 0 },
                                   { 0, 155, 102, 62, 37, 11, 11, 0 } };
 
 const int mgPawnPst[64] = {
- //A1                              H1
-  0,   0,   0,   0,   0,   0,   0,   0,
--10,  -2,  -4,  -1,   1,   5,  -1,  -7,
- -9,  -4,   4,   8,  10,   1,  -1,  -8,
--10,  -4,   8,  14,  12,   5,  -4, -10,
- -8,  -2,   2,  11,  13,   4,  -4, -10,
- -8,  -2,   4,   8,  10,   4,  -2,  -7,
- -8,  -4,   2,   8,   8,   2,  -4, -10,
-  0,   0,   0,   0,   0,   0,   0,   0,
-//A8                               H8
+    //A1                              H1
+     0,   0,   0,   0,   0,   0,   0,   0,
+   -10,  -2,  -6,  -1,   1,   5,  -1,  -7,
+    -9,  -4,   4,   8,  10,   1,  -1,  -8,
+   -10,  -4,   8,  14,  12,   5,  -4, -10,
+    -8,  -2,   2,  11,  13,   4,  -4, -10,
+    -8,  -2,   4,   8,  10,   4,  -2,  -7,
+    -8,  -4,   2,   8,   8,   2,  -4, -10,
+     0,   0,   0,   0,   0,   0,   0,   0,
+     //A8                               H8
 };
 
 const int egPawnPst[64] = {
@@ -43,6 +43,7 @@ const int egPawnPst[64] = {
   4,   2,   0,  -2,  -2,   0,   2,   4,
   0,   0,   0,   0,   0,   0,   0,   0,
 };
+
 
 const int mgKnightPst[64] = {
 -51, -39, -31, -29, -29, -29, -39, -51,
@@ -95,7 +96,7 @@ const int mgRookPst[64] = {
  -4,  -1,  -1,  -1,  -1,  -1,  -1,  -6,
  -5,  -1,   1,   1,  -1,  -1,   0,  -4,
  -4,   0,  -1,   1,   1,   1,   1,  -4,
-  5,   9,  11,  11,  10,  11,  11,   6,
+ -5,   1,   1,  1,    1,   1,   1,  -4,
   1,   1,   1,   1,   1,   1,   1,   1,
 };
 
@@ -106,7 +107,7 @@ const int egRookPst[64] = {
  -4,   0,   0,   0,  -1,  -1,  -1,  -6,
  -4,  -1,   1,   0,  -1,  -1,  -1,  -6,
  -4,   1,   1,   1,   0,   0,   0,  -6,
-  6,  11,  11,  11,   9,  11,  10,   4,
+ -4,   1,   1,   1,  -1,   1,   0,  -6,
   1,   1,   1,   1,   1,   1,   1,   1,
 };
 

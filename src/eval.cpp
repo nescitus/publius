@@ -15,14 +15,12 @@ int egTable[2][6][64];
 
 int Evaluate(Position *pos, EvalData *e) {
 
-    // Clear eval data
-
+    // Init eval data
     e->Clear();
     e->enemyKingZone[White] = GenerateMoves.King(pos->KingSq(Black));
     e->enemyKingZone[Black] = GenerateMoves.King(pos->KingSq(White));
 
     // Evaluate pieces and pawns
-
     for (Color color = White; color < colorNone; ++color) {
 
         // Bishops pair
@@ -30,6 +28,7 @@ int Evaluate(Position *pos, EvalData *e) {
             e->Add(color, 40, 60);
         }
 
+        // Piece eval
         EvalPawn(pos, e, color);
         EvalKnight(pos, e, color);
         EvalBishop(pos, e, color);
@@ -38,16 +37,15 @@ int Evaluate(Position *pos, EvalData *e) {
         EvalKing(pos, e, color);
     }
 
-    EvalAttacks(e, White);
-    EvalAttacks(e, Black);
+    // Finalize king attacks eval
+    EvalKingAttacks(e, White);
+    EvalKingAttacks(e, Black);
 
     // Sum all the eval factors
-
     int mgScore = e->mg[White] - e->mg[Black];
     int egScore = e->eg[White] - e->eg[Black];
 
     // Score interpolation
-
     int mgPhase = std::min(24, e->phase);
     int egPhase = 24 - mgPhase;
     int score = (((mgScore * mgPhase) + (egScore * egPhase)) / 24);
@@ -66,11 +64,9 @@ int Evaluate(Position *pos, EvalData *e) {
   score = (score * multiplier) / 64;
 
   // Make sure eval doesn't exceed mate score
-
   score = Clip(score, EvalLimit);
 
   // Return score relative to the side to move
-
   return pos->GetSide() == White ? score : -score;
 }
 
@@ -82,23 +78,22 @@ void EvalPawn(Position* pos, EvalData* e, Color color) {
 
     while (b) {
         Square sq = PopFirstBit(&b);
+
+        // Pawn material and piece/square table value
         EvalBasic(e, color, Pawn, sq);
 
         // Doubled pawn
-
         span = FrontSpan(Paint(sq), color);
         if (span & pos->Map(color, Pawn)) {
-            e->Add(color, -12, -9);
+            e->Add(color, -9, -9);
         }
 
         // Isolated pawn
-
-        if (!(Mask.adjacent[FileOf(sq)] & pos->Map(color, Pawn))) {
-            e->Add(color, -10, -20);
+        if ((Mask.adjacent[FileOf(sq)] & pos->Map(color, Pawn)) == 0) {
+            e->Add(color, -10, -18);
         }
 
         // Passed pawn
-
         if (!(Mask.passed[color][sq] & pos->Map(~color, Pawn))) {
             e->mg[color] += passedBonusMg[color][RankOf(sq)];
             e->eg[color] += passedBonusEg[color][RankOf(sq)];
@@ -108,18 +103,23 @@ void EvalPawn(Position* pos, EvalData* e, Color color) {
 
 void EvalKnight(Position* pos, EvalData* e, Color color) {
 
+    int pawnCount;
     Bitboard b, mobility;
 
     b = pos->Map(color,Knight);
 
     while (b) {
         Square sq = PopFirstBit(&b);
+
+        // Knight material and piece/square table value
         EvalBasic(e, color, Knight, sq);
 
+        // Knight mobility
         mobility = GenerateMoves.Knight(sq) & ~pos->Occupied();
         e->mg[color] += 4 * (PopCnt(mobility) - 4);
         e->eg[color] += 4 * (PopCnt(mobility) - 4);
 
+        // Knight attacks on the enemy king zone
         if (GenerateMoves.Knight(sq) & e->enemyKingZone[color])
             e->minorAttacks[color]++;
     }
@@ -127,43 +127,55 @@ void EvalKnight(Position* pos, EvalData* e, Color color) {
 
 void EvalBishop(Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, att, mobility;
+    Bitboard b, mobility, att;
 
     b = pos->Map(color, Bishop);
 
     while (b) {
         Square sq = PopFirstBit(&b);
+
+        // Bishop material and piece/square table value
         EvalBasic(e, color, Bishop, sq);
 
+        // Bishop mobility
         mobility = GenerateMoves.Bish(pos->Occupied(), sq);
         e->mg[color] += 5 * (PopCnt(mobility) - 6);
         e->eg[color] += 5 * (PopCnt(mobility) - 6);
 
+        // Bishop attacks on the enemy king zone
+        // including attacks through own queen
         att = GenerateMoves.Bish(pos->Occupied() ^ pos->Map(color, Queen), sq);
         if (att & e->enemyKingZone[color])
             e->minorAttacks[color]++;
     }
-
 }
 
 void EvalRook(Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, att, file, mobility;
+    Bitboard b, mobility, transparent, att, file;
 
     b = pos->Map(color, Rook);
 
     while (b) {
         Square sq = PopFirstBit(&b);
+
+        // Rook material and piece/square table value
         EvalBasic(e, color, Rook, sq);
 
+        // Rook mobility
         mobility = GenerateMoves.Rook(pos->Occupied(), sq);
         e->mg[color] += 2 * (PopCnt(mobility) - 7);
         e->eg[color] += 4 * (PopCnt(mobility) - 7);
 
-        att = GenerateMoves.Rook(pos->Occupied() ^ (pos->Map(color, Queen) | pos->Map(color, Rook)), sq);
+        // Rook's attacks on the enemy king's zone
+        // including attacks through own rook or queen
+        transparent = pos->Map(color, Queen) | pos->Map(color, Rook);
+
+        att = GenerateMoves.Rook(pos->Occupied() ^ transparent, sq);
         if (att & e->enemyKingZone[color])
             e->rookAttacks[color]++;
 
+        // Rook's file (closed, semi-open, open)
         file = FillNorth(b) | FillSouth(b);
 
         if (file & pos->Map(color, Pawn)) {
@@ -176,26 +188,45 @@ void EvalRook(Position* pos, EvalData* e, Color color) {
             else
                 e->Add(color, 12, 12); // rook on an open file
         }
+
+        // Rook on 7th rank attacking pawns or cutting off enemy king
+        if (Paint(sq) & Mask.rr[color][rank7]) {
+            if (pos->Map(~color, Pawn) & Mask.rr[color][rank7]
+                || pos->Map(~color, King) & Mask.rr[color][rank8]) {
+                e->Add(color, 12, 30);
+            }
+        }
     }
 }
 
 void EvalQueen(Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, att, mobility;
+    Bitboard b, mobility, att;
 
     b = pos->Map(color, Queen);
 
     while (b) {
         Square sq = PopFirstBit(&b);
+
+        // Queen material and piece/square table value
         EvalBasic(e, color, Queen, sq);
 
+        // Queen mobility
         mobility = GenerateMoves.Queen(pos->Occupied(), sq);
         e->mg[color] += 1 * (PopCnt(mobility) - 13);
         e->eg[color] += 2 * (PopCnt(mobility) - 13);
 
+        // Queen attacks on enemy king zone
+        // including attacks through own lesser pieces
+        // moving along the same ray
+
+        // diagonal attacks
         att = GenerateMoves.Bish(pos->Occupied() ^ pos->Map(color, Bishop), sq);
 
+        // straight line attacks
         att |= GenerateMoves.Rook(pos->Occupied() ^ pos->Map(color, Rook), sq);
+        
+        // mark the attack
         if (att & e->enemyKingZone[color])
             e->queenAttacks[color]++;
     }
@@ -209,6 +240,8 @@ void EvalKing(Position* pos, EvalData* e, Color color) {
 
     while (b) {
         Square sq = PopFirstBit(&b);
+        
+        // King piece/square table score
         EvalBasic(e, color, King, sq);
         
         // king's pawn shield
@@ -219,7 +252,6 @@ void EvalKing(Position* pos, EvalData* e, Color color) {
 
         mobility = ForwardOf(mobility, color);
         e->mg[color] += 8 * PopCnt(mobility & pos->Map(color, Pawn));
-
     }
 }
 
@@ -231,7 +263,7 @@ void EvalBasic(EvalData *e, const Color color, const int piece, const int sq) {
 
 }
 
-void EvalAttacks(EvalData* e, Color color) {
+void EvalKingAttacks(EvalData* e, Color color) {
 
     int result = 2 * e->queenAttacks[color] * e->rookAttacks[color] * e->minorAttacks[color];
     result += 17 * e->queenAttacks[color] * e->rookAttacks[color];
