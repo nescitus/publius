@@ -6,7 +6,7 @@
 #include "piece.h"
 #include "move.h"
 
-void Position::DoMove(int move, int ply) {
+void Position::DoMove(const int move, const int ply) {
 
     Color color = sideToMove;
     Square fromSquare = GetFromSquare(move);
@@ -104,7 +104,7 @@ void Position::DoMove(int move, int ply) {
     SwitchSide();
 }
 
-void Position::DoNull(int ply) {
+void Position::DoNull(const int ply) {
 
     // Save stuff
 

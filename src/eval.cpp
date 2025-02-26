@@ -76,13 +76,20 @@ int Evaluate(Position *pos, EvalData *e) {
 
 void EvalPawn(Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, file;
+    Bitboard b, span;
 
     b = pos->Map(color, Pawn);
 
     while (b) {
         Square sq = PopFirstBit(&b);
         EvalBasic(e, color, Pawn, sq);
+
+        // Doubled pawn
+
+        span = FrontSpan(Paint(sq), color);
+        if (span & pos->Map(color, Pawn)) {
+            e->Add(color, -12, -9);
+        }
 
         // Isolated pawn
 

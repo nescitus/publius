@@ -4,7 +4,7 @@
 #include "move.h"
 #include "piece.h"
 
-void Position::UndoMove(int move, int ply) {
+void Position::UndoMove(const int move, const int ply) {
 
     Color color = ~sideToMove;
     Square fromSquare = GetFromSquare(move);
@@ -61,7 +61,7 @@ void Position::UndoMove(int move, int ply) {
     sideToMove = ~sideToMove;
 }
 
-void Position::UndoNull(int ply) {
+void Position::UndoNull(const int ply) {
 
     enPassantSq = undoStack[ply].enPassantSq;
     boardHash = undoStack[ply].boardHash;

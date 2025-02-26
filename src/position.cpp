@@ -29,7 +29,7 @@ void Position::Clear() {
 	sideToMove = White;
 }
 
-void Position::Set(std::string str) {
+void Position::Set(const std::string str) {
 
 	Clear();
 	
@@ -201,28 +201,37 @@ void Position::ClearEnPassant() {
      }
 }
 
-void Position::MovePiece(Color color, int typeOfPiece, Square fromSquare, Square toSquare) {
+void Position::MovePiece(const Color color, 
+                         const int typeOfPiece, 
+                         const Square fromSquare, Square toSquare) {
 
      pieceLocation[fromSquare] = noPiece;
      pieceLocation[toSquare] = CreatePiece(color, typeOfPiece);
      pieceBitboard[color][typeOfPiece] ^= Paint(fromSquare, toSquare);
 }
 
-void Position::TakePiece(Color color, int typeOfPiece, Square square) {
+void Position::TakePiece(const Color color, 
+                         const int typeOfPiece, 
+                         const Square square) {
 
      pieceLocation[square] = noPiece;
      pieceBitboard[color][typeOfPiece] ^= Paint(square);
      pieceCount[color][typeOfPiece]--;
 }
 
-void Position::AddPiece(Color color, int typeOfPiece, Square square) {
+void Position::AddPiece(const Color color, 
+                        const int typeOfPiece, 
+                        const Square square) {
 
      pieceLocation[square] = CreatePiece(color,typeOfPiece);
      pieceBitboard[color][typeOfPiece] ^= Paint(square);
      pieceCount[color][typeOfPiece]++;
 }
 
-void Position::ChangePiece(int oldType, int newType, Color color, Square square) {
+void Position::ChangePiece(const int oldType, 
+                           const int newType, 
+                           const Color color, 
+                           const Square square) {
 
      pieceLocation[square] = CreatePiece(color, newType);
      pieceBitboard[color][oldType] ^= Paint(square);
@@ -293,32 +302,32 @@ bool Position::LeavesKingInCheck() {
     return (SquareIsAttacked(KingSq(~(sideToMove)), sideToMove) != 0);
 }
 
-int Position::SquareIsAttacked(Square square, Color color) {
+int Position::SquareIsAttacked(const Square sq, const Color color) {
 
-	return (Map(color, Pawn)  & GenerateMoves.Pawn(~color, square))
-		|| (Map(color, Knight)  & GenerateMoves.Knight(square))
-		|| (MapDiagonalMovers(color) & GenerateMoves.Bish(Occupied(), square))
-		|| (MapStraightMovers(color) & GenerateMoves.Rook(Occupied(), square))
-		|| (Map(color, King)  & GenerateMoves.King(square));
+	return (Map(color, Pawn)  & GenerateMoves.Pawn(~color, sq))
+		|| (Map(color, Knight)  & GenerateMoves.Knight(sq))
+		|| (MapDiagonalMovers(color) & GenerateMoves.Bish(Occupied(), sq))
+		|| (MapStraightMovers(color) & GenerateMoves.Rook(Occupied(), sq))
+		|| (Map(color, King)  & GenerateMoves.King(sq));
 }
 
 Color Position::GetSide() {
     return sideToMove;
 }
 
-int Position::GetPiece(Square square) {
+int Position::GetPiece(const Square square) {
     return pieceLocation[square];
 }
 
-int Position::GetMinorCount(Color color) {
+int Position::GetMinorCount(const Color color) {
     return GetCount(color, Knight) + GetCount(color, Bishop);
 }
 
-int Position::GetMajorCount(Color color) {
+int Position::GetMajorCount(const Color color) {
     return GetCount(color, Rook) + GetCount(color, Queen);
 }
 
-int Position::GetCount(Color color, int type) {
+int Position::GetCount(const Color color, const int type) {
     return pieceCount[color][type];
 }
 
@@ -326,11 +335,11 @@ int Position::GetAllPawnsCount() {
     return GetCount(White, Pawn) + GetCount(Black, Pawn);
 }
 
-Bitboard Position::Map(Color color, int piece) {
+Bitboard Position::Map(const Color color, const int piece) {
     return (pieceBitboard[color][piece]);
 }
 
-Bitboard Position::Map(Color color) {
+Bitboard Position::Map(const Color color) {
 
     return Map(color, Pawn) | Map(color, Knight) | Map(color, Bishop)
          | Map(color, Rook) | Map(color, Queen) | Map(color, King);
@@ -344,19 +353,19 @@ Bitboard Position::Empty() {
     return ~Occupied();
 }
 
-Bitboard Position::MapDiagonalMovers(Color color) {
+Bitboard Position::MapDiagonalMovers(const Color color) {
     return (Map(color, Bishop) | Map(color, Queen));
 }
 
-Bitboard Position::MapStraightMovers(Color color) {
+Bitboard Position::MapStraightMovers(const Color color) {
     return (Map(color, Rook) | Map(color, Queen));
 }
 
-int Position::PieceTypeOnSq(Square square) {
+int Position::PieceTypeOnSq(const Square square) {
     return TypeOfPiece(pieceLocation[square]);
 }
 
-Square Position::KingSq(Color color) {
+Square Position::KingSq(const Color color) {
     return kingSq[color];
 }
 
@@ -364,6 +373,6 @@ Square Position::EnPassantSq() {
     return enPassantSq;
 }
 
-bool Position::IsEmpty(Square sq) {
+bool Position::IsEmpty(const Square sq) {
     return (Occupied() & (Paint(sq) == 0));
 }
