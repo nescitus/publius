@@ -9,7 +9,7 @@
 #include "bitgen.h"
 #include <stdio.h>
 
-sTimer Timer;
+UCItimer Timer;
 MaskData Mask;
 EngineState State;
 MoveGenerator GenerateMoves;

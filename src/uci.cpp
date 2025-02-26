@@ -34,16 +34,15 @@ bool ParseCommand(std::istringstream& stream, Position* pos) {
     stream >> cmd;
 
     if (cmd == "isready") std::cout << "readyok" << std::endl;
-    else if (cmd == "quit") { return false; }
+    else if (cmd == "ucinewgame") OnNewGame();
     else if (cmd == "uci") OnUciCommand();
     else if (cmd == "position") OnPositionCommand(stream, pos);
     else if (cmd == "go") OnGoCommand(stream, pos);
     else if (cmd == "setoption") OnSetOptionCommand(stream);
     else if (cmd == "print") PrintBoard(pos);
     else if (cmd == "perft") OnPerftCommand(stream, pos);
-    
-    //else if (cmd == "step") OnStepCommand(stream, p);
-    //else if (cmd == "ucinewgame") OnNewGame();
+    else if (cmd == "step") OnStepCommand(stream, pos);
+    else if (cmd == "quit") { return false; }
 
     return true;
 }
@@ -83,6 +82,18 @@ void OnPositionCommand(std::istringstream& stream, Position* pos) {
     }
 }
 
+void OnStepCommand(std::istringstream& stream, Position* pos) {
+
+    std::string token;
+
+    for (bool found = true; stream >> token && found;)
+    {
+        char* moveChar = const_cast<char*>(token.c_str());
+        pos->DoMove(StringToMove(pos, moveChar), 0);
+        pos->TryMarkingIrreversible();
+    }
+}
+
 void OnGoCommand(std::istringstream& stream, Position* pos) {
 
     std::string param, read, moveStr, ponderStr;
@@ -103,11 +114,11 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
         }
         else if (param == "winc") {
             stream >> read;
-            Timer.SetData(wInc, std::stoi(read));
+            Timer.SetData(wIncrement, std::stoi(read));
         }
         else if (param == "binc") {
             stream >> read;
-            Timer.SetData(bInc, std::stoi(read));
+            Timer.SetData(bIncrement, std::stoi(read));
         }
         else if (param == "movestogo") {
             stream >> read;
@@ -124,6 +135,10 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
         else if (param == "movetime") {
             stream >> read;
             Timer.SetData(moveTime, std::stoi(read));
+        }
+        else if (param == "nodes") {
+            stream >> read;
+            Timer.SetData(maxNodes, std::stoi(read));
         }
 
         param.clear();
@@ -179,7 +194,7 @@ void OnPerftCommand(std::istringstream& stream, Position* p) {
         << moveCount << " positions" << std::endl;
 }
 
-void ResetEngine(void) {
+void OnNewGame(void) {
 
     History.Clear();
     TT.Clear();

@@ -13,23 +13,24 @@
 #  include <sys/time.h>
 #endif
 
-void sTimer::Clear(void) {
+void UCItimer::Clear(void) {
     SetData(maxDepth, 64);
     timeForMove = -1;
     SetData(wTime, -1);
     SetData(bTime, -1);
-    SetData(wInc, 0);
-    SetData(bInc, 0);
+    SetData(wIncrement, 0);
+    SetData(bIncrement, 0);
     SetData(moveTime, 0);
+    SetData(maxNodes, 0);
     SetData(movesToGo, 40);
     SetData(isInfinite, 0);
 }
 
-void sTimer::SetStartTime(void) {
+void UCItimer::SetStartTime(void) {
     startTime = Now();
 }
 
-void sTimer::SetMoveTiming(void) {
+void UCItimer::SetMoveTiming(void) {
 
     // User-defined time per move, no tricks available
 
@@ -49,6 +50,7 @@ void sTimer::SetMoveTiming(void) {
             data[engTime] -= std::min(1000, data[engTime] / 10);
         }
 
+        // calculate move time
         timeForMove = (data[engTime] + data[engInc] * (data[movesToGo] - 1)) / data[movesToGo];
 
         // while in time trouble, try to save a bit on increment
@@ -69,7 +71,7 @@ void sTimer::SetMoveTiming(void) {
     }
 }
 
-int sTimer::Now(void) {
+int UCItimer::Now(void) {
 
 #if defined(_WIN32) || defined(_WIN64)
 #if _WIN32_WINNT >= 0x0600 // Windows Vista or later
@@ -84,27 +86,27 @@ int sTimer::Now(void) {
 #endif
 }
 
-int sTimer::Elapsed(void) {
+int UCItimer::Elapsed(void) {
     return (Now() - startTime);
 }
 
-int sTimer::IsInfiniteMode(void) {
+int UCItimer::IsInfiniteMode(void) {
     return(data[isInfinite]);
 }
 
-int sTimer::TimeHasElapsed(void) {
+int UCItimer::TimeHasElapsed(void) {
     return (Elapsed() >= timeForMove);
 }
 
-int sTimer::GetData(int slot) {
+int UCItimer::GetData(const int slot) {
     return data[slot];
 }
 
-void sTimer::SetData(int slot, int val) {
+void UCItimer::SetData(const int slot, const int val) {
     data[slot] = val;
 }
 
-void sTimer::SetSideData(Color side) {
-    data[engTime] = (bool)(side == White) ? GetData(wTime) : GetData(bTime);
-    data[engInc] =  (bool)(side == White) ? GetData(wInc) : GetData(bInc);
+void UCItimer::SetSideData(const Color color) {
+    data[engTime] = (bool)(color == White) ? GetData(wTime) : GetData(bTime);
+    data[engInc] =  (bool)(color == White) ? GetData(wIncrement) : GetData(bIncrement);
 }

@@ -34,7 +34,7 @@ void HistoryData::Update(Position *pos, int move, int depth, int ply)
     Square toSquare = GetToSquare(move);
     int piece = pos->GetPiece(fromSquare);
 
-    history[piece][toSquare] += depth * depth;
+    history[piece][toSquare] += Inc(depth);
 
     if (history[piece][toSquare] > HistLimit) {
         Trim();
@@ -50,4 +50,8 @@ int HistoryData::Get(Position *pos, int move)
 {
     return history[pos->GetPiece(GetFromSquare(move))]
                   [GetToSquare(move)];
+}
+
+int HistoryData::Inc(const int depth) {
+    return depth * depth;
 }

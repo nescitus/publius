@@ -2,6 +2,7 @@ void UciLoop(void);
 bool ParseCommand(std::istringstream& stream, Position* pos);
 void OnUciCommand();
 void OnPositionCommand(std::istringstream& stream, Position* pos);
+void OnStepCommand(std::istringstream& stream, Position* pos);
 void OnGoCommand(std::istringstream& stream, Position* pos);
 void OnSetOptionCommand(std::istringstream& stream);
 void OnPerftCommand(std::istringstream& stream, Position* p);

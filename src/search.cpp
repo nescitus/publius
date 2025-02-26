@@ -306,6 +306,11 @@ void TryInterrupting(void)
         return;
     }
 
+    if (Timer.GetData(maxNodes) != 0) {
+        if (nodeCount >= Timer.GetData(maxNodes))
+            State.isStopping = true;
+    }
+
     if (InputAvailable()) {
  
         std::cin.getline(command, 4096);
