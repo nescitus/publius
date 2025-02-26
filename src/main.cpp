@@ -10,10 +10,10 @@
 #include <stdio.h>
 
 sTimer Timer;
-cMask Mask;
+MaskData Mask;
 EngineState State;
 MoveGenerator GenerateMoves;
-cHistory History;
+HistoryData History;
 TransTable TT;
 
 int main() 

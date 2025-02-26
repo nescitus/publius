@@ -16,62 +16,62 @@ void MoveGenerator::Init() {
    }
 }
 
-void MoveGenerator::InitPawnAttacks(Square square, Bitboard b) {
+void MoveGenerator::InitPawnAttacks(const Square sq, const Bitboard b) {
 
-    pawnAttacks[White][square] = GetWPAttacks(b);
-    pawnAttacks[Black][square] = GetBPAttacks(b);
+    pawnAttacks[White][sq] = GetWPAttacks(b);
+    pawnAttacks[Black][sq] = GetBPAttacks(b);
 }
 
-void MoveGenerator::InitKnightAttacks(Square square, Bitboard b) {
+void MoveGenerator::InitKnightAttacks(const Square sq, const Bitboard b) {
 
     Bitboard west = WestOf(b);
     Bitboard east = EastOf(b);
-    knightAttacks[square] = (east | west) << 16;
-    knightAttacks[square] |= (east | west) >> 16;
+    knightAttacks[sq] = (east | west) << 16;
+    knightAttacks[sq] |= (east | west) >> 16;
     west = WestOf(west);
     east = EastOf(east);
-    knightAttacks[square] |= NorthOf(east | west);
-    knightAttacks[square] |= SouthOf(east | west);
+    knightAttacks[sq] |= NorthOf(east | west);
+    knightAttacks[sq] |= SouthOf(east | west);
 }
 
-void MoveGenerator::InitKingAttacks(Square square, Bitboard b) {
+void MoveGenerator::InitKingAttacks(const Square sq, const Bitboard b) {
 
-    kingAttacks[square] = b;
-    kingAttacks[square] |= SidesOf(kingAttacks[square]);
-    kingAttacks[square] |= (NorthOf(kingAttacks[square]) | SouthOf(kingAttacks[square]));
-    kingAttacks[square] ^= Paint(square);
+    kingAttacks[sq] = b;
+    kingAttacks[sq] |= SidesOf(kingAttacks[sq]);
+    kingAttacks[sq] |= (NorthOf(kingAttacks[sq]) | SouthOf(kingAttacks[sq]));
+    kingAttacks[sq] ^= Paint(sq);
 }
 
-Bitboard MoveGenerator::Pawn(Color c, Square s) { 
-	return pawnAttacks[c][s]; 
+Bitboard MoveGenerator::Pawn(const Color color, const Square sq) { 
+	return pawnAttacks[color][sq]; 
 };
 
-Bitboard MoveGenerator::Knight(Square s) { 
-	return knightAttacks[s]; 
+Bitboard MoveGenerator::Knight(const Square sq) { 
+	return knightAttacks[sq]; 
 };
 
-Bitboard MoveGenerator::Bish(Bitboard o, Square s) {
+Bitboard MoveGenerator::Bish(const Bitboard occ, const Square sq) {
 
-    Bitboard b = Paint(s);
-    return NEOf(FillOcclNE(b, ~o))
-         | NWOf(FillOcclNW(b, ~o))
-         | SEOf(FillOcclSE(b, ~o))
-         | SWOf(FillOcclSW(b, ~o));
+    Bitboard b = Paint(sq);
+    return NEOf(FillOcclNE(b, ~occ))
+         | NWOf(FillOcclNW(b, ~occ))
+         | SEOf(FillOcclSE(b, ~occ))
+         | SWOf(FillOcclSW(b, ~occ));
 }
 
-Bitboard MoveGenerator::Rook(Bitboard o, Square s) {
+Bitboard MoveGenerator::Rook(const Bitboard occ, const Square sq) {
 
-    Bitboard b = Paint(s);
-    return NorthOf(FillOcclNorth(b, ~o))
-         | SouthOf(FillOcclSouth(b, ~o))
-         | EastOf(FillOcclEast(b, ~o))
-         | WestOf(FillOcclWest(b, ~o));
+    Bitboard b = Paint(sq);
+    return NorthOf(FillOcclNorth(b, ~occ))
+         | SouthOf(FillOcclSouth(b, ~occ))
+         | EastOf(FillOcclEast(b, ~occ))
+         | WestOf(FillOcclWest(b, ~occ));
 }
 
-Bitboard MoveGenerator::Queen(Bitboard o, Square s) {
-    return Bish(o, s) | Rook(o, s);
+Bitboard MoveGenerator::Queen(const Bitboard occ, const Square sq) {
+    return Bish(occ, sq) | Rook(occ, sq);
 }
 
-Bitboard MoveGenerator::King(Square s) { 
-	return kingAttacks[s]; 
+Bitboard MoveGenerator::King(const Square sq) { 
+	return kingAttacks[sq]; 
 };

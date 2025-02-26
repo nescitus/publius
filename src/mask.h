@@ -2,7 +2,7 @@
 
 // mask
 
-class cMask {
+class MaskData {
 private:
     void InitHashKeys();
     void InitRanks();
@@ -21,4 +21,4 @@ public:
     void Init();
 };
 
-extern cMask Mask;
+extern MaskData Mask;

@@ -1,13 +1,13 @@
 #pragma once
 
-void EvalBasic(evalData* e, Color color, int piece, int sq);
-void EvalPawn(Position* pos, evalData* e, Color color);
-void EvalKnight(Position* pos, evalData* e, Color color);
-void EvalBishop(Position* pos, evalData* e, Color color);
-void EvalRook(Position* pos, evalData* e, Color color);
-void EvalQueen(Position* pos, evalData* e, Color color);
-void EvalKing(Position* pos, evalData* e, Color color);
-void EvalAttacks(evalData* e, Color color);
+void EvalBasic(EvalData* e, const Color color, const int piece, const int sq);
+void EvalPawn(Position* pos, EvalData* e, Color color);
+void EvalKnight(Position* pos, EvalData* e, Color color);
+void EvalBishop(Position* pos, EvalData* e, Color color);
+void EvalRook(Position* pos, EvalData* e, Color color);
+void EvalQueen(Position* pos, EvalData* e, Color color);
+void EvalKing(Position* pos, EvalData* e, Color color);
+void EvalAttacks(EvalData* e, Color color);
 int GetDrawMul(Position* pos, Color strong, Color weak);
 
 const int mgPieceValue[6] = {  93, 400, 401, 599, 1250, 0 };
@@ -43,7 +43,6 @@ const int egPawnPst[64] = {
   4,   2,   0,  -2,  -2,   0,   2,   4,
   0,   0,   0,   0,   0,   0,   0,   0,
 };
-
 
 const int mgKnightPst[64] = {
 -51, -39, -31, -29, -29, -29, -39, -51,

@@ -2,7 +2,7 @@
 #include "square.h"
 #include "publius.h"
 
-void evalData::Clear() {
+void EvalData::Clear() {
     phase = 0;
     for (Color color = White; color < colorNone; ++color) {
         mg[color] = 0;
@@ -13,7 +13,7 @@ void evalData::Clear() {
     }
 }
 
-void evalData::Add(Color color, int mgVal, int egVal) {
+void EvalData::Add(Color color, int mgVal, int egVal) {
 	mg[color] += mgVal;
 	eg[color] += egVal;
 }

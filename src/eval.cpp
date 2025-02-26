@@ -13,7 +13,7 @@
 int mgTable[2][6][64];
 int egTable[2][6][64];
 
-int Evaluate(Position *pos, evalData *e) {
+int Evaluate(Position *pos, EvalData *e) {
 
     // Clear eval data
 
@@ -25,6 +25,7 @@ int Evaluate(Position *pos, evalData *e) {
 
     for (Color color = White; color < colorNone; ++color) {
 
+        // Bishops pair
         if (pos->GetCount(color, Bishop) == 2) {
             e->Add(color, 40, 60);
         }
@@ -73,7 +74,7 @@ int Evaluate(Position *pos, evalData *e) {
   return pos->GetSide() == White ? score : -score;
 }
 
-void EvalPawn(Position* pos, evalData* e, Color color) {
+void EvalPawn(Position* pos, EvalData* e, Color color) {
 
     Bitboard b, file;
 
@@ -89,7 +90,7 @@ void EvalPawn(Position* pos, evalData* e, Color color) {
             e->Add(color, -10, -20);
         }
 
-        // passed pawn
+        // Passed pawn
 
         if (!(Mask.passed[color][sq] & pos->Map(~color, Pawn))) {
             e->mg[color] += passedBonusMg[color][RankOf(sq)];
@@ -98,7 +99,7 @@ void EvalPawn(Position* pos, evalData* e, Color color) {
     }
 }
 
-void EvalKnight(Position* pos, evalData* e, Color color) {
+void EvalKnight(Position* pos, EvalData* e, Color color) {
 
     Bitboard b, mobility;
 
@@ -117,7 +118,7 @@ void EvalKnight(Position* pos, evalData* e, Color color) {
     }
 }
 
-void EvalBishop(Position* pos, evalData* e, Color color) {
+void EvalBishop(Position* pos, EvalData* e, Color color) {
 
     Bitboard b, att, mobility;
 
@@ -138,7 +139,7 @@ void EvalBishop(Position* pos, evalData* e, Color color) {
 
 }
 
-void EvalRook(Position* pos, evalData* e, Color color) {
+void EvalRook(Position* pos, EvalData* e, Color color) {
 
     Bitboard b, att, file, mobility;
 
@@ -171,7 +172,7 @@ void EvalRook(Position* pos, evalData* e, Color color) {
     }
 }
 
-void EvalQueen(Position* pos, evalData* e, Color color) {
+void EvalQueen(Position* pos, EvalData* e, Color color) {
 
     Bitboard b, att, mobility;
 
@@ -193,7 +194,7 @@ void EvalQueen(Position* pos, evalData* e, Color color) {
     }
 }
 
-void EvalKing(Position* pos, evalData* e, Color color) {
+void EvalKing(Position* pos, EvalData* e, Color color) {
 
     Bitboard b, mobility;
 
@@ -215,7 +216,7 @@ void EvalKing(Position* pos, evalData* e, Color color) {
     }
 }
 
-void EvalBasic(evalData *e, Color color, int piece, int sq) {
+void EvalBasic(EvalData *e, const Color color, const int piece, const int sq) {
 
     e->phase += phaseTable[piece];
     e->Add(color, mgPieceValue[piece], egPieceValue[piece]);
@@ -223,7 +224,7 @@ void EvalBasic(evalData *e, Color color, int piece, int sq) {
 
 }
 
-void EvalAttacks(evalData* e, Color color) {
+void EvalAttacks(EvalData* e, Color color) {
 
     int result = 2 * e->queenAttacks[color] * e->rookAttacks[color] * e->minorAttacks[color];
     result += 17 * e->queenAttacks[color] * e->rookAttacks[color];
@@ -248,6 +249,35 @@ int GetDrawMul(Position *pos, Color strong, Color weak) {
         if (pos->GetMajorCount(strong) == 0
         && pos->GetMinorCount(strong) <= 1)
             return 0;
+
+        // KR vs Km(p)
+
+        if (pos->GetCount(strong, Queen) == 0
+            && pos->GetCount(strong, Rook) == 1
+            && pos->GetMinorCount(strong) == 0
+            && pos->GetMajorCount(weak) == 0
+            && pos->GetMinorCount(weak) == 1
+            ) return 16;
+
+        // KRm vs KR(p)
+
+        if (pos->GetCount(strong, Queen) == 0
+            && pos->GetCount(strong, Rook) == 1
+            && pos->GetMinorCount(strong) == 1
+            && pos->GetCount(weak, Queen) == 0
+            && pos->GetCount(weak, Rook) == 1
+            && pos->GetMinorCount(weak) == 0
+            ) return 16;
+
+        // KQm vs KQ(p)
+
+        if (pos->GetCount(strong, Queen) == 1
+            && pos->GetCount(strong, Rook) == 0
+            && pos->GetMinorCount(strong) == 1
+            && pos->GetCount(weak, Queen) == 1
+            && pos->GetCount(weak, Rook) == 0
+            && pos->GetMinorCount(weak) == 0
+            ) return 16;
     }
 
     return 64;

@@ -16,22 +16,34 @@ const int bitTable[64] = {
    61, 22, 43, 51, 60, 42, 59, 58
 };
 
-Bitboard Paint(Square s) {
+// convert square(s) to a corresponding bitboard
+
+Bitboard Paint(const Square s) {
     return (Bitboard)1 << s;
 }
 
-Bitboard Paint(Square s1, Square s2) {
+Bitboard Paint(const Square s1, const Square s2) {
     return Paint(s1) | Paint(s2);
 }
 
-Bitboard Paint(Square s1, Square s2, Square s3) {
+Bitboard Paint(const Square s1, const Square s2, const Square s3) {
     return Paint(s1,s2) | Paint(s3);
 }
 
+// get the first bit of the bitboard
 Square FirstOne(Bitboard b) {
     return (Square)(bitTable[(((b) & (~(b)+1)) * (Bitboard)0x0218A392CD3D5DBF) >> 58]);
 }
 
+// return the first bit and clear it from the bitboard
+Square PopFirstBit(Bitboard* b) {
+
+    Bitboard bb = *b;
+    *b &= (*b - 1);
+    return FirstOne(bb);
+}
+
+// count 1's in the bitboard
 int PopCnt(Bitboard b) {
 
     Bitboard k1 = (Bitboard)0x5555555555555555;
@@ -45,68 +57,74 @@ int PopCnt(Bitboard b) {
     return (b * k4) >> 56;
 }
 
-Square PopFirstBit(Bitboard * b) {
+// Functions to shift a bitboard in the given direction.
+// They are named after cardinal directions and we assume
+// that white moves north, that is up the board,
+// like on a chess diagram.
 
-    Bitboard bb = *b;
-    *b &= (*b - 1);
-    return FirstOne(bb);
-}
-
-Bitboard NorthOf(Bitboard b) {
+Bitboard NorthOf(const Bitboard b) {
     return(b << 8);
 }
 
-Bitboard SouthOf(Bitboard b) {
+Bitboard SouthOf(const Bitboard b) {
     return (b >> 8);
 }
 
-Bitboard WestOf(Bitboard b) {
+Bitboard WestOf(const Bitboard b) {
     return ((b & excludeA) >> 1);
 }
 
-Bitboard EastOf(Bitboard b) {
+Bitboard EastOf(const Bitboard b) {
     return ((b & excludeH) << 1);
 }
 
-Bitboard NWOf(Bitboard b) {
+Bitboard NWOf(const Bitboard b) {
     return ((b & excludeA) << 7);
 }
 
-Bitboard NEOf(Bitboard b) {
+Bitboard NEOf(const Bitboard b) {
     return ((b & excludeH) << 9);
 }
 
-Bitboard SWOf(Bitboard b) {
+Bitboard SWOf(const Bitboard b) {
     return ((b & excludeA) >> 9);
 }
 
-Bitboard SEOf(Bitboard b) {
+Bitboard SEOf(const Bitboard b) {
     return ((b & excludeH) >> 7);
 }
 
-Bitboard GetWPAttacks(Bitboard b) {
+// get pawn bitboard attacks
+
+Bitboard GetWPAttacks(const Bitboard b) {
     return (NEOf(b) | NWOf(b));
 }
 
-Bitboard GetBPAttacks(Bitboard b) {
+Bitboard GetBPAttacks(const Bitboard b) {
     return (SEOf(b) | SWOf(b));
 }
 
-Bitboard SidesOf(Bitboard b) {
+// shift the bitboard to both sides
+Bitboard SidesOf(const Bitboard b) {
     return (WestOf(b) | EastOf(b));
 }
 
-Bitboard ForwardOf(Bitboard b, Color c) {
+// color-dependent forward shift
+Bitboard ForwardOf(const Bitboard b, const Color c) {
 
     if (c == White) return NorthOf(b);
     else return SouthOf(b);
 }
 
-Bitboard FrontSpan(Bitboard b, Color c)
+// color-dependent forward fill
+Bitboard FrontSpan(const Bitboard b, const Color c)
 {
     if (c == White) return FillNorth(NorthOf(b));
     else            return FillSouth(SouthOf(b));
 }
+
+// Basic fill function (north and south only,
+// as these are the most useful)
 
 Bitboard FillNorth(Bitboard b) {
     b |= b << 8;
@@ -124,6 +142,9 @@ Bitboard FillSouth(Bitboard b) {
 
 // Occluded fill algorithms are taken from
 // https://www.chessprogramming.org/Kogge-Stone_Algorithm#Occluded_Fill
+// they do multiple shifts, shifting both
+// the bitboard and the "shadow" cast
+// by the blocking pieces.
 
 Bitboard FillOcclSouth(Bitboard b, Bitboard o) {
 

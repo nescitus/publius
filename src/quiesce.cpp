@@ -7,7 +7,7 @@
 int Quiesce(Position *pos, int ply, int alpha, int beta) {
 
   int best, move, score;
-  evalData e;
+  EvalData e;
   MoveList list;
 
   // Statistics and attempt at quick exit

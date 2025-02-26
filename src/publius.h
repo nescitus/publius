@@ -113,7 +113,7 @@ extern EngineState State;
 
 // evalDdata
 
-class evalData {
+class EvalData {
 public:
 	int mg[2];
 	int eg[2];
@@ -156,7 +156,7 @@ int Clip(int v, int l);
 void TryInterrupting(void);
 void DisplayPv(int score);
 
-int Evaluate(Position *pos, evalData * e);
+int Evaluate(Position *pos, EvalData * e);
 
 void InitLmr();
 void InitPst(void);

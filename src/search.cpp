@@ -42,7 +42,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     int isInCheck, hashFlag, reduction, score, moveType;
     int move, ttMove, bestMove, movesTried, quietMovesTried;
     bool isRoot, isPv;
-    evalData e;
+    EvalData e;
     MoveList list;
 
     // Init

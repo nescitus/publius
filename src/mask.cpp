@@ -4,7 +4,7 @@
 #include "bitboard.h"
 #include "mask.h"
 
-void cMask::Init() {
+void MaskData::Init() {
 
     InitHashKeys();
     InitRanks();
@@ -13,7 +13,7 @@ void cMask::Init() {
     InitSupportMask();
 }
 
-void cMask::InitHashKeys() {
+void MaskData::InitHashKeys() {
 
     for (int piece = 0; piece < 12; piece++)
         for (Square square = A1; square < sqNone; ++square)
@@ -29,7 +29,7 @@ void cMask::InitHashKeys() {
     }
 }
 
-void cMask::InitRanks() {
+void MaskData::InitRanks() {
 
     rank[rank1] = 0x00000000000000FFULL;
     rank[rank2] = 0x000000000000FF00ULL;
@@ -50,7 +50,7 @@ void cMask::InitRanks() {
     file[fileH] = 0x8080808080808080ULL;
 }
 
-void cMask::InitPassedMask() {
+void MaskData::InitPassedMask() {
 
     for (Square s = A1; s < sqNone; ++s) {
         passed[White][s] = FillNorth(NorthOf(Paint(s)));
@@ -60,14 +60,14 @@ void cMask::InitPassedMask() {
     }
 }
 
-void cMask::InitAdjacentMask() {
+void MaskData::InitAdjacentMask() {
 
     for (int f = 0; f < 8; f++) {
         adjacent[f] = WestOf(file[f]) | EastOf(file[f]);
     }
 }
 
-void cMask::InitSupportMask() {
+void MaskData::InitSupportMask() {
 
     for (int f = 0; f < 8; f++) {
         adjacent[f] = WestOf(file[f]) | EastOf(file[f]);

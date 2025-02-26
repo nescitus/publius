@@ -1,6 +1,6 @@
 #pragma once
 
-class cHistory {
+class HistoryData {
 private:
 	int killer[PlyLimit];
 	int history[12][64];
@@ -12,4 +12,4 @@ public:
 	int GetKiller(int ply);
 };
 
-extern cHistory History;
+extern HistoryData History;

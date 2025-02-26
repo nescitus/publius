@@ -4,7 +4,7 @@
 #include "move.h"
 #include "history.h"
 
-void cHistory::Clear(void) 
+void HistoryData::Clear(void) 
 {
     for (int piece = 0; piece < 12; piece++)
         for (Square square = A1; square < sqNone; ++square)
@@ -15,14 +15,14 @@ void cHistory::Clear(void)
     }
 }
 
-void cHistory::Trim(void) 
+void HistoryData::Trim(void) 
 {
     for (int piece = 0; piece < 12; piece++)
         for (Square square = A1; square < sqNone; ++square)
             history[piece][square] /= 2;
 }
 
-void cHistory::Update(Position *pos, int move, int depth, int ply) 
+void HistoryData::Update(Position *pos, int move, int depth, int ply) 
 {
     if (IsMoveNoisy(pos, move)) {
         return;
@@ -41,12 +41,12 @@ void cHistory::Update(Position *pos, int move, int depth, int ply)
     }
 }
 
-int cHistory::GetKiller(int ply) 
+int HistoryData::GetKiller(int ply) 
 {
     return killer[ply];
 }
 
-int cHistory::Get(Position *pos, int move) 
+int HistoryData::Get(Position *pos, int move) 
 {
     return history[pos->GetPiece(GetFromSquare(move))]
                   [GetToSquare(move)];
