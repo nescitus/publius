@@ -3,6 +3,7 @@
 #include "publius.h"
 #include "bitgen.h"
 #include "mask.h"
+#include "hashdata.h"
 #include "piece.h"
 #include "move.h"
 
@@ -28,7 +29,7 @@ void Position::DoMove(const int move, const int ply) {
     // Capture enemy piece
 
     if (prey != noPieceType) {
-        boardHash ^= Mask.pieceKey[CreatePiece(~color, prey)][toSquare];
+        boardHash ^= Key.pieceKey[CreatePiece(~color, prey)][toSquare];
         TakePiece(~color, prey, toSquare);
     }
 
@@ -39,9 +40,9 @@ void Position::DoMove(const int move, const int ply) {
 
     // Update castling rights
 
-    boardHash ^= Mask.castleKey[castleFlags];
+    boardHash ^= Key.castleKey[castleFlags];
     castleFlags &= castleMask[fromSquare] & castleMask[toSquare];
-    boardHash ^= Mask.castleKey[castleFlags];
+    boardHash ^= Key.castleKey[castleFlags];
 
     // Clear en passant square
 
@@ -50,8 +51,8 @@ void Position::DoMove(const int move, const int ply) {
     // Move piece from the original square
 
     MovePiece(color, movingPiece, fromSquare, toSquare);
-    boardHash ^= Mask.pieceKey[CreatePiece(color, movingPiece)][fromSquare]
-              ^ Mask.pieceKey[CreatePiece(color, movingPiece)][toSquare];
+    boardHash ^= Key.pieceKey[CreatePiece(color, movingPiece)][fromSquare]
+              ^ Key.pieceKey[CreatePiece(color, movingPiece)][toSquare];
 
     // Update king location
 
@@ -71,7 +72,7 @@ void Position::DoMove(const int move, const int ply) {
         }
 
         MovePiece(color, Rook, fromSquare, toSquare);
-        boardHash ^= Mask.pieceKey[CreatePiece(color, Rook)][fromSquare] ^ Mask.pieceKey[CreatePiece(color, Rook)][toSquare];
+        boardHash ^= Key.pieceKey[CreatePiece(color, Rook)][fromSquare] ^ Key.pieceKey[CreatePiece(color, Rook)][toSquare];
     }
 
     // Remove pawn captured en passant
@@ -79,7 +80,7 @@ void Position::DoMove(const int move, const int ply) {
     if (moveType == tEnPassant) {
         toSquare = toSquare ^ 8;
         TakePiece(~color, Pawn, toSquare);
-        boardHash ^= Mask.pieceKey[CreatePiece(~color, Pawn)][toSquare];
+        boardHash ^= Key.pieceKey[CreatePiece(~color, Pawn)][toSquare];
     }
 
     // Set new en passant square
@@ -88,7 +89,7 @@ void Position::DoMove(const int move, const int ply) {
         toSquare = toSquare ^ 8;
         if (GenerateMoves.Pawn(color, toSquare) & (pieceBitboard[~color][Pawn])) {
             enPassantSq = toSquare;
-            boardHash ^= Mask.enPassantKey[FileOf(toSquare)];
+            boardHash ^= Key.enPassantKey[FileOf(toSquare)];
         }
     }
 
@@ -96,8 +97,8 @@ void Position::DoMove(const int move, const int ply) {
 
     if (IsMovePromotion(move)) {
         movingPiece = GetPromotedPiece(move);
-        boardHash ^= Mask.pieceKey[CreatePiece(color, Pawn)][toSquare]
-                   ^ Mask.pieceKey[CreatePiece(color, movingPiece)][toSquare];
+        boardHash ^= Key.pieceKey[CreatePiece(color, Pawn)][toSquare]
+                   ^ Key.pieceKey[CreatePiece(color, movingPiece)][toSquare];
         ChangePiece(Pawn, movingPiece, color, toSquare);
     }
 

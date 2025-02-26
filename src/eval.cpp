@@ -260,7 +260,6 @@ void EvalBasic(EvalData *e, const Color color, const int piece, const int sq) {
     e->phase += phaseTable[piece];
     e->Add(color, mgPieceValue[piece], egPieceValue[piece]);
     e->Add(color, mgTable[color][piece][sq], egTable[color][piece][sq]);
-
 }
 
 void EvalKingAttacks(EvalData* e, Color color) {

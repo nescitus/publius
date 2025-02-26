@@ -4,6 +4,7 @@
 #include "bitboard.h"
 #include "bitgen.h"
 #include "mask.h"
+#include "hashdata.h"
 #include "piece.h"
 
 void Position::Clear() {
@@ -174,12 +175,12 @@ Bitboard Position::CalculateHashKey() {
 
     for (Square s = A1; s < 64; ++s)
         if (pieceLocation[s] != noPiece)
-            key ^= Mask.pieceKey[pieceLocation[s]][s];
+            key ^= Key.pieceKey[pieceLocation[s]][s];
 
-    key ^= Mask.castleKey[castleFlags];
+    key ^= Key.castleKey[castleFlags];
 
     if (enPassantSq != sqNone)
-        key ^= Mask.enPassantKey[FileOf(enPassantSq)];
+        key ^= Key.enPassantKey[FileOf(enPassantSq)];
 
     if (sideToMove == Black)
         key ^= sideRandom;
@@ -196,7 +197,7 @@ void Position::SwitchSide() {
 void Position::ClearEnPassant() {
 
      if (enPassantSq != sqNone) {
-         boardHash ^= Mask.enPassantKey[FileOf(enPassantSq)];
+         boardHash ^= Key.enPassantKey[FileOf(enPassantSq)];
          enPassantSq = sqNone;
      }
 }
