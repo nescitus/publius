@@ -16,12 +16,14 @@ Functionalities up to date
 - mobility evaluation
 - rooks on open files
 - primitive king safety
-- passed pawns evaluation
+- passed pawns
+- isolated pawns
 - very primitive evaluation of king's pawn shield
 - very basic evaluation of non-winnable positions
 
 Additional commands:
 - in addition to "position startpos" there is "position kivipete" to test perft
+- "step" command, accepting one or more moves and changing position on the board
 
 Things to add if you want to contribute
 1. bench command
@@ -30,4 +32,4 @@ Things to add if you want to contribute
 4. with (2) and (3) in place staged move generator
 5. comments
 6. more sensible piece/square tables
-7. pawn weakness eval of any kind
+7. doubled and backward pawns
