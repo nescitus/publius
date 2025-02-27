@@ -1,8 +1,11 @@
 #include "color.h"
 #include "square.h"
 #include "publius.h"
-#include "bitboard.h"
 #include "hashdata.h"
+#include <random>
+
+std::mt19937_64 e2(2018);
+std::uniform_int_distribution<Bitboard> dist(std::llround(std::pow(2, 56)), std::llround(std::pow(2, 62)));
 
 void HashData::Init() {
 
@@ -18,4 +21,9 @@ void HashData::Init() {
     for (int i = 0; i < 8; i++) {
         enPassantKey[i] = Random64();
     }
+}
+
+Bitboard HashData::Random64(void) {
+    Bitboard result = dist(e2);
+    return result;
 }

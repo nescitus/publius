@@ -161,7 +161,6 @@ int Evaluate(Position *pos, EvalData * e);
 void InitLmr();
 void InitPst(void);
 int InputAvailable(void);
-Bitboard Random64(void);
 void OnNewGame(void);
 
 // diagnostics

@@ -169,6 +169,19 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
 
             newDepth = depth - 1;
 
+            // Late move pruning
+
+            if (depth <= 3 &&
+               !isPv && 
+               !isInCheck &&
+               !pos->IsInCheck() &&
+                moveType == moveQuiet && 
+                quietMovesTried > 4 * depth) 
+            {
+                pos->UndoMove(move, ply);
+                continue;
+            }
+
             // Late move reduction (LMR)
             
             if (depth > 1 && 
@@ -185,6 +198,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
 
                 if (reduction > 0) {
                     score = -Search(pos, ply + 1, -alpha - 1, -alpha, newDepth - reduction, false);
+                    
                     if (score <= alpha) {
                         pos->UndoMove(move, ply);
                         if (State.isStopping) return 0;

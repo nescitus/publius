@@ -1,8 +1,5 @@
 #define NOMINMAX
 
-#include <random>
-#include <cmath>
-#include <string.h>
 #if defined(_WIN32) || defined(_WIN64)
 #  include <windows.h>
 #else
@@ -13,14 +10,6 @@
 #include "square.h"
 #include "publius.h"
 #include "move.h"
-
-std::mt19937_64 e2(2018);
-std::uniform_int_distribution<Bitboard> dist(std::llround(std::pow(2, 56)), std::llround(std::pow(2, 62)));
-
-Bitboard Random64(void) {
-    Bitboard result = dist(e2);
-    return result;
-}
 
 // TODO: model after hakkapeliitta
 
