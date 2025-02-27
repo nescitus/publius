@@ -1,6 +1,10 @@
 #pragma once
 
-// transposition table
+// bound types
+
+enum eHashEntry { None, lowerBound, upperBound, exactEntry };
+
+// transposition table record
 
 typedef struct {
 	Bitboard key;
@@ -9,6 +13,8 @@ typedef struct {
 	unsigned char flags;
 	unsigned char depth;
 } hashRecord;
+
+// transposition table class
 
 class TransTable {
 private:

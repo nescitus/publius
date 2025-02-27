@@ -4,7 +4,7 @@
 #include "timer.h"
 #include "uci.h"
 #include "mask.h"
-#include "hashdata.h"
+#include "hashkeys.h"
 #include "history.h"
 #include "trans.h"
 #include "bitgen.h"
@@ -12,7 +12,8 @@
 
 UCItimer Timer;
 MaskData Mask;
-HashData Key;
+HashKeys Key;
+Parameters Params;
 EngineState State;
 MoveGenerator GenerateMoves;
 HistoryData History;
@@ -22,9 +23,9 @@ int main()
 {
   Mask.Init();
   Key.Init();
+  Params.Init();
   GenerateMoves.Init();
   InitLmr();
-  InitPst();
   State.Init();
   UciLoop();
   TT.Exit();

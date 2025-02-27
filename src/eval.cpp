@@ -1,5 +1,3 @@
-#include <assert.h>
-#include <stdio.h>
 #include "color.h"
 #include "square.h"
 #include "publius.h"
@@ -8,10 +6,6 @@
 #include "eval.h"
 #include "mask.h"
 #include "piece.h"
-
-// TODO: Params class 
-int mgTable[2][6][64];
-int egTable[2][6][64];
 
 int Evaluate(Position *pos, EvalData *e) {
 
@@ -259,7 +253,8 @@ void EvalBasic(EvalData *e, const Color color, const int piece, const int sq) {
 
     e->phase += phaseTable[piece];
     e->Add(color, mgPieceValue[piece], egPieceValue[piece]);
-    e->Add(color, mgTable[color][piece][sq], egTable[color][piece][sq]);
+    e->Add(color, Params.mgPst[color][piece][sq], 
+                  Params.egPst[color][piece][sq]);
 }
 
 void EvalKingAttacks(EvalData* e, Color color) {
@@ -274,49 +269,4 @@ void EvalKingAttacks(EvalData* e, Color color) {
     result -= 3 * e->minorAttacks[color];
 
     e->Add(color, 400 * result / 100, 0);
-}
-
-int GetDrawMul(Position *pos, Color strong, Color weak) {
-
-    // stronger side has no pawns
-    if (pos->GetCount(strong, Pawn) == 0) {
-
-        // With no pawns, a single minor piece 
-        // cannot win (KK, KBK, KNK, KBKP, KNKP)
-
-        if (pos->GetMajorCount(strong) == 0
-        && pos->GetMinorCount(strong) <= 1)
-            return 0;
-
-        // KR vs Km(p)
-
-        if (pos->GetCount(strong, Queen) == 0
-            && pos->GetCount(strong, Rook) == 1
-            && pos->GetMinorCount(strong) == 0
-            && pos->GetMajorCount(weak) == 0
-            && pos->GetMinorCount(weak) == 1
-            ) return 16;
-
-        // KRm vs KR(p)
-
-        if (pos->GetCount(strong, Queen) == 0
-            && pos->GetCount(strong, Rook) == 1
-            && pos->GetMinorCount(strong) == 1
-            && pos->GetCount(weak, Queen) == 0
-            && pos->GetCount(weak, Rook) == 1
-            && pos->GetMinorCount(weak) == 0
-            ) return 16;
-
-        // KQm vs KQ(p)
-
-        if (pos->GetCount(strong, Queen) == 1
-            && pos->GetCount(strong, Rook) == 0
-            && pos->GetMinorCount(strong) == 1
-            && pos->GetCount(weak, Queen) == 1
-            && pos->GetCount(weak, Rook) == 0
-            && pos->GetMinorCount(weak) == 0
-            ) return 16;
-    }
-
-    return 64;
 }

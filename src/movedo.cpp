@@ -3,7 +3,7 @@
 #include "publius.h"
 #include "bitgen.h"
 #include "mask.h"
-#include "hashdata.h"
+#include "hashkeys.h"
 #include "piece.h"
 #include "move.h"
 

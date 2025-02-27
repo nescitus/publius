@@ -19,7 +19,6 @@ enum eFile { fileA, fileB, fileC, fileD, fileE, fileF, fileG, fileH };
 enum eRank { rank1, rank2, rank3, rank4, rank5, rank6, rank7, rank8 };
 enum eMoveType { tNormal, tCastle, tEnPassant, tPawnjump, tPromN, tPromB, tPromR, tPromQ };
 enum eCastleFlag { wShortCastle = 1, wLongCastle = 2, bShortCastle = 4, bLongCastle = 8};
-enum eHashEntry { None, lowerBound, upperBound, exactEntry };
 enum eMoveFlag { moveQuiet, moveHash, moveNoisy};
 
 static constexpr auto sideRandom = ~((Bitboard)0);
@@ -40,6 +39,17 @@ typedef struct {
 
 static const int stackSize = 2048;
 extern UndoStack undoStack[stackSize];
+
+class Parameters {
+private:
+	void InitPst();
+public:
+	void Init();
+	int mgPst[2][6][64];
+	int egPst[2][6][64];
+};
+
+extern Parameters Params;
 
 // position
 
@@ -159,7 +169,6 @@ void DisplayPv(int score);
 int Evaluate(Position *pos, EvalData * e);
 
 void InitLmr();
-void InitPst(void);
 int InputAvailable(void);
 void OnNewGame(void);
 
@@ -170,10 +179,6 @@ Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy);
 
 extern int pvLine[PlyLimit + 2][PlyLimit + 2];
 extern int pvSize[PlyLimit + 2];
-
-// TODO: params class
-extern int mgTable[2][6][64];
-extern int egTable[2][6][64];
 
 extern const int bitTable[64];
 extern int rootDepth;
