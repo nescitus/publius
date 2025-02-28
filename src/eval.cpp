@@ -18,7 +18,7 @@ int Evaluate(Position *pos, EvalData *e) {
     for (Color color = White; color < colorNone; ++color) {
 
         // Bishops pair
-        if (pos->GetCount(color, Bishop) == 2) {
+        if (pos->Count(color, Bishop) == 2) {
             e->Add(color, 40, 60);
         }
 
@@ -61,7 +61,7 @@ int Evaluate(Position *pos, EvalData *e) {
   score = Clip(score, EvalLimit);
 
   // Return score relative to the side to move
-  return pos->GetSide() == White ? score : -score;
+  return pos->GetSideToMove() == White ? score : -score;
 }
 
 void EvalPawn(Position* pos, EvalData* e, Color color) {
@@ -121,7 +121,7 @@ void EvalKnight(Position* pos, EvalData* e, Color color) {
 
 void EvalBishop(Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, mobility, att;
+    Bitboard b, mobility, occ, att;
 
     b = pos->Map(color, Bishop);
 
@@ -138,7 +138,8 @@ void EvalBishop(Position* pos, EvalData* e, Color color) {
 
         // Bishop attacks on the enemy king zone
         // including attacks through own queen
-        att = GenerateMoves.Bish(pos->Occupied() ^ pos->Map(color, Queen), sq);
+        occ = pos->Occupied() ^ pos->Map(color, Queen);
+        att = GenerateMoves.Bish(occ, sq);
         if (att & e->enemyKingZone[color])
             e->minorAttacks[color]++;
     }
@@ -146,7 +147,7 @@ void EvalBishop(Position* pos, EvalData* e, Color color) {
 
 void EvalRook(Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, mobility, transparent, att, file;
+    Bitboard b, mobility, transparent, occ, att, file;
 
     b = pos->Map(color, Rook);
 
@@ -164,8 +165,8 @@ void EvalRook(Position* pos, EvalData* e, Color color) {
         // Rook's attacks on the enemy king's zone
         // including attacks through own rook or queen
         transparent = pos->Map(color, Queen) | pos->Map(color, Rook);
-
-        att = GenerateMoves.Rook(pos->Occupied() ^ transparent, sq);
+        occ = pos->Occupied() ^ transparent;
+        att = GenerateMoves.Rook(occ, sq);
         if (att & e->enemyKingZone[color])
             e->rookAttacks[color]++;
 
@@ -195,7 +196,7 @@ void EvalRook(Position* pos, EvalData* e, Color color) {
 
 void EvalQueen(Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, mobility, att;
+    Bitboard b, mobility, occ, att;
 
     b = pos->Map(color, Queen);
 
@@ -215,10 +216,12 @@ void EvalQueen(Position* pos, EvalData* e, Color color) {
         // moving along the same ray
 
         // diagonal attacks
-        att = GenerateMoves.Bish(pos->Occupied() ^ pos->Map(color, Bishop), sq);
+        occ = pos->Occupied() ^ pos->Map(color, Bishop);
+        att = GenerateMoves.Bish(occ, sq);
 
         // straight line attacks
-        att |= GenerateMoves.Rook(pos->Occupied() ^ pos->Map(color, Rook), sq);
+        occ = pos->Occupied() ^ pos->Map(color, Rook);
+        att |= GenerateMoves.Rook(occ, sq);
         
         // mark the attack
         if (att & e->enemyKingZone[color])
@@ -238,7 +241,7 @@ void EvalKing(Position* pos, EvalData* e, Color color) {
         // King piece/square table score
         EvalBasic(e, color, King, sq);
         
-        // king's pawn shield
+        // (sorry equivalent of) king's pawn shield
         // (pawns closer to the king are counted twice)
 
         mobility = GenerateMoves.King(sq);
