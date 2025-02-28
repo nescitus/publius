@@ -15,8 +15,6 @@ constexpr int HistLimit = (1 << 15);
 constexpr int PlyLimit = 64;
 constexpr int MovesLimit = 256;
 
-enum eFile { fileA, fileB, fileC, fileD, fileE, fileF, fileG, fileH };
-enum eRank { rank1, rank2, rank3, rank4, rank5, rank6, rank7, rank8 };
 enum eMoveType { tNormal, tCastle, tEnPassant, tPawnjump, tPromN, tPromB, tPromR, tPromQ };
 enum eCastleFlag { wShortCastle = 1, wLongCastle = 2, bShortCastle = 4, bLongCastle = 8};
 enum eMoveFlag { moveQuiet, moveHash, moveNoisy};
@@ -71,13 +69,14 @@ private:
 	void AddPiece(const Color color, const int typeOfPiece, const Square square);
 	void TakePiece(const Color color, const int typeOfPiece, const Square square);
 	void ChangePiece(const int oldType, const int newType, const Color color, const Square square);
+	
 	bool IsDrawBy50MoveRule();
 	bool IsDrawByRepetition();
 	bool IsDrawByInsufficientMaterial();
 public:
 	int castleFlags;
 	Bitboard boardHash;
-	int SquareIsAttacked(const Square sq, Color color);
+	bool SquareIsAttacked(const Square sq, Color color);
 	void Clear();
 	Bitboard CalculateHashKey();
 	void Set(const std::string str);
@@ -86,28 +85,29 @@ public:
 	void UndoMove(const int move, const int ply);
 	void UndoNull(const int ply);
 	bool IsDraw();
-	bool IsNullMoveOk(void);
-
-	Color GetSide();
+	bool CanTryNullMove(void);
+	Color GetSideToMove();
 	int GetPiece(const Square square);
-	int GetCount(const Color color, const int type);
-    int GetAllPawnsCount();
-    int GetMinorCount(const Color color);
-    int GetMajorCount(const Color color);
+	int Count(const Color color, const int type);
+    int CountAllPawns();
+    int CountMinors(const Color color);
+    int CountMajors(const Color color);
 	Bitboard Map(const Color color, const int piece);
 	Bitboard Map(const Color color);
 	Bitboard Occupied();
 	Bitboard Empty();
 	Bitboard MapDiagonalMovers(const Color color);
 	Bitboard MapStraightMovers(const Color color);
+	Bitboard MapPieceType(int pieceType);
 	int PieceTypeOnSq(const Square square);
 	Square KingSq(const Color color);
 	Square EnPassantSq();
 	bool IsInCheck();
 	bool LeavesKingInCheck();
 	void TryMarkingIrreversible(void);
-
 	bool IsEmpty(const Square sq);
+
+	bool IsPawnDefending(Color color, Square sq);
 };
 
 // state
@@ -144,19 +144,19 @@ private:
 	int values[MovesLimit];
 	int ind;
 	int get;
+	void AddPromotions(MoveList* list, Square fromSquare, Square toSquare);
+	void SwapMoves(const int i, const int j);
 public:
 	void Clear();
 	void AddMove(Square fromSquare, Square toSquare, int flag);
 	int GetInd();
 	int GetMove();
 	bool HasMore();
-	void SwapMoves(int i, int j);
 	void ScoreMoves(Position *pos, int ply, int ttMove);
 };
 
 // move generation
 
-void AddPromotions(MoveList *list, Square fromSquare, Square toSquare);
 void FillQuietList(Position *pos, MoveList *list);
 void FillNoisyList(Position *pos, MoveList *list);
 void FillCompleteList(Position *pos, MoveList *list);

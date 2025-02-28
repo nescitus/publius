@@ -241,24 +241,21 @@ void Position::ChangePiece(const int oldType,
      pieceCount[color][oldType]--;
 }
 
-bool Position::IsNullMoveOk() {
+bool Position::CanTryNullMove() {
 
-     return ((GetMinorCount(sideToMove) + GetMajorCount(sideToMove)) > 0);
+     return ((CountMinors(sideToMove) + CountMajors(sideToMove)) > 0);
 }
 
 bool Position::IsDraw() {
 
-    if (IsDrawBy50MoveRule()) {
+    if (IsDrawBy50MoveRule())
         return true;
-    }
 
-    if (IsDrawByRepetition()) {
+    if (IsDrawByRepetition())
         return true;
-    }
 
-    if (IsDrawByInsufficientMaterial()) {
+    if (IsDrawByInsufficientMaterial())
         return true;
-    }
 
 	return false;
 }
@@ -281,29 +278,27 @@ bool Position::IsDrawByRepetition() {
 bool Position::IsDrawByInsufficientMaterial() {
 
     if (!LeavesKingInCheck()) {
-        if (GetAllPawnsCount() + GetMajorCount(White) + GetMajorCount(Black) == 0
-        && GetMinorCount(White) + GetMinorCount(Black) <= 1) return true;
+        if (CountAllPawns() + CountMajors(White) + CountMajors(Black) == 0
+        && CountMinors(White) + CountMinors(Black) <= 1) return true;
     }
 
     return false;
 }
 
 void Position::TryMarkingIrreversible() {
-
-    if (reversibleMoves == 0) {
+    if (reversibleMoves == 0)
         repetitionIndex = 0;
-    }
 }
 
 bool Position::IsInCheck() {
-    return (SquareIsAttacked(KingSq(sideToMove), ~sideToMove));
+    return (SquareIsAttacked(KingSq(sideToMove), ~sideToMove) != 0);
 }
 
 bool Position::LeavesKingInCheck() {
     return (SquareIsAttacked(KingSq(~(sideToMove)), sideToMove) != 0);
 }
 
-int Position::SquareIsAttacked(const Square sq, const Color color) {
+bool Position::SquareIsAttacked(const Square sq, const Color color) {
 
 	return (Map(color, Pawn)  & GenerateMoves.Pawn(~color, sq))
 		|| (Map(color, Knight)  & GenerateMoves.Knight(sq))
@@ -312,7 +307,7 @@ int Position::SquareIsAttacked(const Square sq, const Color color) {
 		|| (Map(color, King)  & GenerateMoves.King(sq));
 }
 
-Color Position::GetSide() {
+Color Position::GetSideToMove() {
     return sideToMove;
 }
 
@@ -320,20 +315,20 @@ int Position::GetPiece(const Square square) {
     return pieceLocation[square];
 }
 
-int Position::GetMinorCount(const Color color) {
-    return GetCount(color, Knight) + GetCount(color, Bishop);
+int Position::CountMinors(const Color color) {
+    return Count(color, Knight) + Count(color, Bishop);
 }
 
-int Position::GetMajorCount(const Color color) {
-    return GetCount(color, Rook) + GetCount(color, Queen);
+int Position::CountMajors(const Color color) {
+    return Count(color, Rook) + Count(color, Queen);
 }
 
-int Position::GetCount(const Color color, const int type) {
+int Position::Count(const Color color, const int type) {
     return pieceCount[color][type];
 }
 
-int Position::GetAllPawnsCount() {
-    return GetCount(White, Pawn) + GetCount(Black, Pawn);
+int Position::CountAllPawns() {
+    return Count(White, Pawn) + Count(Black, Pawn);
 }
 
 Bitboard Position::Map(const Color color, const int piece) {
@@ -375,5 +370,13 @@ Square Position::EnPassantSq() {
 }
 
 bool Position::IsEmpty(const Square sq) {
-    return (Occupied() & (Paint(sq) == 0));
+    return (Occupied() & Paint(sq)) == 0;
+}
+
+bool Position::IsPawnDefending(Color color, Square sq) {
+
+    Bitboard defenders = (Map(White, Pawn) & GenerateMoves.Pawn(Black, sq)) |
+                         (Map(Black, Pawn) & GenerateMoves.Pawn(White, sq));
+
+    return ((defenders & Map(color, Pawn)) != 0);
 }

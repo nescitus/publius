@@ -103,7 +103,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     if (!wasNull
     && !isInCheck 
     && !isPv
-    &&  pos->IsNullMoveOk()) {
+    &&  pos->CanTryNullMove()) {
 
         eval = Evaluate(pos, &e);
 

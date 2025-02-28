@@ -38,7 +38,6 @@ void MaskData::InitRanks() {
         rr[White][i] = rank[i];
         rr[Black][i] = rank[7 - i];
     }
-
 }
 
 void MaskData::InitPassedMask() {

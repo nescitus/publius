@@ -5,7 +5,7 @@
 #include "move.h"
 #include "piece.h"
 
-void MoveList::SwapMoves(int i, int j) {
+void MoveList::SwapMoves(const int i, const int j) {
 
     int tmpMove = moves[i];
     int tmpVal = values[i];
@@ -77,7 +77,15 @@ void MoveList::ScoreMoves(Position * pos, int ply, int ttMove) {
 
                 // capture
                 if (prey != noPieceType) {
-                    values[i] = IntLimit / 2 + 100 + 10 * prey - mover;
+
+                    // this condition is just a placeholder for the proper
+                    // bad capture detection / SEE
+                    if (prey == Pawn && 
+                        mover != Pawn &&
+                        pos->IsPawnDefending(~pos->GetSideToMove(), toSquare ))
+                        values[i] = 0 + 100 + 10 * prey - mover;
+                    else
+                        values[i] = IntLimit / 2 + 100 + 10 * prey - mover;
                 }
                 // quiet move
                 else {
@@ -89,12 +97,13 @@ void MoveList::ScoreMoves(Position * pos, int ply, int ttMove) {
                         values[i] = IntLimit / 2 - 1;
                     // normal move
                     else
-                        values[i] = History.Get(pos, moves[i]);
+                        values[i] = History.GetScore(pos, moves[i]);
                 }
 			}
 
             // en passant capture
-			if (mType == tEnPassant) values[i] = IntLimit / 2 + 106;
+			if (mType == tEnPassant) 
+                values[i] = IntLimit / 2 + 106;
 
             // promotions
 			if (IsMovePromotion(moves[i])) {

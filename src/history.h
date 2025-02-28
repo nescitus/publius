@@ -10,7 +10,7 @@ private:
 public:
 	void Clear(void);
 	void Update(Position* pos, int mv, int d, int ply);
-	int Get(Position* pos, int mv);
+	int GetScore(Position* pos, int mv);
 	int GetKiller1(const int ply);
 	int GetKiller2(const int ply);
 };

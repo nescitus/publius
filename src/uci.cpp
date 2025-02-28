@@ -48,7 +48,7 @@ bool ParseCommand(std::istringstream& stream, Position* pos) {
 
 void OnUciCommand() {
 
-    std::cout << "id name Publius 0.017" << std::endl;
+    std::cout << "id name Publius 0.018" << std::endl;
     std::cout << "id author Pawel Koziol" << std::endl;
     std::cout << "option name Hash type spin default 16 min 1 max 4096" << std::endl;
     std::cout << "option name Clear Hash type button" << std::endl;
@@ -144,7 +144,7 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
         stream >> param;
     }
 
-    Timer.SetSideData(pos->GetSide());
+    Timer.SetSideData(pos->GetSideToMove());
     Timer.SetMoveTiming();
 
     pvLine[0][0] = 0; // clear engine move

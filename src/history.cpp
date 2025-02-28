@@ -60,7 +60,7 @@ int HistoryData::GetKiller2(const int ply)
     return killer2[ply];
 }
 
-int HistoryData::Get(Position *pos, int move) 
+int HistoryData::GetScore(Position *pos, int move) 
 {
     return history[pos->GetPiece(GetFromSquare(move))]
                   [GetToSquare(move)];

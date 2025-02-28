@@ -20,7 +20,7 @@ void FillNoisyList(Position *pos, MoveList * list) {
 
     Bitboard pieces, moves;
     Square fromSquare, toSquare;
-    Color color = pos->GetSide();
+    Color color = pos->GetSideToMove();
     Bitboard prey = pos->Map(~color);
 
     if (color == White) {
@@ -182,7 +182,7 @@ void FillQuietList(Position *pos, MoveList * list) {
 
     Bitboard pieces, moves;
     Square fromSquare, toSquare;
-    Color color = pos->GetSide();
+    Color color = pos->GetSideToMove();
 
     if (color == White) {
 
