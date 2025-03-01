@@ -60,15 +60,6 @@ int Quiesce(Position *pos, int ply, int alpha, int beta) {
 
 		  move = list.GetMove();
 
-		  // Delta pruning
-          // TODO: verify
-
-		  static const int delta[7] = { 400, 625, 625, 800, 1300, 0, 0 };
-
-          if (best + delta[pos->PieceTypeOnSq(GetToSquare(move))] < alpha) {
-              continue;
-          }
-
           // Make move, unless illegal
 
 		  pos->DoMove(move, ply);
