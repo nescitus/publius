@@ -107,6 +107,10 @@ public:
 	bool IsEmpty(const Square sq);
 
 	bool IsPawnDefending(Color color, Square sq);
+	Bitboard AttacksTo(const Square sq);
+	Bitboard AllStraightMovers();
+	Bitboard AllDiagMovers();
+	Bitboard MapPieceType(const int pieceType);
 };
 
 // state

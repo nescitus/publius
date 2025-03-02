@@ -100,10 +100,11 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
 
     // Node-level pruning
 
-    if (!wasNull
-    && !isInCheck 
-    && !isPv
-    &&  pos->CanTryNullMove()) {
+    if (!wasNull &&
+       !isInCheck &&
+       !isPv &&
+        pos->CanTryNullMove()) 
+    {
 
         eval = Evaluate(pos, &e);
 

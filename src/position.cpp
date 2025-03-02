@@ -380,3 +380,26 @@ bool Position::IsPawnDefending(Color color, Square sq) {
 
     return ((defenders & Map(color, Pawn)) != 0);
 }
+
+Bitboard Position::MapPieceType(const int pieceType) {
+    return pieceBitboard[White][pieceType] |
+        pieceBitboard[Black][pieceType];
+}
+
+Bitboard Position::AllDiagMovers() {
+    return MapPieceType(Bishop) | MapPieceType(Queen);
+}
+
+Bitboard Position::AllStraightMovers() {
+    return MapPieceType(Rook) | MapPieceType(Queen);
+}
+
+Bitboard Position::AttacksTo(const Square sq) {
+
+    return (Map(White, Pawn) & GenerateMoves.Pawn(Black, sq)) |
+        (Map(Black, Pawn) & GenerateMoves.Pawn(White, sq)) |
+        (MapPieceType(Knight) & GenerateMoves.Knight(sq)) |
+        ((AllDiagMovers()) & GenerateMoves.Bish(Occupied(), sq)) |
+        ((AllStraightMovers()) & GenerateMoves.Rook(Occupied(), sq)) |
+        (MapPieceType(King) & GenerateMoves.King(sq));
+}
