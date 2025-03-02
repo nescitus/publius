@@ -1,5 +1,6 @@
 #include "color.h"
 #include "square.h"
+#include <iostream>
 
 // step through squares, usually in a "for" loop
 Square operator++(Square& d) { 
@@ -47,4 +48,12 @@ Square InvertSquare(const Square square) {
 // - RelativeSquare(Black, C2) is C7
 Square RelativeSq(const Color color, const Square square) {
     return square ^ (color * 56);
+}
+
+std::string SquareName(Square sq) {
+    
+    std::string result;
+    result += FileOf(sq) + 'a';
+    result += RankOf(sq) + '1';
+    return result;
 }

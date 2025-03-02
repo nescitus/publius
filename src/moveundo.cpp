@@ -9,7 +9,7 @@ void Position::UndoMove(const int move, const int ply) {
     Color color = ~sideToMove;
     Square fromSquare = GetFromSquare(move);
     Square toSquare = GetToSquare(move);
-    int mover = TypeOfPiece(pieceLocation[toSquare]);
+    int hunter = TypeOfPiece(pieceLocation[toSquare]);
     int prey = undoStack[ply].prey;
     int moveType = GetTypeOfMove(move);
 
@@ -19,11 +19,11 @@ void Position::UndoMove(const int move, const int ply) {
     boardHash = undoStack[ply].boardHash;
     repetitionIndex--;
 
-    MovePiece(color, mover, toSquare, fromSquare);
+    MovePiece(color, hunter, toSquare, fromSquare);
 
     // Update king location
 
-    if (mover == King) {
+    if (hunter == King) {
         kingSq[color] = fromSquare;
     }
 
@@ -53,7 +53,7 @@ void Position::UndoMove(const int move, const int ply) {
     // Change promoted piece back to pawn
 
     if (IsMovePromotion(move)) {
-        ChangePiece(mover, Pawn, color, fromSquare);
+        ChangePiece(hunter, Pawn, color, fromSquare);
     }
 
     // Switch side

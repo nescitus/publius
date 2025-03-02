@@ -57,7 +57,7 @@ bool MoveList::HasMore() {
 void MoveList::ScoreMoves(Position * pos, int ply, int ttMove) {
 
 	Square fromSquare, toSquare;
-	int mType, mover, prey;
+	int mType, hunter, prey;
 
 	for (int i = 0; i < ind; i++) {
         // hash move
@@ -72,20 +72,16 @@ void MoveList::ScoreMoves(Position * pos, int ply, int ttMove) {
 
 				fromSquare = GetFromSquare(moves[i]);
 				toSquare = GetToSquare(moves[i]);
-				mover = pos->PieceTypeOnSq(fromSquare);
+				hunter = pos->PieceTypeOnSq(fromSquare);
 				prey = pos->PieceTypeOnSq(toSquare);
 
                 // capture
                 if (prey != noPieceType) {
 
-                    // this condition is just a placeholder for the proper
-                    // bad capture detection / SEE
-                    if (prey == Pawn && 
-                        mover != Pawn &&
-                        pos->IsPawnDefending(~pos->GetSideToMove(), toSquare ))
-                        values[i] = 0 + 100 + 10 * prey - mover;
+                    if (IsBadCapture(pos, moves[i]))
+                        values[i] = 0 + 100 + 10 * prey - hunter;
                     else
-                        values[i] = IntLimit / 2 + 100 + 10 * prey - mover;
+                        values[i] = IntLimit / 2 + 100 + 10 * prey - hunter;
                 }
                 // quiet move
                 else {

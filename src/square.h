@@ -5,6 +5,7 @@ Type safety is explained in color.h
 */
 
 #pragma once
+#include <iostream>
 
 enum eFile { fileA, fileB, fileC, fileD, fileE, fileF, fileG, fileH };
 enum eRank { rank1, rank2, rank3, rank4, rank5, rank6, rank7, rank8 };
@@ -42,3 +43,4 @@ int RankOf(const Square square);
 int FileOf(const Square square);
 Square InvertSquare(const Square square);
 Square RelativeSq(const Color color, const Square square);
+std::string SquareName(Square sq);

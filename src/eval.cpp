@@ -164,7 +164,7 @@ void EvalRook(Position* pos, EvalData* e, Color color) {
 
         // Rook's attacks on the enemy king's zone
         // including attacks through own rook or queen
-        transparent = pos->Map(color, Queen) | pos->Map(color, Rook);
+        transparent = pos->MapStraightMovers(color);
         occ = pos->Occupied() ^ transparent;
         att = GenerateMoves.Rook(occ, sq);
         if (att & e->enemyKingZone[color])
@@ -196,7 +196,7 @@ void EvalRook(Position* pos, EvalData* e, Color color) {
 
 void EvalQueen(Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, mobility, occ, att;
+    Bitboard b, mobility, transparent, occ, att;
 
     b = pos->Map(color, Queen);
 
@@ -216,14 +216,16 @@ void EvalQueen(Position* pos, EvalData* e, Color color) {
         // moving along the same ray
 
         // diagonal attacks
-        occ = pos->Occupied() ^ pos->Map(color, Bishop);
+        transparent = pos->Map(color, Bishop);
+        occ = pos->Occupied() ^ transparent;
         att = GenerateMoves.Bish(occ, sq);
 
         // straight line attacks
-        occ = pos->Occupied() ^ pos->Map(color, Rook);
+        transparent = pos->Map(color, Rook);
+        occ = pos->Occupied() ^ transparent;
         att |= GenerateMoves.Rook(occ, sq);
         
-        // mark the attack
+        // register the attack
         if (att & e->enemyKingZone[color])
             e->queenAttacks[color]++;
     }

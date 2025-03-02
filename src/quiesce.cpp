@@ -60,6 +60,9 @@ int Quiesce(Position *pos, int ply, int alpha, int beta) {
 
 		  move = list.GetMove();
 
+          if (IsBadCapture(pos, move))
+              continue;
+
           // Make move, unless illegal
 
 		  pos->DoMove(move, ply);

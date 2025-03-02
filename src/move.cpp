@@ -38,12 +38,8 @@ bool IsMoveNoisy(Position *pos, int move) {
 std::string MoveToString(int move) {
 
     static const char prom_char[5] = "nbrq";
-    std::string move_str;
-
-    move_str += FileOf(GetFromSquare(move)) + 'a';
-    move_str += RankOf(GetFromSquare(move)) + '1';
-    move_str += FileOf(GetToSquare(move)) + 'a';
-    move_str += RankOf(GetToSquare(move)) + '1';
+    std::string move_str = SquareName(GetFromSquare(move))
+                         + SquareName(GetToSquare(move));
 
     if (IsMovePromotion(move)) {
         move_str += prom_char[(move >> 12) & 3];

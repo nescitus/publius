@@ -12,7 +12,7 @@ void Position::DoMove(const int move, const int ply) {
     Color color = sideToMove;
     Square fromSquare = GetFromSquare(move);
     Square toSquare = GetToSquare(move);
-    int movingPiece = TypeOfPiece(pieceLocation[fromSquare]);
+    int hunter = TypeOfPiece(pieceLocation[fromSquare]);
     int prey = TypeOfPiece(pieceLocation[toSquare]);
     int moveType = GetTypeOfMove(move);
 
@@ -35,7 +35,7 @@ void Position::DoMove(const int move, const int ply) {
 
     // Update reversible moves counter
 
-    if (movingPiece == Pawn || prey != noPieceType) reversibleMoves = 0;
+    if (hunter == Pawn || prey != noPieceType) reversibleMoves = 0;
     else                                            reversibleMoves++;
 
     // Update castling rights
@@ -50,13 +50,13 @@ void Position::DoMove(const int move, const int ply) {
 
     // Move piece from the original square
 
-    MovePiece(color, movingPiece, fromSquare, toSquare);
-    boardHash ^= Key.pieceKey[CreatePiece(color, movingPiece)][fromSquare]
-              ^ Key.pieceKey[CreatePiece(color, movingPiece)][toSquare];
+    MovePiece(color, hunter, fromSquare, toSquare);
+    boardHash ^= Key.pieceKey[CreatePiece(color, hunter)][fromSquare]
+              ^ Key.pieceKey[CreatePiece(color, hunter)][toSquare];
 
     // Update king location
 
-    if (movingPiece == King) {
+    if (hunter == King) {
         kingSq[color] = toSquare;
     }
 
@@ -96,10 +96,10 @@ void Position::DoMove(const int move, const int ply) {
     // Promotion
 
     if (IsMovePromotion(move)) {
-        movingPiece = GetPromotedPiece(move);
+        hunter = GetPromotedPiece(move);
         boardHash ^= Key.pieceKey[CreatePiece(color, Pawn)][toSquare]
-                   ^ Key.pieceKey[CreatePiece(color, movingPiece)][toSquare];
-        ChangePiece(Pawn, movingPiece, color, toSquare);
+                   ^ Key.pieceKey[CreatePiece(color, hunter)][toSquare];
+        ChangePiece(Pawn, hunter, color, toSquare);
     }
 
     SwitchSide();

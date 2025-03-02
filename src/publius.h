@@ -98,7 +98,6 @@ public:
 	Bitboard Empty();
 	Bitboard MapDiagonalMovers(const Color color);
 	Bitboard MapStraightMovers(const Color color);
-	Bitboard MapPieceType(int pieceType);
 	int PieceTypeOnSq(const Square square);
 	Square KingSq(const Color color);
 	Square EnPassantSq();
@@ -160,6 +159,8 @@ public:
 void FillQuietList(Position *pos, MoveList *list);
 void FillNoisyList(Position *pos, MoveList *list);
 void FillCompleteList(Position *pos, MoveList *list);
+
+bool IsBadCapture(Position* pos, int move);
 
 int Clip(int v, int l);
 
