@@ -1,5 +1,6 @@
 #include "color.h"
 #include "square.h"
+#include "limits.h"
 #include "publius.h"
 #include "piece.h"
 

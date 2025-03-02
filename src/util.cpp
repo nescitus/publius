@@ -8,6 +8,7 @@
 #endif
 #include "color.h"
 #include "square.h"
+#include "limits.h"
 #include "publius.h"
 #include "move.h"
 
@@ -49,16 +50,6 @@ int InputAvailable(void) {
     select(STDIN_FILENO + 1, &readfds, NULL, NULL, &tv);
     return FD_ISSET(STDIN_FILENO, &readfds);
 #endif
-}
-
-void RefreshPv(int ply, int move) {
-
-    pvLine[ply][ply] = move;
-
-    for (int j = ply + 1; j < pvSize[ply + 1]; ++j)
-        pvLine[ply][j] = pvLine[ply + 1][j];
-
-    pvSize[ply] = pvSize[ply + 1];
 }
 
 int Clip(int v, int l) {

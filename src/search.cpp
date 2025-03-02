@@ -1,40 +1,21 @@
 #include <stdio.h>
 #include <string.h>
-#include "math.h"
 #include "color.h"
 #include "square.h"
+#include "limits.h"
 #include "publius.h"
 #include "timer.h"
 #include "history.h"
 #include "trans.h"
 #include "move.h"
+#include "lmr.h"
+#include "pv.h"
 #include "search.h"
 
 // stack to hold information necessary to undo moves
 UndoStack undoStack[stackSize];
 
-// array keeping principal variation, used also to retrieve best move and ponder move
-int pvLine[PlyLimit + 2][PlyLimit + 2];
-int pvSize[PlyLimit + 2];
-
-int lmr[2][64][64];
-
 Bitboard nodeCount;
-
-void InitLmr() {
-
-    // Set depth of late move reduction
-
-    for (int depth = 0; depth < 64; depth++)
-        for (int moves = 0; moves < 64; moves++) {
-
-            int r = log(depth) * log(moves) / 2;
-            if (depth == 0 || moves == 0) r = 0;
-
-            lmr[0][depth][moves] = r + 1; // zero window node
-            lmr[1][depth][moves] = r;     // principal variation node
-        }
-}
 
 int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull) {
 
@@ -65,7 +46,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
 
     nodeCount++;
     TryInterrupting();
-    pvSize[ply] = ply;
+    Pv.size[ply] = ply;
 
     // Quick exit on a timeout
 
@@ -144,7 +125,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     // Calculate moves' scores to sort them
 
     if (isRoot) 
-        list.ScoreMoves(pos, ply, pvLine[0][0]);
+        list.ScoreMoves(pos, ply, Pv.line[0][0]);
     else      
         list.ScoreMoves(pos, ply, ttMove);
 
@@ -199,9 +180,9 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
                !isInCheck && 
                !pos->IsInCheck())
             {   
-                reduction = lmr[isPv]
-                               [std::min(depth,63)]
-                               [std::min(movesTried, 63)];
+                reduction = Lmr.table[isPv]
+                                     [std::min(depth,63)]
+                                     [std::min(movesTried, 63)];
                 if (reduction >= newDepth)
                     reduction = newDepth - 1;
 
@@ -241,7 +222,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
                 // change the best move
 
                 if (isRoot) {
-                    RefreshPv(ply, move);
+                    Pv.Refresh(ply, move);
                     DisplayPv(score);
                 }
 
@@ -255,7 +236,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
                 if (score > alpha) {
                     alpha = score;
                     bestMove = move;
-                    RefreshPv(ply, move);
+                    Pv.Refresh(ply, move);
                     if (isRoot) {
                         DisplayPv(score);
                     }
@@ -313,8 +294,8 @@ void DisplayPv(int score) {
               << " score "
               << scoreType << " " << score << " pv";
 
-    for (int j = 0; j < pvSize[0]; ++j) {
-        std::cout << " " << MoveToString(pvLine[0][j]);
+    for (int j = 0; j < Pv.size[0]; ++j) {
+        std::cout << " " << MoveToString(Pv.line[0][j]);
     }
 
     std::cout << std::endl;
@@ -350,11 +331,8 @@ void TryInterrupting(void)
     }
 }
 
-int Timeout() 
-{
-#ifdef USE_TUNING
-    return false;
-#endif
+int Timeout() {
+
     return (!State.isPondering && 
             !Timer.IsInfiniteMode() && 
             Timer.TimeHasElapsed());

@@ -5,16 +5,6 @@ typedef unsigned long long Bitboard;
 #include <iostream>
 #include <algorithm>
 
-// limits
-
-constexpr int Infinity = 32767;
-constexpr int MateScore = 32000;
-constexpr int EvalLimit = 29999;
-constexpr int IntLimit = 2147483646;
-constexpr int HistLimit = (1 << 15);
-constexpr int PlyLimit = 64;
-constexpr int MovesLimit = 256;
-
 enum eMoveType { tNormal, tCastle, tEnPassant, tPawnjump, tPromN, tPromB, tPromR, tPromQ };
 enum eCastleFlag { wShortCastle = 1, wLongCastle = 2, bShortCastle = 4, bLongCastle = 8};
 enum eMoveFlag { moveQuiet, moveHash, moveNoisy};
@@ -173,7 +163,6 @@ void DisplayPv(int score);
 
 int Evaluate(Position *pos, EvalData * e);
 
-void InitLmr();
 int InputAvailable(void);
 void OnNewGame(void);
 
@@ -181,9 +170,6 @@ void OnNewGame(void);
 
 void PrintBoard(Position *pos);
 Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy);
-
-extern int pvLine[PlyLimit + 2][PlyLimit + 2];
-extern int pvSize[PlyLimit + 2];
 
 extern const int bitTable[64];
 extern int rootDepth;

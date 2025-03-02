@@ -1,7 +1,9 @@
 #include "color.h"
 #include "square.h"
+#include "limits.h"
 #include "publius.h"
 #include "move.h"
+#include "pv.h"
 #include "search.h"
 
 int Quiesce(Position *pos, int ply, int alpha, int beta) {
@@ -18,7 +20,7 @@ int Quiesce(Position *pos, int ply, int alpha, int beta) {
       return 0;
   }
 
-  pvSize[ply] = ply;
+  Pv.size[ply] = ply;
   
   // Draw detection
 
@@ -97,7 +99,7 @@ int Quiesce(Position *pos, int ply, int alpha, int beta) {
 			  best = score;
 			  if (score > alpha) {
 				  alpha = score;
-				  RefreshPv(ply, move);
+				  Pv.Refresh(ply, move);
 			  }
 		  }
 	  }

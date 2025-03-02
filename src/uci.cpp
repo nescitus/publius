@@ -4,6 +4,7 @@
 #include <sstream>
 #include "color.h"
 #include "square.h"
+#include "limits.h"
 #include "publius.h"
 #include "timer.h"
 #include "history.h"
@@ -12,6 +13,7 @@
 #include "search.h"
 #include "uci.h"
 #include "eval.h"
+#include "pv.h"
 
 void UciLoop(void) {
 
@@ -147,16 +149,16 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
     Timer.SetSideData(pos->GetSideToMove());
     Timer.SetMoveTiming();
 
-    pvLine[0][0] = 0; // clear engine move
-    pvLine[0][1] = 0; // clear ponder move
+    Pv.line[0][0] = 0; // clear engine move
+    Pv.line[0][1] = 0; // clear ponder move
     Think(pos);
 
-    if (pvLine[0][1]) {
-        std::cout << "bestmove " << MoveToString(pvLine[0][0])
-                  << " ponder " << MoveToString(pvLine[0][1]) << std::endl;
+    if (Pv.line[0][1]) {
+        std::cout << "bestmove " << MoveToString(Pv.line[0][0])
+                  << " ponder " << MoveToString(Pv.line[0][1]) << std::endl;
     }
     else
-        std::cout << "bestmove " << MoveToString(pvLine[0][0]) << std::endl;
+        std::cout << "bestmove " << MoveToString(Pv.line[0][0]) << std::endl;
 }
 
 void OnSetOptionCommand(std::istringstream& stream) {

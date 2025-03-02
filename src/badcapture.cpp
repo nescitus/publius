@@ -1,6 +1,7 @@
 #include "color.h"
 #include "piece.h"
 #include "square.h"
+#include "limits.h"
 #include "publius.h"
 #include "move.h"
 #include "bitboard.h"
