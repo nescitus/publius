@@ -1,5 +1,7 @@
 #pragma once
 
+static constexpr auto sideRandom = ~((Bitboard)0);
+
 class HashKeys {
 public:
     void Init();

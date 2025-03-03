@@ -2,6 +2,8 @@
 #include "square.h"
 #include "limits.h"
 #include "publius.h"
+#include "evaldata.h"
+
 
 void EvalData::Clear() {
     phase = 0;

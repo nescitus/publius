@@ -9,8 +9,6 @@ enum eMoveType { tNormal, tCastle, tEnPassant, tPawnjump, tPromN, tPromB, tPromR
 enum eCastleFlag { wShortCastle = 1, wLongCastle = 2, bShortCastle = 4, bLongCastle = 8};
 enum eMoveFlag { moveQuiet, moveHash, moveNoisy};
 
-static constexpr auto sideRandom = ~((Bitboard)0);
-
 static constexpr auto startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -";
 static constexpr auto kiwipeteFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
 
@@ -96,7 +94,6 @@ public:
 	void TryMarkingIrreversible(void);
 	bool IsEmpty(const Square sq);
 
-	bool IsPawnDefending(Color color, Square sq);
 	Bitboard AttacksTo(const Square sq);
 	Bitboard AllStraightMovers();
 	Bitboard AllDiagMovers();
@@ -113,21 +110,6 @@ public:
 };
 
 extern EngineState State;
-
-// evalDdata
-
-class EvalData {
-public:
-	int mg[2];
-	int eg[2];
-	Bitboard enemyKingZone[2];
-	int minorAttacks[2];
-	int rookAttacks[2];
-	int queenAttacks[2];
-	int phase; // game phase (24 for starting position)
-	void Clear();
-	void Add(Color color, int mgVal, int egVal);
-};
 
 // list
 
@@ -155,13 +137,12 @@ void FillNoisyList(Position *pos, MoveList *list);
 void FillCompleteList(Position *pos, MoveList *list);
 
 bool IsBadCapture(Position* pos, int move);
+int Swap(Position* pos, Square fromSquare, Square toSquare);
 
 int Clip(int v, int l);
 
 void TryInterrupting(void);
 void DisplayPv(int score);
-
-int Evaluate(Position *pos, EvalData * e);
 
 int InputAvailable(void);
 void OnNewGame(void);

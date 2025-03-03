@@ -374,14 +374,6 @@ bool Position::IsEmpty(const Square sq) {
     return (Occupied() & Paint(sq)) == 0;
 }
 
-bool Position::IsPawnDefending(Color color, Square sq) {
-
-    Bitboard defenders = (Map(White, Pawn) & GenerateMoves.Pawn(Black, sq)) |
-                         (Map(Black, Pawn) & GenerateMoves.Pawn(White, sq));
-
-    return ((defenders & Map(color, Pawn)) != 0);
-}
-
 Bitboard Position::MapPieceType(const int pieceType) {
     return pieceBitboard[White][pieceType] |
         pieceBitboard[Black][pieceType];

@@ -1,5 +1,6 @@
 #include "limits.h"
 #include "pv.h"
+#include <iostream>
 
 void PvCollector::Clear() {
 
@@ -8,12 +9,12 @@ void PvCollector::Clear() {
             line[i][j] = 0;
 }
 
-void PvCollector::Refresh(int ply, int move) {
+void PvCollector::Refresh(const int ply, const int move) {
 
     line[ply][ply] = move;
 
-    for (int j = ply + 1; j < size[ply + 1]; ++j)
-        line[ply][j] = line[ply + 1][j];
+    for (int i = ply + 1; i < size[ply + 1]; ++i)
+        line[ply][i] = line[ply + 1][i];
 
     size[ply] = size[ply + 1];
 }

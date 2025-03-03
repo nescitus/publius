@@ -1,5 +1,6 @@
 #pragma once
 
+int Evaluate(Position* pos, EvalData* e);
 void EvalBasic(EvalData* e, const Color color, const int piece, const int sq);
 void EvalPawn(Position* pos, EvalData* e, Color color);
 void EvalKnight(Position* pos, EvalData* e, Color color);

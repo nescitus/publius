@@ -12,6 +12,7 @@
 #include "move.h"
 #include "search.h"
 #include "uci.h"
+#include "evaldata.h"
 #include "eval.h"
 #include "pv.h"
 
@@ -50,7 +51,7 @@ bool ParseCommand(std::istringstream& stream, Position* pos) {
 
 void OnUciCommand() {
 
-    std::cout << "id name Publius 0.022" << std::endl;
+    std::cout << "id name Publius 0.024" << std::endl;
     std::cout << "id author Pawel Koziol" << std::endl;
     std::cout << "option name Hash type spin default 16 min 1 max 4096" << std::endl;
     std::cout << "option name Clear Hash type button" << std::endl;
@@ -155,10 +156,12 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
 
     if (Pv.line[0][1]) {
         std::cout << "bestmove " << MoveToString(Pv.line[0][0])
-                  << " ponder " << MoveToString(Pv.line[0][1]) << std::endl;
+                  << " ponder "  << MoveToString(Pv.line[0][1]) 
+                  << std::endl;
     }
     else
-        std::cout << "bestmove " << MoveToString(Pv.line[0][0]) << std::endl;
+        std::cout << "bestmove " << MoveToString(Pv.line[0][0]) 
+                  << std::endl;
 }
 
 void OnSetOptionCommand(std::istringstream& stream) {
@@ -190,9 +193,10 @@ void OnPerftCommand(std::istringstream& stream, Position* p) {
     Timer.SetStartTime();
     moveCount = Perft(p, 0, depth, true);
 
-    std::cout << "Perft " << depth << " completed in "
-        << Timer.Elapsed() << " milliseconds, visiting "
-        << moveCount << " positions" << std::endl;
+    std::cout << "Perft " << depth 
+              << " completed in " << Timer.Elapsed() 
+              << " milliseconds, visiting " << moveCount 
+              << " positions" << std::endl;
 }
 
 void OnNewGame(void) {

@@ -4,6 +4,7 @@
 #include "publius.h"
 #include "bitboard.h"
 #include "bitgen.h"
+#include "evaldata.h"
 #include "eval.h"
 #include "mask.h"
 #include "piece.h"

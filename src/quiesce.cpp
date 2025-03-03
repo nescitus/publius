@@ -4,6 +4,8 @@
 #include "publius.h"
 #include "move.h"
 #include "pv.h"
+#include "evaldata.h"
+#include "eval.h"
 #include "search.h"
 
 int Quiesce(Position *pos, int ply, int alpha, int beta) {

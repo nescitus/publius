@@ -10,6 +10,8 @@
 #include "move.h"
 #include "lmr.h"
 #include "pv.h"
+#include "evaldata.h"
+#include "eval.h"
 #include "search.h"
 
 // stack to hold information necessary to undo moves
@@ -294,6 +296,7 @@ void DisplayPv(int score) {
               << " score "
               << scoreType << " " << score << " pv";
 
+    // print main line
     for (int j = 0; j < Pv.size[0]; ++j) {
         std::cout << " " << MoveToString(Pv.line[0][j]);
     }
