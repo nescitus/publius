@@ -10,7 +10,6 @@ void EvalQueen(Position* pos, EvalData* e, Color color);
 void EvalKing(Position* pos, EvalData* e, Color color);
 void EvalKingAttacks(EvalData* e, Color color);
 int GetDrawMul(Position* pos, Color strong, Color weak);
-Square AdjustKingSquare(Square sq);
 
 const int mgPieceValue[6] = {  93, 400, 401, 599, 1250, 0 };
 const int egPieceValue[6] = { 105, 360, 374, 615, 1205, 0 };
@@ -21,6 +20,16 @@ const int passedBonusMg[2][8] = { { 0, 10, 10, 30, 50, 80, 120, 0},
 
 const int passedBonusEg[2][8] = { { 0, 11, 11, 37, 62, 102, 155, 0 },
                                   { 0, 155, 102, 62, 37, 11, 11, 0 } };
+
+const int knightMobMg[9] = { -16, -12,  -8,  -4,   0,   4,   8,  12,  16 };
+const int knightMobEg[9] = { -16, -12,  -8,  -4,   0,   4,   8,  12,  16 };
+const int bishMobMg[15]  = { -30, -25, -20, -15, -10,  -5,   0,   5,  10,  15,  20,  25,  30,  35,  40};
+const int bishMobEg[15]  = { -30, -25, -20, -15, -10,  -5,   0,   5,  10,  15,  20,  25,  30,  35,  40 };
+const int rookMobMg[15] =  { -16, -13, -10,  -8,  -6,  -4,  -2,   0,   2,   4,   6,   8,  10,  12,  14 };
+const int rookMobEg [15] = { -28, -24, -20, -16, -12,  -8,  -4,   0,   4,   8,  12,  16,  20,  24,  28 };
+const int queenMobMg[28] = { -13, -12, -11, -10,  -9,  -8,  -7,  -6 , -5,  -4,  -3,  -2,  -1,   0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14 };
+const int queenMobEg[28] = { -28, -24, -22, -20, -18, -16, -14, -12 ,-10,  -8,  -6,  -4,  -2,   0,   2,   4,   6,   8,  10,  12,  14,  16,  18,  20,  22,  24,  26,  28 };
+
 
 const int mgPawnPst[64] = {
 //A1                                H1

@@ -47,7 +47,6 @@ int Evaluate(Position *pos, EvalData *e) {
     int score = (((mgScore * mgPhase) + (egScore * egPhase)) / 24);
 
   // Drawn and drawish endgame evaluation
-
   int multiplier = 64;
   if (score > 0) {
       multiplier = GetDrawMul(pos, White, Black);
@@ -99,7 +98,7 @@ void EvalPawn(Position* pos, EvalData* e, Color color) {
 
 void EvalKnight(Position* pos, EvalData* e, Color color) {
 
-    int pawnCount;
+    int cnt;
     Bitboard b, mobility;
 
     b = pos->Map(color,Knight);
@@ -112,8 +111,8 @@ void EvalKnight(Position* pos, EvalData* e, Color color) {
 
         // Knight mobility
         mobility = GenerateMoves.Knight(sq) & ~pos->Occupied();
-        e->mg[color] += 4 * (PopCnt(mobility) - 4);
-        e->eg[color] += 4 * (PopCnt(mobility) - 4);
+        cnt = PopCnt(mobility);
+        e->Add(color, knightMobMg[cnt], knightMobEg[cnt] );
 
         // Knight attacks on the enemy king zone
         if (GenerateMoves.Knight(sq) & e->enemyKingZone[color])
@@ -123,7 +122,8 @@ void EvalKnight(Position* pos, EvalData* e, Color color) {
 
 void EvalBishop(Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, mobility, occ, att;
+    int cnt;
+    Bitboard b, mobility, occupancy, att;
 
     b = pos->Map(color, Bishop);
 
@@ -135,13 +135,13 @@ void EvalBishop(Position* pos, EvalData* e, Color color) {
 
         // Bishop mobility
         mobility = GenerateMoves.Bish(pos->Occupied(), sq);
-        e->mg[color] += 5 * (PopCnt(mobility) - 6);
-        e->eg[color] += 5 * (PopCnt(mobility) - 6);
+        cnt = PopCnt(mobility);
+        e->Add(color, bishMobMg[cnt], bishMobEg[cnt]);
 
         // Bishop attacks on the enemy king zone
         // including attacks through own queen
-        occ = pos->Occupied() ^ pos->Map(color, Queen);
-        att = GenerateMoves.Bish(occ, sq);
+        occupancy = pos->Occupied() ^ pos->Map(color, Queen);
+        att = GenerateMoves.Bish(occupancy, sq);
         if (att & e->enemyKingZone[color])
             e->minorAttacks[color]++;
     }
@@ -149,7 +149,8 @@ void EvalBishop(Position* pos, EvalData* e, Color color) {
 
 void EvalRook(Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, mobility, transparent, occ, att, file;
+    int cnt;
+    Bitboard b, mobility, transparent, occupancy, att, file;
 
     b = pos->Map(color, Rook);
 
@@ -161,14 +162,14 @@ void EvalRook(Position* pos, EvalData* e, Color color) {
 
         // Rook mobility
         mobility = GenerateMoves.Rook(pos->Occupied(), sq);
-        e->mg[color] += 2 * (PopCnt(mobility) - 7);
-        e->eg[color] += 4 * (PopCnt(mobility) - 7);
+        cnt = PopCnt(mobility);
+        e->Add(color, rookMobMg[cnt], rookMobEg[cnt]);
 
         // Rook's attacks on the enemy king's zone
         // including attacks through own rook or queen
         transparent = pos->MapStraightMovers(color);
-        occ = pos->Occupied() ^ transparent;
-        att = GenerateMoves.Rook(occ, sq);
+        occupancy = pos->Occupied() ^ transparent;
+        att = GenerateMoves.Rook(occupancy, sq);
         if (att & e->enemyKingZone[color])
             e->rookAttacks[color]++;
 
@@ -198,7 +199,8 @@ void EvalRook(Position* pos, EvalData* e, Color color) {
 
 void EvalQueen(Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, mobility, transparent, occ, att;
+    int cnt;
+    Bitboard b, mobility, transparent, occupancy, att;
 
     b = pos->Map(color, Queen);
 
@@ -210,8 +212,8 @@ void EvalQueen(Position* pos, EvalData* e, Color color) {
 
         // Queen mobility
         mobility = GenerateMoves.Queen(pos->Occupied(), sq);
-        e->mg[color] += 1 * (PopCnt(mobility) - 13);
-        e->eg[color] += 2 * (PopCnt(mobility) - 13);
+        cnt = PopCnt(mobility);
+        e->Add(color, queenMobMg[cnt], queenMobEg[cnt]);
 
         // Queen attacks on enemy king zone
         // including attacks through own lesser pieces
@@ -219,13 +221,13 @@ void EvalQueen(Position* pos, EvalData* e, Color color) {
 
         // diagonal attacks
         transparent = pos->Map(color, Bishop);
-        occ = pos->Occupied() ^ transparent;
-        att = GenerateMoves.Bish(occ, sq);
+        occupancy = pos->Occupied() ^ transparent;
+        att = GenerateMoves.Bish(occupancy, sq);
 
         // straight line attacks
         transparent = pos->Map(color, Rook);
-        occ = pos->Occupied() ^ transparent;
-        att |= GenerateMoves.Rook(occ, sq);
+        occupancy = pos->Occupied() ^ transparent;
+        att |= GenerateMoves.Rook(occupancy, sq);
         
         // register the attack
         if (att & e->enemyKingZone[color])
