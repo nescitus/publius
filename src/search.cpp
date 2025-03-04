@@ -267,12 +267,12 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
 int GetMoveType(Position *pos, int move, int ttMove) {
 
     if (move == ttMove) 
-        return moveHash;  
+        return moveHash;  // move from the hash table
 
     if (IsMoveNoisy(pos, move))
-        return moveNoisy;
+        return moveNoisy; // capture or promotion
    
-    return moveQuiet;
+    return moveQuiet;     // quiet move
 }
 
 void DisplayPv(int score) {
@@ -280,8 +280,16 @@ void DisplayPv(int score) {
     std::string scoreType;
     Bitboard nps = 0;
     int elapsed = Timer.Elapsed();
+
+    // calculate nodes per second
     if (elapsed) nps = nodeCount * 1000 / elapsed;
 
+    // If we are outside of normal evaluation range,
+    // then the engine either gives a checkmate
+    // or is being mated. In this case, we translate
+    // the score into distance to mate and set
+    // approppriate score type ("mate" instead of
+    // the usual centipawns)
     scoreType = "mate";
     if (score < -EvalLimit)     
         score = (-MateScore - score) / 2;
@@ -289,6 +297,7 @@ void DisplayPv(int score) {
         score = (MateScore - score + 1) / 2;
     else scoreType = "cp";
 
+    // print statistics
     std::cout << "info depth " << rootDepth
               << " time " << elapsed
               << " nodes " << nodeCount
@@ -309,10 +318,14 @@ void TryInterrupting(void)
 {
     char command[80];
 
+    // We don't check for timeout in every node,
+    // but only every so often, to improve speed
     if (nodeCount & 4095 || rootDepth == 1) {
         return;
     }
 
+    // Search limited by the nodecount
+    // (not entirely precise, see previous comment)
     if (Timer.GetData(maxNodes) != 0) {
         if (nodeCount >= Timer.GetData(maxNodes))
             State.isStopping = true;

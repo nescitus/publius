@@ -11,6 +11,7 @@
 #include "limits.h"
 #include "publius.h"
 #include "move.h"
+#include "search.h"
 
 // TODO: model after hakkapeliitta
 

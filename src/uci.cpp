@@ -45,13 +45,12 @@ bool ParseCommand(std::istringstream& stream, Position* pos) {
     else if (cmd == "perft") OnPerftCommand(stream, pos);
     else if (cmd == "step") OnStepCommand(stream, pos);
     else if (cmd == "quit") { return false; }
-
     return true;
 }
 
 void OnUciCommand() {
 
-    std::cout << "id name Publius 0.025" << std::endl;
+    std::cout << "id name Publius 0.026" << std::endl;
     std::cout << "id author Pawel Koziol" << std::endl;
     std::cout << "option name Hash type spin default 16 min 1 max 4096" << std::endl;
     std::cout << "option name Clear Hash type button" << std::endl;

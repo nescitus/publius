@@ -13,6 +13,7 @@ int GetDrawMul(Position* pos, Color strong, Color weak);
 
 const int mgPieceValue[6] = {  93, 400, 401, 599, 1250, 0 };
 const int egPieceValue[6] = { 105, 350, 374, 630, 1215, 0 };
+
 const int phaseTable[6]   = {   0,   1,   1,   2,   4,  0 };
 
 const int passedBonusMg[2][8] = { { 0, 10, 10, 30, 50, 80, 120, 0},

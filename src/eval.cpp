@@ -67,7 +67,7 @@ int Evaluate(Position *pos, EvalData *e) {
 
 void EvalPawn(Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, span;
+    Bitboard b, span, support;
 
     b = pos->Map(color, Pawn);
 
