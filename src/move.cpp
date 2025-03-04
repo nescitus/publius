@@ -29,6 +29,7 @@ bool IsMovePromotion(int move) {
 	return move & 0x4000;
 }
 
+// does this move change material balance?
 bool IsMoveNoisy(Position *pos, int move) {
 
     return (pos->GetPiece(GetToSquare(move)) != noPiece

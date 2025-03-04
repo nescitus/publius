@@ -18,51 +18,45 @@ void Position::DoMove(const int move, const int ply) {
     int moveType = GetTypeOfMove(move);
 
     // Save data needed for undoing a move
-
     undoStack[ply].move = move;
     undoStack[ply].prey = prey;
     undoStack[ply].castleFlags = castleFlags;
     undoStack[ply].enPassantSq = enPassantSq;
     undoStack[ply].reversibleMoves = reversibleMoves;
     undoStack[ply].boardHash = boardHash;
+
+    // Update repetition list
     repetitionList[repetitionIndex++] = boardHash;
 
     // Capture enemy piece
-
     if (prey != noPieceType) {
         boardHash ^= Key.pieceKey[CreatePiece(~color, prey)][toSquare];
         TakePiece(~color, prey, toSquare);
     }
 
     // Update reversible moves counter
-
     if (hunter == Pawn || prey != noPieceType) reversibleMoves = 0;
-    else                                            reversibleMoves++;
+    else                                       reversibleMoves++;
 
     // Update castling rights
-
     boardHash ^= Key.castleKey[castleFlags];
     castleFlags &= castleMask[fromSquare] & castleMask[toSquare];
     boardHash ^= Key.castleKey[castleFlags];
 
     // Clear en passant square
-
     ClearEnPassant();
 
     // Move piece from the original square
-
     MovePiece(color, hunter, fromSquare, toSquare);
     boardHash ^= Key.pieceKey[CreatePiece(color, hunter)][fromSquare]
               ^ Key.pieceKey[CreatePiece(color, hunter)][toSquare];
 
     // Update king location
-
     if (hunter == King) {
         kingSq[color] = toSquare;
     }
 
     // Make complementary rook move in case of castling
-
     if (moveType == tCastle) {
 
         switch (toSquare) {
@@ -77,7 +71,6 @@ void Position::DoMove(const int move, const int ply) {
     }
 
     // Remove pawn captured en passant
-
     if (moveType == tEnPassant) {
         toSquare = toSquare ^ 8;
         TakePiece(~color, Pawn, toSquare);
@@ -85,7 +78,6 @@ void Position::DoMove(const int move, const int ply) {
     }
 
     // Set new en passant square
-
     if (moveType == tPawnjump) {
         toSquare = toSquare ^ 8;
         if (GenerateMoves.Pawn(color, toSquare) & (pieceBitboard[~color][Pawn])) {
@@ -95,7 +87,6 @@ void Position::DoMove(const int move, const int ply) {
     }
 
     // Promotion
-
     if (IsMovePromotion(move)) {
         hunter = GetPromotedPiece(move);
         boardHash ^= Key.pieceKey[CreatePiece(color, Pawn)][toSquare]
@@ -103,19 +94,18 @@ void Position::DoMove(const int move, const int ply) {
         ChangePiece(Pawn, hunter, color, toSquare);
     }
 
+    // Switch side to move
     SwitchSide();
 }
 
 void Position::DoNull(const int ply) {
 
     // Save stuff
-
     undoStack[ply].move = 0;
     undoStack[ply].enPassantSq = enPassantSq;
     undoStack[ply].boardHash = boardHash;
 
     // Update repetition list
-
     repetitionList[repetitionIndex++] = boardHash;
     reversibleMoves++;
 

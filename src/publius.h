@@ -136,8 +136,8 @@ void FillQuietList(Position *pos, MoveList *list);
 void FillNoisyList(Position *pos, MoveList *list);
 void FillCompleteList(Position *pos, MoveList *list);
 
-bool IsBadCapture(Position* pos, int move);
-int Swap(Position* pos, Square fromSquare, Square toSquare);
+bool IsBadCapture(Position *pos, int move);
+int Swap(Position *pos, Square fromSquare, Square toSquare);
 
 int Clip(int v, int l);
 

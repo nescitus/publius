@@ -16,6 +16,9 @@ int Evaluate(Position *pos, EvalData *e) {
     e->enemyKingZone[White] = GenerateMoves.King(pos->KingSq(Black));
     e->enemyKingZone[Black] = GenerateMoves.King(pos->KingSq(White));
 
+    // Tempo bonus
+    e->Add(pos->GetSideToMove(), 5, 10);
+
     // Evaluate pieces and pawns
     for (Color color = White; color < colorNone; ++color) {
 
@@ -258,6 +261,9 @@ void EvalKing(Position* pos, EvalData* e, Color color) {
     }
 }
 
+// Operations repeated while evaluating any piece:
+// adding material value, piece/square tables score
+// and calculating the game phase.
 void EvalBasic(EvalData *e, const Color color, const int piece, const int sq) {
 
     e->phase += phaseTable[piece];
@@ -266,7 +272,10 @@ void EvalBasic(EvalData *e, const Color color, const int piece, const int sq) {
                   Params.egPst[color][piece][sq]);
 }
 
-void EvalKingAttacks(EvalData* e, Color color) {
+// Simple king attack calculation, relying just on the number
+// of attackers and their strength. More attacking pieces = good,
+// more heavy attackers = better, attack with just minor pieces = meh.
+void EvalKingAttacks(EvalData *e, Color color) {
 
     int result = 2 * e->queenAttacks[color] * e->rookAttacks[color] * e->minorAttacks[color];
     result += 17 * e->queenAttacks[color] * e->rookAttacks[color];
