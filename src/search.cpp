@@ -117,6 +117,17 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
         }   // end of null move code
     }
 
+    // Set futility pruning flag
+
+    bool canDoFutility = false;
+
+    if (depth <= 6 &&
+        !isInCheck &&
+        !isPv &&
+        Evaluate(pos, &e) + 75 * depth < beta) {
+        canDoFutility = true;
+    }
+
     // Init moves and variables before entering main loop
 
     bestScore = -Infinity;
@@ -160,6 +171,19 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
             // Set new search depth
 
             newDepth = depth - 1;
+
+            // Futility pruning
+
+            if (canDoFutility &&
+                movesTried > 1 &&
+               !isPv &&
+               !isInCheck &&
+               !pos->IsInCheck() &&
+                moveType == moveQuiet) 
+            {
+                pos->UndoMove(move, ply);
+                continue;
+            }
 
             // Late move pruning
 
