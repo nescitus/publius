@@ -45,28 +45,29 @@ private:
 	Bitboard pieceBitboard[2][6];
 	Square enPassantSq;
 	Square kingSq[2];
+	int castleFlags;
 	int pieceCount[2][6];
 	int pieceLocation[64];
 	int reversibleMoves;
 	int repetitionIndex;
 	Bitboard repetitionList[256];
 
+    
+	void Clear();
 	void SwitchSide();
 	void ClearEnPassant();
 	void MovePiece(const Color color, const int typeOfPiece, const Square fromSquare, Square toSquare);
 	void AddPiece(const Color color, const int typeOfPiece, const Square square);
 	void TakePiece(const Color color, const int typeOfPiece, const Square square);
 	void ChangePiece(const int oldType, const int newType, const Color color, const Square square);
+	Bitboard CalculateHashKey();
 	
 	bool IsDrawBy50MoveRule();
 	bool IsDrawByRepetition();
 	bool IsDrawByInsufficientMaterial();
 public:
-	int castleFlags;
 	Bitboard boardHash;
 	bool SquareIsAttacked(const Square sq, Color color);
-	void Clear();
-	Bitboard CalculateHashKey();
 	void Set(const std::string str);
 	void DoMove(const int move, const int ply);
 	void DoNull(const int ply);
@@ -93,6 +94,10 @@ public:
 	bool LeavesKingInCheck();
 	void TryMarkingIrreversible(void);
 	bool IsEmpty(const Square sq);
+	bool WhiteCanCastleShort();
+	bool BlackCanCastleShort();
+	bool WhiteCanCastleLong();
+	bool BlackCanCastleLong();
 
 	Bitboard AttacksTo(const Square sq);
 	Bitboard AllStraightMovers();

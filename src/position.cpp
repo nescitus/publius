@@ -396,3 +396,19 @@ Bitboard Position::AttacksTo(const Square sq) {
         ((AllStraightMovers()) & GenerateMoves.Rook(Occupied(), sq)) |
         (MapPieceType(King) & GenerateMoves.King(sq));
 }
+
+bool Position::WhiteCanCastleShort() {
+    return castleFlags & wShortCastle;
+}
+
+bool Position::BlackCanCastleShort() {
+    return castleFlags & bShortCastle;
+}
+
+bool Position::WhiteCanCastleLong() {
+    return castleFlags & wLongCastle;
+}
+
+bool Position::BlackCanCastleLong() {
+    return castleFlags & bLongCastle;
+}

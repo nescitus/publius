@@ -189,7 +189,7 @@ void FillQuietList(Position *pos, MoveList * list) {
 
         // White short castle
 
-        if ((pos->castleFlags & wShortCastle)
+        if ((pos->WhiteCanCastleShort())
         && !(pos->Occupied() & Paint(F1, G1))) {
             if (!pos->SquareIsAttacked(E1, Black)
                 && !pos->SquareIsAttacked(F1, Black))
@@ -198,7 +198,7 @@ void FillQuietList(Position *pos, MoveList * list) {
 
         // White long castle
 
-        if ((pos->castleFlags & wLongCastle)
+        if ((pos->WhiteCanCastleLong())
         && !(pos->Occupied() & Paint(B1, C1, D1))) {
             if (!pos->SquareIsAttacked(E1, Black)
                 && !pos->SquareIsAttacked(D1, Black))
@@ -224,7 +224,7 @@ void FillQuietList(Position *pos, MoveList * list) {
 
         // Black short castle
 
-        if ((pos->castleFlags & bShortCastle)
+        if ((pos->BlackCanCastleShort())
         && !(pos->Occupied() & Paint(F8, G8))) {
             if (!pos->SquareIsAttacked(E8, White)
                 && !pos->SquareIsAttacked(F8, White))
@@ -233,7 +233,7 @@ void FillQuietList(Position *pos, MoveList * list) {
 
         // Black long castle
 
-        if ((pos->castleFlags & bLongCastle)
+        if ((pos->BlackCanCastleLong())
         && !(pos->Occupied() & Paint(B8, C8, D8))) {
             if (!pos->SquareIsAttacked(E8, White)
                 && !pos->SquareIsAttacked(D8, White))
