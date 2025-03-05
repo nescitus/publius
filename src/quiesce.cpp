@@ -17,7 +17,11 @@ int Quiesce(Position *pos, int ply, int alpha, int beta) {
   // Statistics and attempt at quick exit
 
   nodeCount++;
+
+  // Check for timeout
   TryInterrupting();
+
+  // Exit to unwind search if it has timed out
   if (State.isStopping) {
       return 0;
   }

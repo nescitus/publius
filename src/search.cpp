@@ -45,19 +45,19 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     }
 
     // Periodically check for timeout, ponderhit or stop command
-
     nodeCount++;
-    TryInterrupting();
     Pv.size[ply] = ply;
 
-    // Quick exit on a timeout
+    // Check for timeout
+    TryInterrupting();
 
+    // Exit to unwind search if it has timed out
     if (State.isStopping) {
         return 0;
     }
 
-    // Quick exit on on a statically detected draw, unless we are at root
-
+    // Quick exit on on a statically detected draw, 
+    // unless we are at root
     if (pos->IsDraw() && !isRoot) {
         // Too many early exits in a row 
         // might cause a timeout, so we safeguard
@@ -67,7 +67,6 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     }
 
     // Retrieving data from transposition table
-
     if (TT.Retrieve(pos->boardHash, &ttMove, &score, &hashFlag, alpha, beta, depth, ply)) {
 
         if (!isPv || (score > alpha && score < beta)) {
@@ -76,17 +75,14 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     }
 
     // Safeguard against exceeding ply limit
-
     if (ply >= PlyLimit - 1) {
         return Evaluate(pos, &e);
     }
 
     // Are we in check? 
-
     isInCheck = pos->IsInCheck();
 
     // Node-level pruning
-
     if (!wasNull &&
        !isInCheck &&
        !isPv &&
@@ -95,16 +91,14 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
 
         eval = Evaluate(pos, &e);
 
-        // Static null move / RFP
-
-        if (depth <= 6) {
-            score = eval - 75 * depth;
+        // Static null move / brta pruning / RFP
+        if (depth <= 4) {
+            score = eval - 125 * depth;
             if (score > beta)
                 return score;
         }
 
         // Null move
-
         if (eval > beta &&  depth > 1) {
             reduction = 3 + depth / 6;
             pos->DoNull(ply);
@@ -122,7 +116,6 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     }
 
     // Set futility pruning flag
-
     bool canDoFutility = false;
 
     if (depth <= 6 &&
@@ -133,25 +126,21 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     }
 
     // Init moves and variables before entering main loop
-
     bestScore = -Infinity;
     list.Clear();
     FillCompleteList(pos, &list);
     moveListLength = list.GetInd();
 
     // Calculate moves' scores to sort them
-
     if (isRoot) 
         list.ScoreMoves(pos, ply, Pv.line[0][0]);
     else      
         list.ScoreMoves(pos, ply, ttMove);
 
     // Check extension
-
     if (isInCheck) depth++;
 
     // Main loop
-
     if (moveListLength) {
         for (int i = 0; i < moveListLength; i++) {
 
@@ -166,18 +155,15 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
             }
 
             // Update move statistics
-
             movesTried++;
             if (moveType == moveQuiet) {
                 quietMovesTried++;
             }
 
             // Set new search depth
-
             newDepth = depth - 1;
 
             // Futility pruning
-
             if (canDoFutility &&
                 movesTried > 1 &&
                !isPv &&
@@ -190,7 +176,6 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
             }
 
             // Late move pruning
-
             if (depth <= 3 &&
                !isPv && 
                !isInCheck &&
@@ -203,7 +188,6 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
             }
 
             // Late move reduction (LMR)
-            
             if (depth > 1 && 
                 quietMovesTried > 3 && 
                 moveType == moveQuiet && 
@@ -227,8 +211,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
                 }
             }
 
-            // PVS
-
+            // PVS (Principal variation search)
             if (bestScore == -Infinity)
                 score = -Search(pos, ply + 1, -beta, -alpha, newDepth, false);
             else {
@@ -243,14 +226,12 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
             }
 
             // Beta cutoff
-
             if (score >= beta) {
                 History.Update(pos, move, depth, ply);
                 TT.Store(pos->boardHash, move, score, upperBound, depth, ply);
 
                 // If beta cutoff occurs at the root, 
                 // change the best move
-
                 if (isRoot) {
                     Pv.Refresh(ply, move);
                     DisplayPv(score);
@@ -260,7 +241,6 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
             }
 
             // Updating score and alpha
-
             if (score > bestScore) {
                 bestScore = score;
                 if (score > alpha) {
@@ -276,13 +256,11 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     } // end of the main loop
 
     // Return correct checkmate/stalemate score
-
     if (bestScore == -Infinity) {
         return pos->IsInCheck() ? -MateScore + ply : 0;
     }
 
     // Save score in the transposition table
-
     if (bestMove) {
         TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, depth, ply);
     } else {
@@ -292,6 +270,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     return bestScore;
 }
 
+// We need to know the move type for the pruning decisions
 int GetMoveType(Position *pos, int move, int ttMove) {
 
     if (move == ttMove) 
@@ -359,17 +338,26 @@ void TryInterrupting(void)
             State.isStopping = true;
     }
 
+    // There are some commands
+    // that need to be replied to during search
     if (InputAvailable()) {
  
         std::cin.getline(command, 4096);
+
+        // user ordered us to stop
         if (!strcmp(command, "stop"))
             State.isStopping = true;
+
+        // transition from pondering to normal search
         else if (!strcmp(command, "ponderhit"))
             State.isPondering = false;
+
+        // ping equivalent in the UCI protocol
         else if (!strcmp(command, "isready"))
             std::cout << "readyok" << std::endl;
     }
 
+    // the time is out!
     if (Timeout()) {
         State.isStopping = true;
     }
