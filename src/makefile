@@ -39,7 +39,7 @@ TARGET = publius
 
 all:	$(TARGET)
 
-CXXFLAGS=-Wall
+CXXFLAGS = -Wall -std=c++17
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
