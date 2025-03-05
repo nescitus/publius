@@ -1,12 +1,16 @@
 Publius is a dead simple bitboard chess engine for didactic purposes. Basically a boilerplate chess engine to build upon, no strings attached.
 
+The current rating estimate is 2650 on the CCRL scale.
+
 Functionalities up to date
 
 - basic UCI support
 - bitboard move generator
 - pseudo-legal move list
+- static exchange evaluator to detect bad captures
 - perft
-- alpha-beta search
+- alpha-beta search with PVS
+- quiescence search
 - transposition table
 - draw detection
 - null move
@@ -27,9 +31,7 @@ Additional commands:
 
 Things to add if you want to contribute
 1. bench command
-2. static exchange evaluator
-3. a function to check whether a move is pseudolegal
-4. with (2) and (3) in place staged move generator
+2. a function to check whether a move is pseudolegal
+4. with (2) in place staged move generator
 5. comments
-6. more sensible piece/square tables
-7. doubled and backward pawns
+7. backward pawns
