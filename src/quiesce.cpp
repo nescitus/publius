@@ -27,6 +27,10 @@ int Quiesce(Position *pos, int ply, int alpha, int beta) {
   // Draw detection
 
   if (pos->IsDraw()) {
+      // Too many early exits in a row 
+      // might cause a timeout, so we safeguard
+      if (Timeout())
+          State.isStopping = true;
       return 0;
   }
 

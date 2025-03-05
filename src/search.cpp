@@ -59,6 +59,10 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     // Quick exit on on a statically detected draw, unless we are at root
 
     if (pos->IsDraw() && !isRoot) {
+        // Too many early exits in a row 
+        // might cause a timeout, so we safeguard
+        if (Timeout())
+            State.isStopping = true;
         return 0;
     }
 
@@ -93,8 +97,8 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
 
         // Static null move / RFP
 
-        if (depth <= 4) {
-            score = eval - 125 * depth;
+        if (depth <= 6) {
+            score = eval - 75 * depth;
             if (score > beta)
                 return score;
         }
