@@ -39,17 +39,13 @@ void Position::DoMove(const int move, const int ply) {
     else                                       reversibleMoves++;
 
     // Update castling rights
-    boardHash ^= Key.castleKey[castleFlags];
-    castleFlags &= castleMask[fromSquare] & castleMask[toSquare];
-    boardHash ^= Key.castleKey[castleFlags];
+    UpdateCastlingRights(fromSquare, toSquare);
 
     // Clear en passant square
     ClearEnPassant();
 
     // Move piece from the original square
     MovePiece(color, hunter, fromSquare, toSquare);
-    boardHash ^= Key.pieceKey[CreatePiece(color, hunter)][fromSquare]
-              ^ Key.pieceKey[CreatePiece(color, hunter)][toSquare];
 
     // Update king location
     if (hunter == King) {
@@ -66,7 +62,7 @@ void Position::DoMove(const int move, const int ply) {
         case G8: { fromSquare = H8; toSquare = F8; break; }
         }
 
-        MovePiece(color, Rook, fromSquare, toSquare);
+        MovePieceNoHash(color, Rook, fromSquare, toSquare);
         boardHash ^= Key.pieceKey[CreatePiece(color, Rook)][fromSquare] ^ Key.pieceKey[CreatePiece(color, Rook)][toSquare];
     }
 
@@ -79,11 +75,7 @@ void Position::DoMove(const int move, const int ply) {
 
     // Set new en passant square
     if (moveType == tPawnjump) {
-        toSquare = toSquare ^ 8;
-        if (GenerateMoves.Pawn(color, toSquare) & (pieceBitboard[~color][Pawn])) {
-            enPassantSq = toSquare;
-            boardHash ^= Key.enPassantKey[FileOf(toSquare)];
-        }
+        SetEnPassantSquare(color, toSquare);
     }
 
     // Promotion
@@ -111,4 +103,10 @@ void Position::DoNull(const int ply) {
 
     ClearEnPassant();
     SwitchSide();
+}
+
+void Position::UpdateCastlingRights(const Square fromSquare, const Square toSquare) {
+    boardHash ^= Key.castleKey[castleFlags];
+    castleFlags &= castleMask[fromSquare] & castleMask[toSquare];
+    boardHash ^= Key.castleKey[castleFlags];
 }

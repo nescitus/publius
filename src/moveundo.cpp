@@ -20,7 +20,7 @@ void Position::UndoMove(const int move, const int ply) {
     boardHash = undoStack[ply].boardHash;
     repetitionIndex--;
 
-    MovePiece(color, hunter, toSquare, fromSquare);
+    MovePieceNoHash(color, hunter, toSquare, fromSquare);
 
     // Update king location
 
@@ -38,10 +38,10 @@ void Position::UndoMove(const int move, const int ply) {
 
     if (moveType == tCastle) {
         switch (toSquare) {
-        case C1: { MovePiece(color, Rook, D1, A1); break; }
-        case G1: { MovePiece(color, Rook, F1, H1); break; }
-        case C8: { MovePiece(color, Rook, D8, A8); break; }
-        case G8: { MovePiece(color, Rook, F8, H8); break; }
+        case C1: { MovePieceNoHash(color, Rook, D1, A1); break; }
+        case G1: { MovePieceNoHash(color, Rook, F1, H1); break; }
+        case C8: { MovePieceNoHash(color, Rook, D8, A8); break; }
+        case G8: { MovePieceNoHash(color, Rook, F8, H8); break; }
         }
     }
 

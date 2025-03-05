@@ -203,13 +203,20 @@ void Position::ClearEnPassant() {
      }
 }
 
-void Position::MovePiece(const Color color, 
-                         const int typeOfPiece, 
-                         const Square fromSquare, Square toSquare) {
+void Position::MovePiece(const Color color, const int hunter, 
+                         const Square fromSquare, const Square toSquare) {
+
+    MovePieceNoHash(color, hunter, fromSquare, toSquare);
+    boardHash ^= Key.pieceKey[CreatePiece(color, hunter)][fromSquare]
+              ^ Key.pieceKey[CreatePiece(color, hunter)][toSquare];
+}
+
+void Position::MovePieceNoHash(const Color color, const int hunter, 
+                               const Square fromSquare, Square toSquare) {
 
      pieceLocation[fromSquare] = noPiece;
-     pieceLocation[toSquare] = CreatePiece(color, typeOfPiece);
-     pieceBitboard[color][typeOfPiece] ^= Paint(fromSquare, toSquare);
+     pieceLocation[toSquare] = CreatePiece(color, hunter);
+     pieceBitboard[color][hunter] ^= Paint(fromSquare, toSquare);
 }
 
 void Position::TakePiece(const Color color, 
@@ -242,48 +249,13 @@ void Position::ChangePiece(const int oldType,
      pieceCount[color][oldType]--;
 }
 
-bool Position::CanTryNullMove() {
+void Position::SetEnPassantSquare(const Color color, Square toSquare) {
 
-     return ((CountMinors(sideToMove) + CountMajors(sideToMove)) > 0);
-}
-
-bool Position::IsDraw() {
-
-    if (IsDrawBy50MoveRule())
-        return true;
-
-    if (IsDrawByRepetition())
-        return true;
-
-    if (IsDrawByInsufficientMaterial())
-        return true;
-
-	return false;
-}
-
-bool Position::IsDrawBy50MoveRule() {
-    return (reversibleMoves > 100);
-}
-
-bool Position::IsDrawByRepetition() {
-
-    for (int i = 4; i <= reversibleMoves; i += 2) {
-        if (boardHash == repetitionList[repetitionIndex - i]) {
-            return true;
-        }
+    toSquare = toSquare ^ 8;
+    if (GenerateMoves.Pawn(color, toSquare) & (pieceBitboard[~color][Pawn])) {
+        enPassantSq = toSquare;
+        boardHash ^= Key.enPassantKey[FileOf(toSquare)];
     }
-
-    return false;
-}
-
-bool Position::IsDrawByInsufficientMaterial() {
-
-    if (!LeavesKingInCheck()) {
-        if (CountAllPawns() + CountMajors(White) + CountMajors(Black) == 0
-        && CountMinors(White) + CountMinors(Black) <= 1) return true;
-    }
-
-    return false;
 }
 
 void Position::TryMarkingIrreversible() {
@@ -291,103 +263,16 @@ void Position::TryMarkingIrreversible() {
         repetitionIndex = 0;
 }
 
-bool Position::IsInCheck() {
-    return (SquareIsAttacked(KingSq(sideToMove), ~sideToMove) != 0);
+bool Position::SquareIsAttacked(const Square sq, const Color color) const {
+
+    return (Map(color, Pawn) & GenerateMoves.Pawn(~color, sq))
+        || (Map(color, Knight) & GenerateMoves.Knight(sq))
+        || (MapDiagonalMovers(color) & GenerateMoves.Bish(Occupied(), sq))
+        || (MapStraightMovers(color) & GenerateMoves.Rook(Occupied(), sq))
+        || (Map(color, King) & GenerateMoves.King(sq));
 }
 
-bool Position::LeavesKingInCheck() {
-    return (SquareIsAttacked(KingSq(~(sideToMove)), sideToMove) != 0);
-}
-
-bool Position::SquareIsAttacked(const Square sq, const Color color) {
-
-	return (Map(color, Pawn)  & GenerateMoves.Pawn(~color, sq))
-		|| (Map(color, Knight)  & GenerateMoves.Knight(sq))
-		|| (MapDiagonalMovers(color) & GenerateMoves.Bish(Occupied(), sq))
-		|| (MapStraightMovers(color) & GenerateMoves.Rook(Occupied(), sq))
-		|| (Map(color, King)  & GenerateMoves.King(sq));
-}
-
-Color Position::GetSideToMove() {
-    return sideToMove;
-}
-
-int Position::GetPiece(const Square square) {
-    return pieceLocation[square];
-}
-
-int Position::CountMinors(const Color color) {
-    return Count(color, Knight) + Count(color, Bishop);
-}
-
-int Position::CountMajors(const Color color) {
-    return Count(color, Rook) + Count(color, Queen);
-}
-
-int Position::Count(const Color color, const int type) {
-    return pieceCount[color][type];
-}
-
-int Position::CountAllPawns() {
-    return Count(White, Pawn) + Count(Black, Pawn);
-}
-
-Bitboard Position::Map(const Color color, const int piece) {
-    return (pieceBitboard[color][piece]);
-}
-
-Bitboard Position::Map(const Color color) {
-
-    return Map(color, Pawn) | Map(color, Knight) | Map(color, Bishop)
-         | Map(color, Rook) | Map(color, Queen) | Map(color, King);
-}
-
-Bitboard Position::Occupied() {
-    return Map(White) | Map(Black);
-}
-
-Bitboard Position::Empty() {
-    return ~Occupied();
-}
-
-Bitboard Position::MapDiagonalMovers(const Color color) {
-    return (Map(color, Bishop) | Map(color, Queen));
-}
-
-Bitboard Position::MapStraightMovers(const Color color) {
-    return (Map(color, Rook) | Map(color, Queen));
-}
-
-int Position::PieceTypeOnSq(const Square square) {
-    return TypeOfPiece(pieceLocation[square]);
-}
-
-Square Position::KingSq(const Color color) {
-    return kingSq[color];
-}
-
-Square Position::EnPassantSq() {
-    return enPassantSq;
-}
-
-bool Position::IsEmpty(const Square sq) {
-    return (Occupied() & Paint(sq)) == 0;
-}
-
-Bitboard Position::MapPieceType(const int pieceType) {
-    return pieceBitboard[White][pieceType] |
-        pieceBitboard[Black][pieceType];
-}
-
-Bitboard Position::AllDiagMovers() {
-    return MapPieceType(Bishop) | MapPieceType(Queen);
-}
-
-Bitboard Position::AllStraightMovers() {
-    return MapPieceType(Rook) | MapPieceType(Queen);
-}
-
-Bitboard Position::AttacksTo(const Square sq) {
+Bitboard Position::AttacksTo(const Square sq) const {
 
     return (Map(White, Pawn) & GenerateMoves.Pawn(Black, sq)) |
         (Map(Black, Pawn) & GenerateMoves.Pawn(White, sq)) |
@@ -395,20 +280,4 @@ Bitboard Position::AttacksTo(const Square sq) {
         ((AllDiagMovers()) & GenerateMoves.Bish(Occupied(), sq)) |
         ((AllStraightMovers()) & GenerateMoves.Rook(Occupied(), sq)) |
         (MapPieceType(King) & GenerateMoves.King(sq));
-}
-
-bool Position::WhiteCanCastleShort() {
-    return castleFlags & wShortCastle;
-}
-
-bool Position::BlackCanCastleShort() {
-    return castleFlags & bShortCastle;
-}
-
-bool Position::WhiteCanCastleLong() {
-    return castleFlags & wLongCastle;
-}
-
-bool Position::BlackCanCastleLong() {
-    return castleFlags & bLongCastle;
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+// info depth 19 time 55657 nodes 54190536 nps 973651 score cp 24 pv e2e4 e7e5 b1c3 b8c6 g1f3 f8c5 a2a3 c5b6 f1c4 g8f6 e1g1 e8g8 d2d3 d7d6 c3a4 d6d5 a4b6 a7b6 e4d5 f6d5
+
 typedef unsigned long long Bitboard;
 
 #include <iostream>
@@ -56,53 +58,57 @@ private:
 	void Clear();
 	void SwitchSide();
 	void ClearEnPassant();
-	void MovePiece(const Color color, const int typeOfPiece, const Square fromSquare, Square toSquare);
+	void MovePiece(const Color color, const int hunter, const Square fromSquare, Square toSquare);
+	void MovePieceNoHash(const Color color, const int hunter, const Square fromSquare, Square toSquare);
 	void AddPiece(const Color color, const int typeOfPiece, const Square square);
 	void TakePiece(const Color color, const int typeOfPiece, const Square square);
 	void ChangePiece(const int oldType, const int newType, const Color color, const Square square);
+	void SetEnPassantSquare(const Color color, Square toSquare);
 	Bitboard CalculateHashKey();
 	
-	bool IsDrawBy50MoveRule();
-	bool IsDrawByRepetition();
-	bool IsDrawByInsufficientMaterial();
+	bool IsDrawBy50MoveRule() const;
+	bool IsDrawByRepetition() const;
+	bool IsDrawByInsufficientMaterial() const;
 public:
 	Bitboard boardHash;
-	bool SquareIsAttacked(const Square sq, Color color);
+	bool SquareIsAttacked(const Square sq, Color color) const;
 	void Set(const std::string str);
 	void DoMove(const int move, const int ply);
 	void DoNull(const int ply);
 	void UndoMove(const int move, const int ply);
 	void UndoNull(const int ply);
-	bool IsDraw();
-	bool CanTryNullMove(void);
-	Color GetSideToMove();
-	int GetPiece(const Square square);
-	int Count(const Color color, const int type);
-    int CountAllPawns();
-    int CountMinors(const Color color);
-    int CountMajors(const Color color);
-	Bitboard Map(const Color color, const int piece);
-	Bitboard Map(const Color color);
-	Bitboard Occupied();
-	Bitboard Empty();
-	Bitboard MapDiagonalMovers(const Color color);
-	Bitboard MapStraightMovers(const Color color);
-	int PieceTypeOnSq(const Square square);
-	Square KingSq(const Color color);
-	Square EnPassantSq();
-	bool IsInCheck();
-	bool LeavesKingInCheck();
+	bool IsDraw() const;
+	bool CanTryNullMove(void) const;
+	Color GetSideToMove() const;
+	int GetPiece(const Square square) const;
+	int Count(const Color color, const int type) const;
+    int CountAllPawns() const;
+    int CountMinors(const Color color) const;
+    int CountMajors(const Color color) const;
+	Bitboard Map(const Color color, const int piece) const;
+	Bitboard Map(const Color color) const;
+	Bitboard Occupied() const;
+	Bitboard Empty() const;
+	Bitboard MapDiagonalMovers(const Color color) const;
+	Bitboard MapStraightMovers(const Color color) const;
+	int PieceTypeOnSq(const Square square) const;
+	Square KingSq(const Color color) const;
+	Square EnPassantSq() const;
+	bool IsInCheck() const;
+	bool LeavesKingInCheck() const;
 	void TryMarkingIrreversible(void);
-	bool IsEmpty(const Square sq);
-	bool WhiteCanCastleShort();
-	bool BlackCanCastleShort();
-	bool WhiteCanCastleLong();
-	bool BlackCanCastleLong();
+	bool IsEmpty(const Square sq) const;
+	bool WhiteCanCastleShort() const;
+	bool BlackCanCastleShort() const;
+	bool WhiteCanCastleLong() const;
+	bool BlackCanCastleLong() const;
 
-	Bitboard AttacksTo(const Square sq);
-	Bitboard AllStraightMovers();
-	Bitboard AllDiagMovers();
-	Bitboard MapPieceType(const int pieceType);
+	Bitboard AttacksTo(const Square sq) const;
+	Bitboard AllStraightMovers() const;
+	Bitboard AllDiagMovers() const;
+	Bitboard MapPieceType(const int pieceType) const;
+
+	void UpdateCastlingRights(const Square fromSquare, const Square toSquare);
 };
 
 // state
