@@ -91,7 +91,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
 
         eval = Evaluate(pos, &e);
 
-        // Static null move / brta pruning / RFP
+        // Static null move / beta pruning / RFP
         if (depth <= 4) {
             score = eval - 125 * depth;
             if (score > beta)

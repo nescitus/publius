@@ -223,6 +223,14 @@ void Position::TakePiece(const Color color,
                          const int typeOfPiece, 
                          const Square square) {
 
+    TakePieceNoHash(color, typeOfPiece, square);
+    boardHash ^= Key.pieceKey[CreatePiece(color, typeOfPiece)][square];
+}
+
+void Position::TakePieceNoHash(const Color color, 
+                               const int typeOfPiece, 
+                               const Square square) {
+
      pieceLocation[square] = noPiece;
      pieceBitboard[color][typeOfPiece] ^= Paint(square);
      pieceCount[color][typeOfPiece]--;
@@ -256,6 +264,13 @@ void Position::SetEnPassantSquare(const Color color, Square toSquare) {
         enPassantSq = toSquare;
         boardHash ^= Key.enPassantKey[FileOf(toSquare)];
     }
+}
+
+void Position::UpdateCastlingRights(const Square fromSquare, const Square toSquare) {
+
+    boardHash ^= Key.castleKey[castleFlags];
+    castleFlags &= castleMask[fromSquare] & castleMask[toSquare];
+    boardHash ^= Key.castleKey[castleFlags];
 }
 
 void Position::TryMarkingIrreversible() {

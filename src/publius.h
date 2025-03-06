@@ -62,8 +62,10 @@ private:
 	void MovePieceNoHash(const Color color, const int hunter, const Square fromSquare, Square toSquare);
 	void AddPiece(const Color color, const int typeOfPiece, const Square square);
 	void TakePiece(const Color color, const int typeOfPiece, const Square square);
+	void TakePieceNoHash(const Color color, const int typeOfPiece, const Square square);
 	void ChangePiece(const int oldType, const int newType, const Color color, const Square square);
 	void SetEnPassantSquare(const Color color, Square toSquare);
+	void UpdateCastlingRights(const Square fromSquare, const Square toSquare);
 	Bitboard CalculateHashKey();
 	
 	bool IsDrawBy50MoveRule() const;
@@ -107,8 +109,7 @@ public:
 	Bitboard AllStraightMovers() const;
 	Bitboard AllDiagMovers() const;
 	Bitboard MapPieceType(const int pieceType) const;
-
-	void UpdateCastlingRights(const Square fromSquare, const Square toSquare);
+	bool IsOnSq(const Color color, const int piece, const Square square) const;
 };
 
 // state

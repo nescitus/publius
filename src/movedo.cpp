@@ -30,7 +30,6 @@ void Position::DoMove(const int move, const int ply) {
 
     // Capture enemy piece
     if (prey != noPieceType) {
-        boardHash ^= Key.pieceKey[CreatePiece(~color, prey)][toSquare];
         TakePiece(~color, prey, toSquare);
     }
 
@@ -54,23 +53,17 @@ void Position::DoMove(const int move, const int ply) {
 
     // Make complementary rook move in case of castling
     if (moveType == tCastle) {
-
         switch (toSquare) {
-        case C1: { fromSquare = A1; toSquare = D1; break; }
-        case G1: { fromSquare = H1; toSquare = F1; break; }
-        case C8: { fromSquare = A8; toSquare = D8; break; }
-        case G8: { fromSquare = H8; toSquare = F8; break; }
+            case C1: { MovePiece(color, Rook, A1, D1); break; }
+            case G1: { MovePiece(color, Rook, H1, F1); break; }
+            case C8: { MovePiece(color, Rook, A8, D8); break; }
+            case G8: { MovePiece(color, Rook, H8, F8); break; }
         }
-
-        MovePieceNoHash(color, Rook, fromSquare, toSquare);
-        boardHash ^= Key.pieceKey[CreatePiece(color, Rook)][fromSquare] ^ Key.pieceKey[CreatePiece(color, Rook)][toSquare];
     }
 
     // Remove pawn captured en passant
     if (moveType == tEnPassant) {
-        toSquare = toSquare ^ 8;
-        TakePiece(~color, Pawn, toSquare);
-        boardHash ^= Key.pieceKey[CreatePiece(~color, Pawn)][toSquare];
+        TakePiece(~color, Pawn, toSquare ^ 8);
     }
 
     // Set new en passant square
@@ -103,10 +96,4 @@ void Position::DoNull(const int ply) {
 
     ClearEnPassant();
     SwitchSide();
-}
-
-void Position::UpdateCastlingRights(const Square fromSquare, const Square toSquare) {
-    boardHash ^= Key.castleKey[castleFlags];
-    castleFlags &= castleMask[fromSquare] & castleMask[toSquare];
-    boardHash ^= Key.castleKey[castleFlags];
 }
