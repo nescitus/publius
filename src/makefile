@@ -9,6 +9,7 @@ SRCS= \
 	endgame.cpp \
 	eval.cpp \
 	evaldata.cpp \
+	evalhash.cpp \	
 	gen.cpp \
 	hashkeys.cpp \
 	history.cpp \
@@ -39,7 +40,7 @@ TARGET = publius
 
 all:	$(TARGET)
 
-CXXFLAGS = -Wall -std=c++17
+CXXFLAGS=-Wall
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

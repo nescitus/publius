@@ -1,5 +1,28 @@
 #pragma once
 
+#include <cstdint>
+
+// Define the eval hash entry
+struct EvalTTEntry {
+    Bitboard key;
+    int val;
+};
+
+class EvalHashTable {
+public:
+    EvalHashTable(size_t size); // constructor
+    ~EvalHashTable(); // destructor
+    void Save(Bitboard key, int val);
+    bool Retrieve(Bitboard key, int* score) const;
+
+private:
+    size_t Hash(Bitboard key) const;
+    EvalTTEntry* EvalTT;    // Dynamically allocated array
+    const size_t tableSize; // Size of the hash table (must be a power of two)
+};
+
+extern EvalHashTable EvalHash;
+
 int Evaluate(Position* pos, EvalData* e);
 void EvalBasic(EvalData* e, const Color color, const int piece, const int sq);
 void EvalPawn(Position* pos, EvalData* e, Color color);
@@ -31,6 +54,23 @@ const int rookMobEg [15] = { -28, -24, -20, -16, -12,  -8,  -4,   0,   4,   8,  
 const int queenMobMg[28] = { -13, -12, -11, -10,  -9,  -8,  -7,  -6 , -5,  -4,  -3,  -2,  -1,   0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14 };
 const int queenMobEg[28] = { -28, -24, -22, -20, -18, -16, -14, -12 ,-10,  -8,  -6,  -4,  -2,   0,   2,   4,   6,   8,  10,  12,  14,  16,  18,  20,  22,  24,  26,  28 };
 
+const int tempoMg = 5;
+const int tempoEg = 10;
+const int bishPairMg = 40;
+const int bishPairEg = 60;
+const int doubledPawnMg = -9;
+const int doubledPawnEg = -9;
+const int isolPawnMg = -10;
+const int isolPawnEg = -18;
+const int rookClosedMg = -6;
+const int rookClosedEg = -6;
+const int rookHalfMg = 6;
+const int rookHalfEg = 6;
+const int rookOpenMg = 12;
+const int rookOpenEg = 12;
+const int rook7thMg = 12;
+const int rook7thEg = 30;
+const int kingPseudoShield = 8;
 
 const int mgPawnPst[64] = {
 //A1                                H1

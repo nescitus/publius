@@ -115,15 +115,24 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WholeProgramOptimization>true</WholeProgramOptimization>
+      <Optimization>MaxSpeed</Optimization>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\badcapture.cpp" />
     <ClCompile Include="src\bitboard.cpp" />
     <ClCompile Include="src\bitgen.cpp" />
+    <ClCompile Include="src\color.cpp" />
+    <ClCompile Include="src\diagnostics.cpp" />
+    <ClCompile Include="src\endgame.cpp" />
     <ClCompile Include="src\eval.cpp" />
+    <ClCompile Include="src\evaldata.cpp" />
+    <ClCompile Include="src\evalhash.cpp" />
     <ClCompile Include="src\gen.cpp" />
+    <ClCompile Include="src\hashkeys.cpp" />
     <ClCompile Include="src\history.cpp" />
     <ClCompile Include="src\list.cpp" />
+    <ClCompile Include="src\lmr.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mask.cpp" />
     <ClCompile Include="src\move.cpp" />
@@ -131,7 +140,9 @@
     <ClCompile Include="src\moveundo.cpp" />
     <ClCompile Include="src\piece.cpp" />
     <ClCompile Include="src\position.cpp" />
+    <ClCompile Include="src\position_getters.cpp" />
     <ClCompile Include="src\pst.cpp" />
+    <ClCompile Include="src\pv.cpp" />
     <ClCompile Include="src\quiesce.cpp" />
     <ClCompile Include="src\root.cpp" />
     <ClCompile Include="src\search.cpp" />
@@ -142,9 +153,25 @@
     <ClCompile Include="src\util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\bitboard.h" />
+    <ClInclude Include="src\bitgen.h" />
+    <ClInclude Include="src\color.h" />
     <ClInclude Include="src\eval.h" />
+    <ClInclude Include="src\evaldata.h" />
+    <ClInclude Include="src\hashkeys.h" />
+    <ClInclude Include="src\history.h" />
+    <ClInclude Include="src\limits.h" />
+    <ClInclude Include="src\lmr.h" />
+    <ClInclude Include="src\mask.h" />
+    <ClInclude Include="src\move.h" />
+    <ClInclude Include="src\piece.h" />
     <ClInclude Include="src\publius.h" />
+    <ClInclude Include="src\pv.h" />
+    <ClInclude Include="src\search.h" />
+    <ClInclude Include="src\square.h" />
     <ClInclude Include="src\timer.h" />
+    <ClInclude Include="src\trans.h" />
+    <ClInclude Include="src\uci.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

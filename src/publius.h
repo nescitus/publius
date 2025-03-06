@@ -1,7 +1,5 @@
 #pragma once
 
-// info depth 19 time 55657 nodes 54190536 nps 973651 score cp 24 pv e2e4 e7e5 b1c3 b8c6 g1f3 f8c5 a2a3 c5b6 f1c4 g8f6 e1g1 e8g8 d2d3 d7d6 c3a4 d6d5 a4b6 a7b6 e4d5 f6d5
-
 typedef unsigned long long Bitboard;
 
 #include <iostream>

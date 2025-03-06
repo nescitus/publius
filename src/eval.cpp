@@ -9,7 +9,15 @@
 #include "mask.h"
 #include "piece.h"
 
+EvalHashTable EvalHash(1024);
+
 int Evaluate(Position *pos, EvalData *e) {
+
+    int score = 0;
+
+    if (EvalHash.Retrieve(pos->boardHash, &score)) {
+        return score;
+    }
 
     // Init eval data
     e->Clear();
@@ -17,14 +25,14 @@ int Evaluate(Position *pos, EvalData *e) {
     e->enemyKingZone[Black] = GenerateMoves.King(pos->KingSq(White));
 
     // Tempo bonus
-    e->Add(pos->GetSideToMove(), 5, 10);
+    e->Add(pos->GetSideToMove(), tempoMg, tempoEg);
 
     // Evaluate pieces and pawns
     for (Color color = White; color < colorNone; ++color) {
 
         // Bishops pair
         if (pos->Count(color, Bishop) == 2) {
-            e->Add(color, 40, 60);
+            e->Add(color, bishPairMg, bishPairEg);
         }
 
         // Piece eval
@@ -47,7 +55,7 @@ int Evaluate(Position *pos, EvalData *e) {
     // Score interpolation
     int mgPhase = std::min(24, e->phase);
     int egPhase = 24 - mgPhase;
-    int score = (((mgScore * mgPhase) + (egScore * egPhase)) / 24);
+    score = (((mgScore * mgPhase) + (egScore * egPhase)) / 24);
 
   // Drawn and drawish endgame evaluation
   int multiplier = 64;
@@ -64,8 +72,13 @@ int Evaluate(Position *pos, EvalData *e) {
   // Make sure eval doesn't exceed mate score
   score = Clip(score, EvalLimit);
 
-  // Return score relative to the side to move
-  return pos->GetSideToMove() == White ? score : -score;
+  // Make score relative to the side to move
+  if (pos->GetSideToMove() == Black)
+      score = -score;
+
+  EvalHash.Save(pos->boardHash, score);
+
+  return score;
 }
 
 void EvalPawn(Position* pos, EvalData* e, Color color) {
@@ -83,12 +96,12 @@ void EvalPawn(Position* pos, EvalData* e, Color color) {
         // Doubled pawn
         span = FrontSpan(Paint(sq), color);
         if (span & pos->Map(color, Pawn)) {
-            e->Add(color, -9, -9);
+            e->Add(color, doubledPawnMg, doubledPawnEg);
         }
 
         // Isolated pawn
         if ((Mask.adjacent[FileOf(sq)] & pos->Map(color, Pawn)) == 0) {
-            e->Add(color, -10, -18);
+            e->Add(color, isolPawnMg, isolPawnEg);
         }
 
         // Passed pawn
@@ -179,22 +192,25 @@ void EvalRook(Position* pos, EvalData* e, Color color) {
         // Rook's file (closed, semi-open, open)
         file = FillNorth(b) | FillSouth(b);
 
+        // rook on a closed file
         if (file & pos->Map(color, Pawn)) {
-            e->Add(color, -6, -6);     // rook on a closed file
+            e->Add(color, rookClosedMg, rookClosedEg);
         }
         else
         {
+            // rook on a semi-open file
             if (file & pos->Map(~color, Pawn))
-                e->Add(color, 6, 6);   // rook on a semi-open file
+                e->Add(color, rookHalfMg, rookHalfEg);   
             else
-                e->Add(color, 12, 12); // rook on an open file
+                // rook on an open file
+                e->Add(color, rookOpenMg, rookOpenEg); 
         }
 
         // Rook on 7th rank attacking pawns or cutting off enemy king
         if (Paint(sq) & Mask.rr[color][rank7]) {
             if (pos->Map(~color, Pawn) & Mask.rr[color][rank7]
                 || pos->Map(~color, King) & Mask.rr[color][rank8]) {
-                e->Add(color, 12, 30);
+                e->Add(color, rook7thMg, rook7thEg);
             }
         }
     }
@@ -254,10 +270,10 @@ void EvalKing(Position* pos, EvalData* e, Color color) {
         // (pawns closer to the king are counted twice)
 
         mobility = GenerateMoves.King(sq);
-        e->mg[color] += 8 * PopCnt(mobility & pos->Map(color, Pawn));
+        e->mg[color] += kingPseudoShield * PopCnt(mobility & pos->Map(color, Pawn));
 
         mobility = ForwardOf(mobility, color);
-        e->mg[color] += 8 * PopCnt(mobility & pos->Map(color, Pawn));
+        e->mg[color] += kingPseudoShield * PopCnt(mobility & pos->Map(color, Pawn));
     }
 }
 

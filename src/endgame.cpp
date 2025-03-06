@@ -4,7 +4,7 @@
 #include "limits.h"
 #include "publius.h"
 
-int GetDrawMul(Position* pos, Color strong, Color weak) {
+int GetDrawMul(Position *pos, Color strong, Color weak) {
 
     // stronger side has no pawns
     if (pos->Count(strong, Pawn) == 0) {
