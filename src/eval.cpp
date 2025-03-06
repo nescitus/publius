@@ -84,7 +84,7 @@ int Evaluate(Position *pos, EvalData *e) {
 void EvalPawn(Position* pos, EvalData* e, Color color) {
 
     Bitboard b, span, support;
-
+ 
     b = pos->Map(color, Pawn);
 
     while (b) {
@@ -190,7 +190,7 @@ void EvalRook(Position* pos, EvalData* e, Color color) {
             e->rookAttacks[color]++;
 
         // Rook's file (closed, semi-open, open)
-        file = FillNorth(b) | FillSouth(b);
+        file = FillNorth(Paint(sq)) | FillSouth(Paint(sq));
 
         // rook on a closed file
         if (file & pos->Map(color, Pawn)) {
@@ -256,7 +256,7 @@ void EvalQueen(Position* pos, EvalData* e, Color color) {
 
 void EvalKing(Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, mobility;
+    Bitboard b, mobility, file, next;
 
     b = pos->Map(color, King);
 
@@ -265,6 +265,24 @@ void EvalKing(Position* pos, EvalData* e, Color color) {
         
         // King piece/square table score
         EvalBasic(e, color, King, sq);
+
+        // Penalising open files near the king
+
+        file = FillNorth(Paint(sq)) | FillSouth(Paint(sq)) | Paint(sq);
+        if ((file & pos->Map(color, Pawn)) == 0)
+            e->mg[color] -= 8;
+
+        next = EastOf(file);
+        if (next) {
+            if ((next & pos->Map(color, Pawn)) == 0)
+                e->mg[color] -= 6;
+        }
+
+        next = WestOf(file);
+        if (next) {
+            if ((next & pos->Map(color, Pawn)) == 0)
+                e->mg[color] -= 6;
+        }
         
         // (sorry equivalent of) king's pawn shield
         // (pawns closer to the king are counted twice)
