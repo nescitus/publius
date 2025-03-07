@@ -38,17 +38,24 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     isRoot = !ply;
     isPv = (beta > alpha + 1);
 
-    // Quiescence search entry point
+    // QUIESCENCE SEARCH entry point. Ideally
+    // we want to evaluate a quiet position
+    // (i.e. a position where there are no
+    // favourable captures, so that we may
+    // consider its evaluation stable). That's
+    // why we do a capture-only search instead 
+    // of returning the evaluation score here. 
 
     if (depth <= 0) {
         return Quiesce(pos, ply, alpha, beta);
     }
 
-    // Periodically check for timeout, ponderhit or stop command
+    // Some bookkeeping
     nodeCount++;
     Pv.size[ply] = ply;
 
-    // Check for timeout
+    // Periodically check for timeout, 
+    // ponderhit or stop command
     TryInterrupting();
 
     // Exit to unwind search if it has timed out
@@ -57,7 +64,8 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     }
 
     // Quick exit on on a statically detected draw, 
-    // unless we are at root
+    // unless we are at root, where we need to have
+    // a move.
     if (pos->IsDraw() && !isRoot) {
         // Too many early exits in a row 
         // might cause a timeout, so we safeguard
@@ -66,9 +74,37 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
         return 0;
     }
 
-    // Retrieving data from transposition table
+    // MATE DISTANCE PRUNING, a minor improvement 
+    // shaving off some nodes when the checkmate 
+    // is near. It prevents looking for the longer
+    // checmkates if a shorter one has been already 
+    // found. It cannot be used at the root, as it 
+    // doesn't return a move, only a value.
+
+    if (!isRoot) {
+        alpha = std::max(alpha, -MateScore + ply);
+        beta = std::min(beta, MateScore - ply + 1);
+        if (alpha >= beta) {
+            return alpha;
+        }
+    }
+
+    //  READ THE TRANSPOSITION TABLE. If we have 
+    //  already searched the current position to 
+    //  sufficient depth, we may use the score
+    //  of the pasr search directly. If the depth 
+    //  was lower, we still expect the move from 
+    //  the previous search to be good and we will
+    //  try it first.
+    
     if (TT.Retrieve(pos->boardHash, &ttMove, &score, &hashFlag, alpha, beta, depth, ply)) {
 
+        // Remember that pv-nodes don't use some 
+        // pruning/reduction techniques. Because 
+        // of that, we cannot use score from the
+        // zero  window nodes. Despite the  same
+        // nominal depth, they represent more
+        // shallow and less precise search.
         if (!isPv || (score > alpha && score < beta)) {
             return score;
         }
