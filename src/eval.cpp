@@ -270,18 +270,18 @@ void EvalKing(Position* pos, EvalData* e, Color color) {
 
         file = FillNorth(Paint(sq)) | FillSouth(Paint(sq)) | Paint(sq);
         if ((file & pos->Map(color, Pawn)) == 0)
-            e->mg[color] -= 8;
+            e->mg[color] += kingOpenFilePenalty;
 
         next = EastOf(file);
         if (next) {
             if ((next & pos->Map(color, Pawn)) == 0)
-                e->mg[color] -= 6;
+                e->mg[color] += kingNearOpenPenalty;
         }
 
         next = WestOf(file);
         if (next) {
             if ((next & pos->Map(color, Pawn)) == 0)
-                e->mg[color] -= 6;
+                e->mg[color] += kingNearOpenPenalty;
         }
         
         // (sorry equivalent of) king's pawn shield

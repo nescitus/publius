@@ -71,32 +71,8 @@ const int rookOpenEg = 12;
 const int rook7thMg = 12;
 const int rook7thEg = 30;
 const int kingPseudoShield = 8;
-
-const int kingShield[64] = {
-    //A1                                H1
-      0,   0,   0,   0,   0,   0,   0,   0,
-     12,  12,   2,  -1,  -1,   2,  10,  10,
-      4,   5,  -1,  -1,  -1,  -1,   6,   4,
-     -1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,
-      0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,
-      //A8                                H8
-};
-
-const int kingStorm[64] = {
-    //A1                                H1
-      0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   1,   0,   0,
-      0,   1,   0,   0,   0,   0,   1,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,
-      0,   0,   0,   0,   0,   0,   0,   0,
-      //A8                                H8
-};
+const int kingOpenFilePenalty = -8;
+const int kingNearOpenPenalty = -6;
 
 const int mgPawnPst[64] = {
 //A1                                H1
