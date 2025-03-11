@@ -29,24 +29,23 @@ int Quiesce(Position *pos, int ply, int alpha, int beta) {
   Pv.size[ply] = ply;
   
   // Draw detection
-
   if (pos->IsDraw()) {
+
       // Too many early exits in a row 
       // might cause a timeout, so we safeguard
       if (Timeout())
           State.isStopping = true;
-      return 0;
+
+      return ScoreDraw;
   }
 
   // Safeguarding against overflow
-  
   if (ply >= PlyLimit - 1) {
       return Evaluate(pos, &e);
   }
 
   // Get a stand-pat score and adjust bounds
   // (exiting if eval exceeds beta)
-
   best = Evaluate(pos, &e);
   
   if (best >= beta) {
@@ -58,14 +57,12 @@ int Quiesce(Position *pos, int ply, int alpha, int beta) {
   }
 
   // Generate and sort move list
-
   list.Clear();
   FillNoisyList(pos, &list);
   int length = list.GetInd();
   list.ScoreMoves(pos, ply, 0);
 
   // Main loop
-
   if (length) {
 
 	  for (int i = 0; i < length; i++) {
@@ -84,27 +81,22 @@ int Quiesce(Position *pos, int ply, int alpha, int beta) {
           }
 
           // Recursion
-
 		  score = -Quiesce(pos, ply + 1, -beta, -alpha);
 
           // Unmake move
-
 		  pos->UndoMove(move, ply);
           
           // Exit if needed
-
           if (State.isStopping) {
               return 0;
           }
 
 		  // Beta cutoff
-
           if (score >= beta) {
               return score;
           }
 
 		  // Adjust alpha and score
-
 		  if (score > best) {
 			  best = score;
 			  if (score > alpha) {

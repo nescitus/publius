@@ -19,6 +19,8 @@ void Parameters::InitPst(void) {
 
             mgPst[color][Pawn][RelativeSq(color, square)] = mgPawnPst[square];
             egPst[color][Pawn][RelativeSq(color, square)] = egPawnPst[square];
+            shield[color][RelativeSq(color, square)] = kingShield[square];
+            storm[color][RelativeSq(color, square)] = kingStorm[square];
 
             mgPst[color][Knight][RelativeSq(color, square)] = mgKnightPst[square];
             egPst[color][Knight][RelativeSq(color, square)] = egKnightPst[square];

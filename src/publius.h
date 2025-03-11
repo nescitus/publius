@@ -33,6 +33,8 @@ public:
 	void Init();
 	int mgPst[2][6][64];
 	int egPst[2][6][64];
+	int shield[2][64];
+	int storm[2][64];
 };
 
 extern Parameters Params;

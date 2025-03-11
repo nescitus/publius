@@ -43,8 +43,9 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     // (i.e. a position where there are no
     // favourable captures, so that we may
     // consider its evaluation stable). That's
-    // why we do a capture-only search instead 
-    // of returning the evaluation score here. 
+    // why at leaf nodes we initiate 
+    // a capture-only search instead of
+    // returning the evaluation score here. 
 
     if (depth <= 0) {
         return Quiesce(pos, ply, alpha, beta);
@@ -71,7 +72,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
         // might cause a timeout, so we safeguard
         if (Timeout())
             State.isStopping = true;
-        return 0;
+        return ScoreDraw;
     }
 
     // MATE DISTANCE PRUNING, a minor improvement 
@@ -115,7 +116,8 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
         return Evaluate(pos, &e);
     }
 
-    // Are we in check? 
+    // Are we in check? Knowing that is useful 
+    // for pruning/reduction/extension decisions
     isInCheck = pos->IsInCheck();
 
     // Node-level pruning
@@ -127,14 +129,32 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
 
         eval = Evaluate(pos, &e);
 
-        // Static null move / beta pruning / RFP
+        // STATIC NULL MOVE (or Reverse Futility Pruning 
+        // or Beta Pruning) is similar to null move.
+        // Instead of letting the opponent search
+        // two moves in a row, it simply assumes some
+        // loss, increasing with depth. If side to move
+        // can accept that loss, then we prune.
+
         if (depth <= 4) {
             score = eval - 125 * depth;
             if (score > beta)
                 return score;
         }
 
-        // Null move
+        // NULL MOVE PRUNING means allowing the opponent
+        // to execute two moves in a row, for eample 
+        // capturing something and escaping a recapture. 
+        // If this cannot  wreck our position, then it is 
+        // so good that there's  no  point in searching 
+        // any further. We cannot really do two null moves 
+        // in a row, as this would be the same position
+        // searched at the smaller depth. "wasNull" flag
+        // above takes care of that. Also, null move is 
+        // not used in the endgame because of the risk 
+        // of zugzwang - se CanTryNullMove function 
+        // for details.
+
         if (eval > beta &&  depth > 1) {
             reduction = 3 + depth / 6;
             pos->DoNull(ply);
@@ -151,7 +171,11 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
         }   // end of null move code
     }
 
-    // Set futility pruning flag
+    // SET FUTILITY PRUNING FLAG. We are going to bet
+    // that if the static evaluation of a node is bad,
+    // then quiet moves will lead to no improvement.
+    // Score margin is increased with depth.
+
     bool canDoFutility = false;
 
     if (depth <= 6 &&
@@ -161,13 +185,25 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
         canDoFutility = true;
     }
 
+    // Reduce when position is not on transposition table.
+    // Idea from Prodeo chess engine (from Ed Schroder).
+    // Please note that the implementation is non-standard,
+    // as normally pv-nodes are not excluded, but this is
+    // what worked for this engine.
+    if (depth > 5 && !isPv && ttMove == 0 && !isInCheck) {
+        depth--;
+    }
+
     // Init moves and variables before entering main loop
     bestScore = -Infinity;
     list.Clear();
     FillCompleteList(pos, &list);
     moveListLength = list.GetInd();
 
-    // Calculate moves' scores to sort them
+    // Calculate moves' scores to sort them. Normally
+    // we are going to search the transposition table
+    // move first; in root node we start searching
+    // from the best move from the previous iteration.
     if (isRoot) 
         list.ScoreMoves(pos, ply, Pv.line[0][0]);
     else      
@@ -185,6 +221,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
 
             pos->DoMove(move, ply);
 
+            // Filter out illegal moves
             if (pos->LeavesKingInCheck()) {
                 pos->UndoMove(move, ply);
                 continue;

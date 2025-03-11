@@ -54,7 +54,12 @@ bool TransTable::Retrieve(Bitboard key, int *move, int *score, int *flag, int al
 		if (slot->depth >= depth) {
 			*score = slot->score;
 
-            // adjust checkmate score to root distnce
+            // ADJUST CHECKMATE SCORE. We must be careful 
+            // about checkmate scoring. "Mate in n" returned 
+            // from the transposition table means "mate in n 
+            // if we start counting n right now". Yet search 
+            // always returns mate scores as distance 
+            // from the root, so we must convert to that metric.
 
             if (*score < -EvalLimit) {
                 *score += ply;

@@ -15,6 +15,7 @@ public:
     Bitboard passed[2][64];
     Bitboard support[2][64];
     Bitboard adjacent[8];
+    Bitboard closeRanks[8];
     void Init();
 };
 

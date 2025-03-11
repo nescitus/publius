@@ -7,3 +7,4 @@ constexpr int IntLimit = 2147483646;
 constexpr int HistLimit = (1 << 15);
 constexpr int PlyLimit = 64;
 constexpr int MovesLimit = 256;
+constexpr int ScoreDraw = 0;
