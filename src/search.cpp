@@ -68,10 +68,12 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     // unless we are at root, where we need to have
     // a move.
     if (pos->IsDraw() && !isRoot) {
+
         // Too many early exits in a row 
         // might cause a timeout, so we safeguard
         if (Timeout())
             State.isStopping = true;
+
         return ScoreDraw;
     }
 
@@ -120,7 +122,9 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     // for pruning/reduction/extension decisions
     isInCheck = pos->IsInCheck();
 
-    // Node-level pruning
+    // NODE-LEVEL PRUNING. We try to avoid searching
+    // the current node. All the techniques used for it
+    // are speculative, but statistically they work.
     if (!wasNull &&
        !isInCheck &&
        !isPv &&

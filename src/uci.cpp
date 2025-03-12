@@ -43,6 +43,7 @@ bool ParseCommand(std::istringstream& stream, Position* pos) {
     else if (cmd == "setoption") OnSetOptionCommand(stream);
     else if (cmd == "print") PrintBoard(pos);
     else if (cmd == "perft") OnPerftCommand(stream, pos);
+    else if (cmd == "bench") OnBenchCommand(stream, pos);
     else if (cmd == "step") OnStepCommand(stream, pos);
     else if (cmd == "quit") { return false; }
     return true;
@@ -50,7 +51,7 @@ bool ParseCommand(std::istringstream& stream, Position* pos) {
 
 void OnUciCommand() {
 
-    std::cout << "id name Publius 0.036" << std::endl;
+    std::cout << "id name Publius 0.037" << std::endl;
     std::cout << "id author Pawel Koziol" << std::endl;
     std::cout << "option name Hash type spin default 16 min 1 max 4096" << std::endl;
     std::cout << "option name Clear Hash type button" << std::endl;
@@ -181,6 +182,16 @@ void OnSetOptionCommand(std::istringstream& stream) {
         int val = std::stoi(value);
         TT.Allocate(val);
     }
+}
+
+void OnBenchCommand(std::istringstream& stream, Position* pos) {
+
+    int depth;
+
+    depth = 4;
+    stream >> depth;
+    std::cout << "Running perft test at depth " << depth << std::endl;
+    Bench(pos, depth);
 }
 
 void OnPerftCommand(std::istringstream& stream, Position* p) {

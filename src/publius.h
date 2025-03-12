@@ -159,6 +159,7 @@ void OnNewGame(void);
 
 // diagnostics
 
+void Bench(Position* p, int depth);
 void PrintBoard(Position *pos);
 Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy);
 
