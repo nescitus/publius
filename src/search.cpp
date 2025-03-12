@@ -36,6 +36,13 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     movesTried = 0;
     quietMovesTried = 0;
     isRoot = !ply;
+
+    // We distinguish two kinds of nodes:
+    // zero window nodes and principal variation
+    // nodes. Zero window nodes can only fail high
+    // or fail low, as there is no distance between
+    // alpha and beta. Only pv-nodes can return
+    // an exact score.
     isPv = (beta > alpha + 1);
 
     // QUIESCENCE SEARCH entry point. Ideally
@@ -214,7 +221,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
         list.ScoreMoves(pos, ply, ttMove);
 
     // Check extension
-    if (isInCheck) depth++;
+    if (isInCheck && (isPv || depth < 9)) depth++;
 
     // Main loop
     if (moveListLength) {
@@ -252,7 +259,12 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
                 continue;
             }
 
-            // Late move pruning
+            // Late move pruning. Near the leaf nodes
+            // quiet moves that are ordered way back
+            // are unlikely to succeed, so we prune them.
+            // This may lead to an error, but statistically
+            // speaking, depth gain is more important
+            // and a deeper search will fix the error.
             if (depth <= 3 &&
                !isPv && 
                !isInCheck &&
@@ -264,7 +276,13 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
                 continue;
             }
 
-            // Late move reduction (LMR)
+            // Late move reduction (LMR). We assume
+            // that with decent move ordering cutoffs
+            // will be caused by the moves ordered early.
+            // That's why we search later moves at the 
+            // reduced depth. However, if a reduced depth
+            // search scores above beta, we need to search
+            // at the normal depth.
             if (depth > 1 && 
                 quietMovesTried > 3 && 
                 moveType == moveQuiet && 
@@ -274,12 +292,20 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
                 reduction = Lmr.table[isPv]
                                      [std::min(depth,63)]
                                      [std::min(movesTried, 63)];
+                
+                // for now it is redundant
+                // but as you add more conditions,
+                // it will come handy
                 if (reduction >= newDepth)
                     reduction = newDepth - 1;
 
+                // do a reduced depth search
                 if (reduction > 0) {
                     score = -Search(pos, ply + 1, -alpha - 1, -alpha, newDepth - reduction, false);
                     
+                    // if the reduced search score falls
+                    // below alpha, don't bother with
+                    // full depth search
                     if (score <= alpha) {
                         pos->UndoMove(move, ply);
                         if (State.isStopping) return 0;
@@ -289,6 +315,14 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
             }
 
             // PVS (Principal variation search)
+            // we search the first move of a pv-node
+            // with a full window. For each later node
+            // de do a scout search first, testing whether
+            // score is above alpha (and thus above last best score).
+            // Only if it is, we do a full window search
+            // to get the exact value of the current node.
+            // Zero window searches are still conducted
+            // with a zero window.
             if (bestScore == -Infinity)
                 score = -Search(pos, ply + 1, -beta, -alpha, newDepth, false);
             else {
@@ -297,6 +331,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
                     score = -Search(pos, ply + 1, -beta, -alpha, newDepth, false);
             }
 
+            // Undo move
             pos->UndoMove(move, ply);
             if (State.isStopping) {
                 return 0;
@@ -304,22 +339,42 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
 
             // Beta cutoff
             if (score >= beta) {
+                
+                // Beta cutoff means that a move is good.
+                // Update history table and killer moves
+                // so that the move will be sorted higher
+                // next time we encounter it.
                 History.Update(pos, move, depth, ply);
+
+                // Store move in the transposition table
                 TT.Store(pos->boardHash, move, score, upperBound, depth, ply);
 
                 // If beta cutoff occurs at the root, 
-                // change the best move
+                // change the best move and display
+                // the new mainline. (Cutoffs can happen
+                // in the root node because er are using
+                // the aspiration window).
                 if (isRoot) {
                     Pv.Refresh(ply, move);
                     DisplayPv(score);
                 }
 
+                // Stop searching this node. It has already
+                // refuted opponent's previous move and looking
+                // for a better refutation would only waste time.
                 return score;
             }
 
             // Updating score and alpha
             if (score > bestScore) {
                 bestScore = score;
+
+                // The current move is better than whatever
+                // we have calculated so far. The lack of beta
+                // cutoff implies that we are in the pv-node
+                // with some distance between alpha and beta
+                // and we are looking for the best move 
+                // and its exact value.
                 if (score > alpha) {
                     alpha = score;
                     bestMove = move;
@@ -337,7 +392,12 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
         return pos->IsInCheck() ? -MateScore + ply : 0;
     }
 
-    // Save score in the transposition table
+    // Save score in the transposition table.
+    // Please note that the search structure
+    // ensures this is done only if we are not
+    // unwinding the search due to timeout.
+    // This is a common source of bugs. If you wish,
+    // you can add an explicit test for that.
     if (bestMove) {
         TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, depth, ply);
     } else {
