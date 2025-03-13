@@ -298,31 +298,41 @@ void FillQuietList(Position *pos, MoveList *list) {
     }
 }
 
+// So far, we are generating only direct checks here.
+// Adding discovered checks requires detecting whether
+// a moving piece is between the king and a potential
+// checker and is not moving along the same ray.
+// This will be done at some stage, but is not
+// the top priority right now.
+
 void FillCheckList(Position* pos, MoveList* list) {
 
     Bitboard pieces, moves;
     Square fromSquare, toSquare;
     Color color = pos->GetSideToMove();
     Square ksq = pos->KingSq(~color);
+    
+    // find locations from where the direct checks can be given
+    Bitboard pawnChecks = ForwardOf(SidesOf(Paint(ksq)), ~color);
     Bitboard knightCheck = GenerateMoves.Knight(ksq);
     Bitboard diagCheck = GenerateMoves.Bish(pos->Occupied(), ksq);
     Bitboard straightCheck = GenerateMoves.Rook(pos->Occupied(), ksq);
-
-
-    /*
+    
     if (color == White) {
 
         // White double pawn moves
 
         moves = (NorthOf(NorthOf(pos->Map(White, Pawn) & Mask.rank[rank2]) & pos->Empty())) & pos->Empty();
+        moves &= pawnChecks;
         while (moves) {
             toSquare = PopFirstBit(&moves);
             list->AddMove(toSquare - 16, toSquare, tPawnjump);
         }
 
-        // White normal pawn moves
+        // White single pawn moves
 
         moves = NorthOf(pos->Map(White, Pawn) & ~Mask.rank[rank7]) & pos->Empty();
+        moves &= pawnChecks;
         while (moves) {
             toSquare = PopFirstBit(&moves);
             list->AddMove(toSquare - 8, toSquare, 0);
@@ -333,6 +343,7 @@ void FillCheckList(Position* pos, MoveList* list) {
         // Black double pawn moves
 
         moves = (SouthOf(SouthOf(pos->Map(Black, Pawn) & Mask.rank[rank7]) & pos->Empty())) & pos->Empty();
+        moves &= pawnChecks;
         while (moves) {
             toSquare = PopFirstBit(&moves);
             list->AddMove(toSquare + 16, toSquare, tPawnjump);
@@ -341,12 +352,12 @@ void FillCheckList(Position* pos, MoveList* list) {
         // Black single pawn moves
 
         moves = SouthOf(pos->Map(Black, Pawn) & ~Mask.rank[rank2]) & pos->Empty();
+        moves &= pawnChecks;
         while (moves) {
             toSquare = PopFirstBit(&moves);
             list->AddMove(toSquare + 8, toSquare, 0);
         }
     }
-    */
 
     // Knight moves
 
@@ -399,7 +410,7 @@ void FillCompleteList(Position *pos, MoveList *list) {
     FillQuietList(pos, list);
 }
 
-void FillChecksAndCaptures(Position* pos, MoveList* list) {
+void FillChecksAndCaptures(Position* pos, MoveList *list) {
 
     FillNoisyList(pos, list);
     FillCheckList(pos, list);

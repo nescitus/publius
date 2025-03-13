@@ -32,7 +32,7 @@ int MoveList::GetInd() {
 
 int MoveList::GetMove() { 
 
-    int mv;
+    int move;
     int min = -4 * HistLimit;
     int score = min;
     int loc = 0;
@@ -45,10 +45,10 @@ int MoveList::GetMove() {
     }
 
     values[loc] = min;
-    mv = moves[loc];
+    move = moves[loc];
     if (loc > get) SwapMoves(loc, get);
     get++;
-    return mv; 
+    return move; 
 };
 
 bool MoveList::HasMore() { 

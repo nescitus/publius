@@ -221,7 +221,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
         list.ScoreMoves(pos, ply, ttMove);
 
     // Check extension
-    if (isInCheck) depth++;
+    if (isInCheck && (isPv || depth < 7)) depth++;
 
     // Main loop
     if (moveListLength) {

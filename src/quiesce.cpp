@@ -48,7 +48,9 @@ int Quiesce(Position *pos, int ply, int qdepth, int alpha, int beta) {
   isInCheck = pos->IsInCheck();
 
   // Get a stand-pat score and adjust bounds
-  // (exiting if eval exceeds beta)
+  // (exiting if eval exceeds beta
+  // but starting at the lowers possible value
+  // when in check)
   if (isInCheck)
       best = -Infinity;
   else
