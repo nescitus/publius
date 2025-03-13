@@ -55,7 +55,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     // returning the evaluation score here. 
 
     if (depth <= 0) {
-        return Quiesce(pos, ply, alpha, beta);
+        return Quiesce(pos, ply, 0, alpha, beta);
     }
 
     // Some bookkeeping
@@ -163,7 +163,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
         // searched at the smaller depth. "wasNull" flag
         // above takes care of that. Also, null move is 
         // not used in the endgame because of the risk 
-        // of zugzwang - se CanTryNullMove function 
+        // of zugzwang - se CanTryNullMove() function 
         // for details.
 
         if (eval > beta &&  depth > 1) {
@@ -221,7 +221,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
         list.ScoreMoves(pos, ply, ttMove);
 
     // Check extension
-    if (isInCheck && (isPv || depth < 9)) depth++;
+    if (isInCheck) depth++;
 
     // Main loop
     if (moveListLength) {
@@ -278,7 +278,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
 
             // Late move reduction (LMR). We assume
             // that with decent move ordering cutoffs
-            // will be caused by the moves ordered early.
+            // will be caused by the moves tried early on.
             // That's why we search later moves at the 
             // reduced depth. However, if a reduced depth
             // search scores above beta, we need to search

@@ -179,7 +179,7 @@ void FillNoisyList(Position *pos, MoveList * list) {
 
 }
 
-void FillQuietList(Position *pos, MoveList * list) {
+void FillQuietList(Position *pos, MoveList *list) {
 
     Bitboard pieces, moves;
     Square fromSquare, toSquare;
@@ -298,8 +298,109 @@ void FillQuietList(Position *pos, MoveList * list) {
     }
 }
 
+void FillCheckList(Position* pos, MoveList* list) {
+
+    Bitboard pieces, moves;
+    Square fromSquare, toSquare;
+    Color color = pos->GetSideToMove();
+    Square ksq = pos->KingSq(~color);
+    Bitboard knightCheck = GenerateMoves.Knight(ksq);
+    Bitboard diagCheck = GenerateMoves.Bish(pos->Occupied(), ksq);
+    Bitboard straightCheck = GenerateMoves.Rook(pos->Occupied(), ksq);
+
+
+    /*
+    if (color == White) {
+
+        // White double pawn moves
+
+        moves = (NorthOf(NorthOf(pos->Map(White, Pawn) & Mask.rank[rank2]) & pos->Empty())) & pos->Empty();
+        while (moves) {
+            toSquare = PopFirstBit(&moves);
+            list->AddMove(toSquare - 16, toSquare, tPawnjump);
+        }
+
+        // White normal pawn moves
+
+        moves = NorthOf(pos->Map(White, Pawn) & ~Mask.rank[rank7]) & pos->Empty();
+        while (moves) {
+            toSquare = PopFirstBit(&moves);
+            list->AddMove(toSquare - 8, toSquare, 0);
+        }
+    }
+    else {
+
+        // Black double pawn moves
+
+        moves = (SouthOf(SouthOf(pos->Map(Black, Pawn) & Mask.rank[rank7]) & pos->Empty())) & pos->Empty();
+        while (moves) {
+            toSquare = PopFirstBit(&moves);
+            list->AddMove(toSquare + 16, toSquare, tPawnjump);
+        }
+
+        // Black single pawn moves
+
+        moves = SouthOf(pos->Map(Black, Pawn) & ~Mask.rank[rank2]) & pos->Empty();
+        while (moves) {
+            toSquare = PopFirstBit(&moves);
+            list->AddMove(toSquare + 8, toSquare, 0);
+        }
+    }
+    */
+
+    // Knight moves
+
+    pieces = pos->Map(color, Knight);
+    while (pieces) {
+        fromSquare = PopFirstBit(&pieces);
+        moves = GenerateMoves.Knight(fromSquare) & pos->Empty();
+        moves &= knightCheck;
+        while (moves) {
+            list->AddMove(fromSquare, PopFirstBit(&moves), 0);
+        }
+    }
+
+    // Diagonal moves
+
+    pieces = pos->MapDiagonalMovers(color);
+    while (pieces) {
+        fromSquare = PopFirstBit(&pieces);
+        moves = GenerateMoves.Bish(pos->Occupied(), fromSquare) & pos->Empty();
+        moves &= diagCheck;
+        while (moves) {
+            list->AddMove(fromSquare, PopFirstBit(&moves), 0);
+        }
+    }
+
+    // Straight moves
+
+    pieces = pos->MapStraightMovers(color);
+    while (pieces) {
+        fromSquare = PopFirstBit(&pieces);
+        moves = GenerateMoves.Rook(pos->Occupied(), fromSquare) & pos->Empty();
+        moves &= straightCheck;
+        while (moves) {
+            list->AddMove(fromSquare, PopFirstBit(&moves), 0);
+        }
+    }
+
+    // King moves
+    /*
+    moves = GenerateMoves.King(pos->KingSq(color)) & pos->Empty();
+    while (moves) {
+        list->AddMove(pos->KingSq(color), PopFirstBit(&moves), 0);
+    }
+    */
+}
+
 void FillCompleteList(Position *pos, MoveList *list) {
 
     FillNoisyList(pos, list);
     FillQuietList(pos, list);
+}
+
+void FillChecksAndCaptures(Position* pos, MoveList* list) {
+
+    FillNoisyList(pos, list);
+    FillCheckList(pos, list);
 }

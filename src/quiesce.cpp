@@ -8,11 +8,12 @@
 #include "eval.h"
 #include "search.h"
 
-int Quiesce(Position *pos, int ply, int alpha, int beta) {
+int Quiesce(Position *pos, int ply, int qdepth, int alpha, int beta) {
 
   int best, move, score;
   EvalData e;
   MoveList list;
+  bool isInCheck;
 
   // Statistics and attempt at quick exit
 
@@ -44,9 +45,14 @@ int Quiesce(Position *pos, int ply, int alpha, int beta) {
       return Evaluate(pos, &e);
   }
 
+  isInCheck = pos->IsInCheck();
+
   // Get a stand-pat score and adjust bounds
   // (exiting if eval exceeds beta)
-  best = Evaluate(pos, &e);
+  if (isInCheck)
+      best = -Infinity;
+  else
+      best = Evaluate(pos, &e);
   
   if (best >= beta) {
       return best;
@@ -58,7 +64,13 @@ int Quiesce(Position *pos, int ply, int alpha, int beta) {
 
   // Generate and sort move list
   list.Clear();
-  FillNoisyList(pos, &list);
+  if (isInCheck)
+      FillCompleteList(pos, &list);
+  else if (qdepth == 0)
+      FillChecksAndCaptures(pos, &list);
+  else
+      FillNoisyList(pos, &list);
+
   int length = list.GetInd();
   list.ScoreMoves(pos, ply, 0);
 
@@ -69,8 +81,10 @@ int Quiesce(Position *pos, int ply, int alpha, int beta) {
 
 		  move = list.GetMove();
 
-          if (IsBadCapture(pos, move))
-              continue;
+          if (!isInCheck && !pos->IsEmpty(GetToSquare(move))) {
+              if (IsBadCapture(pos, move))
+                  continue;
+          }
 
           // Make move, unless illegal
 
@@ -81,7 +95,7 @@ int Quiesce(Position *pos, int ply, int alpha, int beta) {
           }
 
           // Recursion
-		  score = -Quiesce(pos, ply + 1, -beta, -alpha);
+		  score = -Quiesce(pos, ply + 1, qdepth+1, -beta, -alpha);
 
           // Unmake move
 		  pos->UndoMove(move, ply);
@@ -105,6 +119,11 @@ int Quiesce(Position *pos, int ply, int alpha, int beta) {
 			  }
 		  }
 	  }
+  }
+
+  // Return correct checkmate/stalemate score
+  if (best == -Infinity) {
+      return pos->IsInCheck() ? -MateScore + ply : 0;
   }
 
   return best;

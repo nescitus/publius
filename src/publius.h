@@ -144,7 +144,9 @@ public:
 
 void FillQuietList(Position *pos, MoveList *list);
 void FillNoisyList(Position *pos, MoveList *list);
+void FillCheckList(Position* pos, MoveList* list);
 void FillCompleteList(Position *pos, MoveList *list);
+void FillChecksAndCaptures(Position* pos, MoveList* list);
 
 bool IsBadCapture(Position *pos, int move);
 int Swap(Position *pos, Square fromSquare, Square toSquare);
