@@ -4,13 +4,15 @@ class HistoryData {
 private:
 	int killer1[PlyLimit];
 	int killer2[PlyLimit];
-	int history[12][64];
+	int cutoffHistory[12][64];
+	int triesHistory[12][64];
 	void Trim(void);
-	int HistoryData::Inc(const int depth);
+	int Inc(const int depth);
 public:
 	void Clear(void);
-	void Update(Position* pos, int mv, int d, int ply);
-	int GetScore(Position* pos, int mv);
+	void Update(Position *pos, const int move, const int depth, const int ply);
+	void UpdateTries(Position *pos, const int move, const int depth);
+	int GetScore(Position *pos, const int move);
 	int GetKiller1(const int ply);
 	int GetKiller2(const int ply);
 };

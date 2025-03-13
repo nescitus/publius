@@ -27,6 +27,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     bool isRoot, isPv;
     EvalData e;
     MoveList list;
+    int moveList[256];
 
     // Init
 
@@ -239,6 +240,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
             }
 
             // Update move statistics
+            moveList[movesTried] = move;
             movesTried++;
             if (moveType == moveQuiet) {
                 quietMovesTried++;
@@ -345,6 +347,9 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
                 // so that the move will be sorted higher
                 // next time we encounter it.
                 History.Update(pos, move, depth, ply);
+                for (int i = 0; i < movesTried; i++) {
+                    History.UpdateTries(pos, moveList[i], depth);
+                }
 
                 // Store move in the transposition table
                 TT.Store(pos->boardHash, move, score, upperBound, depth, ply);
