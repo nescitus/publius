@@ -33,7 +33,7 @@ Bitboard Paint(const Square s1, const Square s2, const Square s3) {
 
 // get the first bit of the bitboard
 Square FirstOne(Bitboard b) {
-    return (Square)(bitTable[(((b) & (~(b)+1)) * (Bitboard)0x0218A392CD3D5DBF) >> 58]);
+    return static_cast<Square>(bitTable[(((b) & (~(b)+1)) * (Bitboard)0x0218A392CD3D5DBF) >> 58]);
 }
 
 // return the first bit and clear it from the bitboard

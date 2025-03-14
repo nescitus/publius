@@ -5,32 +5,34 @@
 #include "move.h"
 #include "piece.h"
 
-int GetTypeOfMove(int move) {
+int GetTypeOfMove(const int move) {
     return move >> 12;
 }
 
-Square GetFromSquare(int move) {
-    return (Square)(move & 63);
+Square GetFromSquare(const int move) {
+    return static_cast<Square>(move & 63);
 }
 
-Square GetToSquare(int move) {
-    return (Square)((move >> 6) & 63);
+Square GetToSquare(const int move) {
+    return static_cast<Square>((move >> 6) & 63);
 }
 
-int GetPromotedPiece(int move) {
+int GetPromotedPiece(const int move) {
 	return (move >> 12) - 3;
 }
 
-int CreateMove(Square fromSquare, Square toSquare, int flag) {
+int CreateMove(const Square fromSquare, 
+               const Square toSquare, 
+               const int flag) {
     return (flag << 12) | (toSquare << 6) | fromSquare;
 }
 
-bool IsMovePromotion(int move) {
+bool IsMovePromotion(const int move) {
 	return move & 0x4000;
 }
 
 // does this move change material balance?
-bool IsMoveNoisy(Position *pos, int move) {
+bool IsMoveNoisy(Position *pos, const int move) {
 
     return (pos->GetPiece(GetToSquare(move)) != noPiece
         || IsMovePromotion(move)

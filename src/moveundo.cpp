@@ -55,7 +55,8 @@ void Position::UndoMove(const int move, const int ply) {
         ChangePieceNoHash(hunter, Pawn, color, fromSquare);
     }
 
-    // Switch side
+    // Switch side (we don't use SwitchSide() function,
+    // as it would modify the hash key)
     sideToMove = ~sideToMove;
 }
 

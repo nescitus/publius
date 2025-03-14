@@ -4,9 +4,15 @@
 #include "publius.h"
 #include "bitboard.h"
 #include "bitgen.h"
-#include "mask.h"
 #include "hashkeys.h"
 #include "piece.h"
+
+// For Position class members observe the following 
+// naming convention: if the function to manipulate
+// board position doesn't change the hashkey, then
+// it has "NoHash" appended to the name. Otherwise,
+// expect any manipulator function to modify
+// the hash key.
 
 void Position::Clear() {
 
@@ -274,25 +280,7 @@ void Position::UpdateCastlingRights(const Square fromSquare, const Square toSqua
 }
 
 void Position::TryMarkingIrreversible() {
+
     if (reversibleMoves == 0)
         repetitionIndex = 0;
-}
-
-bool Position::SquareIsAttacked(const Square sq, const Color color) const {
-
-    return (Map(color, Pawn) & GenerateMoves.Pawn(~color, sq))
-        || (Map(color, Knight) & GenerateMoves.Knight(sq))
-        || (MapDiagonalMovers(color) & GenerateMoves.Bish(Occupied(), sq))
-        || (MapStraightMovers(color) & GenerateMoves.Rook(Occupied(), sq))
-        || (Map(color, King) & GenerateMoves.King(sq));
-}
-
-Bitboard Position::AttacksTo(const Square sq) const {
-
-    return (Map(White, Pawn) & GenerateMoves.Pawn(Black, sq)) |
-        (Map(Black, Pawn) & GenerateMoves.Pawn(White, sq)) |
-        (MapPieceType(Knight) & GenerateMoves.Knight(sq)) |
-        ((AllDiagMovers()) & GenerateMoves.Bish(Occupied(), sq)) |
-        ((AllStraightMovers()) & GenerateMoves.Rook(Occupied(), sq)) |
-        (MapPieceType(King) & GenerateMoves.King(sq));
 }

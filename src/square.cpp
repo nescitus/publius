@@ -24,7 +24,7 @@ Square operator^(Square d1, int d2) {
 
 // given rank and file, define square
 Square MakeSquare(const int rank, int file) {
-    return (Square) ((file << 3) | rank);
+    return static_cast<Square>((file << 3) | rank);
 }
 
 // get rank that a square belongs to
