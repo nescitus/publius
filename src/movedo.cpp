@@ -10,6 +10,7 @@
 
 void Position::DoMove(const int move, const int ply) {
 
+    // Init variables
     Color color = sideToMove;
     Square fromSquare = GetFromSquare(move);
     Square toSquare = GetToSquare(move);
@@ -76,7 +77,7 @@ void Position::DoMove(const int move, const int ply) {
         hunter = GetPromotedPiece(move);
         boardHash ^= Key.pieceKey[CreatePiece(color, Pawn)][toSquare]
                    ^ Key.pieceKey[CreatePiece(color, hunter)][toSquare];
-        ChangePiece(Pawn, hunter, color, toSquare);
+        ChangePieceNoHash(Pawn, hunter, color, toSquare);
     }
 
     // Switch side to move

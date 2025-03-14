@@ -7,6 +7,7 @@
 
 void Position::UndoMove(const int move, const int ply) {
 
+    // Init variables
     Color color = ~sideToMove;
     Square fromSquare = GetFromSquare(move);
     Square toSquare = GetToSquare(move);
@@ -14,28 +15,27 @@ void Position::UndoMove(const int move, const int ply) {
     int prey = undoStack[ply].prey;
     int moveType = GetTypeOfMove(move);
 
+    // Copy stuff needed to undo the move
     castleFlags = undoStack[ply].castleFlags;
     enPassantSq = undoStack[ply].enPassantSq;
     reversibleMoves = undoStack[ply].reversibleMoves;
     boardHash = undoStack[ply].boardHash;
     repetitionIndex--;
 
+    // Move piece
     MovePieceNoHash(color, hunter, toSquare, fromSquare);
 
     // Update king location
-
     if (hunter == King) {
         kingSq[color] = fromSquare;
     }
 
     // Undo capture
-
     if (prey != noPieceType) {
-        AddPiece(~color, prey, toSquare);
+        AddPieceNoHash(~color, prey, toSquare);
     }
 
     // Undo complementary rook move in case of castling
-
     if (moveType == tCastle) {
         switch (toSquare) {
         case C1: { MovePieceNoHash(color, Rook, D1, A1); break; }
@@ -46,19 +46,16 @@ void Position::UndoMove(const int move, const int ply) {
     }
 
     // Reinstate a pawn captured en passant
-
     if (moveType == tEnPassant) {
-        AddPiece(~color, Pawn, toSquare ^ 8);
+        AddPieceNoHash(~color, Pawn, toSquare ^ 8);
     }
 
     // Change promoted piece back to pawn
-
     if (IsMovePromotion(move)) {
-        ChangePiece(hunter, Pawn, color, fromSquare);
+        ChangePieceNoHash(hunter, Pawn, color, fromSquare);
     }
 
     // Switch side
-
     sideToMove = ~sideToMove;
 }
 

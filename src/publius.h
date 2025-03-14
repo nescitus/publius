@@ -58,10 +58,10 @@ private:
 	void ClearEnPassant();
 	void MovePiece(const Color color, const int hunter, const Square fromSquare, Square toSquare);
 	void MovePieceNoHash(const Color color, const int hunter, const Square fromSquare, Square toSquare);
-	void AddPiece(const Color color, const int typeOfPiece, const Square square);
+	void AddPieceNoHash(const Color color, const int typeOfPiece, const Square square);
 	void TakePiece(const Color color, const int typeOfPiece, const Square square);
 	void TakePieceNoHash(const Color color, const int typeOfPiece, const Square square);
-	void ChangePiece(const int oldType, const int newType, const Color color, const Square square);
+	void ChangePieceNoHash(const int oldType, const int newType, const Color color, const Square square);
 	void SetEnPassantSquare(const Color color, Square toSquare);
 	void UpdateCastlingRights(const Square fromSquare, const Square toSquare);
 	Bitboard CalculateHashKey();

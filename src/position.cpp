@@ -69,52 +69,52 @@ void Position::Set(const std::string str) {
                     square = square + 8; 
                     break;
 				case 'p': 
-                    AddPiece(Black, Pawn, InvertSquare(square)); 
+                    AddPieceNoHash(Black, Pawn, InvertSquare(square)); 
                     ++square; 
                     break;
 				case 'b': 
-                    AddPiece(Black, Bishop, InvertSquare(square)); 
+                    AddPieceNoHash(Black, Bishop, InvertSquare(square)); 
                     ++square; 
                     break;
 				case 'n': 
-                    AddPiece(Black, Knight, InvertSquare(square)); 
+                    AddPieceNoHash(Black, Knight, InvertSquare(square)); 
                     ++square; 
                     break;
 				case 'r': 
-                    AddPiece(Black, Rook, InvertSquare(square)); 
+                    AddPieceNoHash(Black, Rook, InvertSquare(square)); 
                     ++square; 
                     break;
 				case 'q': 
-                    AddPiece(Black, Queen, InvertSquare(square)); 
+                    AddPieceNoHash(Black, Queen, InvertSquare(square)); 
                     ++square; 
                     break;
 				case 'k': 
-                    AddPiece(Black, King, InvertSquare(square)); 
+                    AddPieceNoHash(Black, King, InvertSquare(square)); 
                     kingSq[Black] = InvertSquare(square); 
                     ++square; 
                     break;
 				case 'P': 
-                    AddPiece(White, Pawn, InvertSquare(square)); 
+                    AddPieceNoHash(White, Pawn, InvertSquare(square)); 
                     ++square; 
                     break;
 				case 'B': 
-                    AddPiece(White, Bishop, InvertSquare(square)); 
+                    AddPieceNoHash(White, Bishop, InvertSquare(square)); 
                     ++square; 
                     break;
 				case 'N': 
-                    AddPiece(White, Knight, InvertSquare(square)); 
+                    AddPieceNoHash(White, Knight, InvertSquare(square)); 
                     ++square; 
                     break;
 				case 'R': 
-                    AddPiece(White, Rook, InvertSquare(square)); 
+                    AddPieceNoHash(White, Rook, InvertSquare(square)); 
                     ++square; 
                     break;
 				case 'Q': 
-                    AddPiece(White, Queen, InvertSquare(square)); 
+                    AddPieceNoHash(White, Queen, InvertSquare(square)); 
                     ++square; 
                     break;
 				case 'K': 
-                    AddPiece(White, King, InvertSquare(square)); 
+                    AddPieceNoHash(White, King, InvertSquare(square)); 
                     kingSq[White] = InvertSquare(square); 
                     ++square; 
                     break;
@@ -236,19 +236,19 @@ void Position::TakePieceNoHash(const Color color,
      pieceCount[color][typeOfPiece]--;
 }
 
-void Position::AddPiece(const Color color, 
-                        const int typeOfPiece, 
-                        const Square square) {
+void Position::AddPieceNoHash(const Color color, 
+                              const int typeOfPiece, 
+                              const Square square) {
 
      pieceLocation[square] = CreatePiece(color,typeOfPiece);
      pieceBitboard[color][typeOfPiece] ^= Paint(square);
      pieceCount[color][typeOfPiece]++;
 }
 
-void Position::ChangePiece(const int oldType, 
-                           const int newType, 
-                           const Color color, 
-                           const Square square) {
+void Position::ChangePieceNoHash(const int oldType, 
+                                 const int newType, 
+                                 const Color color, 
+                                 const Square square) {
 
      pieceLocation[square] = CreatePiece(color, newType);
      pieceBitboard[color][oldType] ^= Paint(square);
