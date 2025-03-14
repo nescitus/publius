@@ -33,11 +33,15 @@ void EvalQueen(Position* pos, EvalData* e, Color color);
 void EvalKing(Position* pos, EvalData* e, Color color);
 void EvalKingAttacks(EvalData* e, Color color);
 int GetDrawMul(Position* pos, Color strong, Color weak);
+int Interpolate(EvalData* e);
 
 const int mgPieceValue[6] = {  93, 400, 401, 599, 1250, 0 };
 const int egPieceValue[6] = { 105, 350, 374, 630, 1215, 0 };
 
+// Game phase is used to interpolate between middlegame
+// and endgame scores. See Interpolate() for details.
 const int phaseTable[6]   = {   0,   1,   1,   2,   4,  0 };
+const int MaxGamePhase = 24;
 
 const int passedBonusMg[2][8] = { { 0, 10, 10, 30, 50, 80, 120, 0},
                                   { 0, 120, 80, 50, 30, 10, 10, 0} };

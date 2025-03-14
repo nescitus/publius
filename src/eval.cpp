@@ -48,14 +48,7 @@ int Evaluate(Position *pos, EvalData *e) {
     EvalKingAttacks(e, White);
     EvalKingAttacks(e, Black);
 
-    // Sum all the eval factors
-    int mgScore = e->mg[White] - e->mg[Black];
-    int egScore = e->eg[White] - e->eg[Black];
-
-    // Score interpolation
-    int mgPhase = std::min(24, e->phase);
-    int egPhase = 24 - mgPhase;
-    score = (((mgScore * mgPhase) + (egScore * egPhase)) / 24);
+    score = Interpolate(e);
 
   // Drawn and drawish endgame evaluation
   int multiplier = 64;
@@ -321,4 +314,16 @@ void EvalKingAttacks(EvalData *e, Color color) {
     result -= 3 * e->minorAttacks[color];
 
     e->Add(color, 400 * result / 100, 0);
+}
+
+int Interpolate(EvalData *e) {
+
+    // Sum all the eval factors
+    int mgScore = e->mg[White] - e->mg[Black];
+    int egScore = e->eg[White] - e->eg[Black];
+
+    // Score interpolation
+    int mgPhase = std::min(24, e->phase);
+    int egPhase = 24 - mgPhase;
+    return (((mgScore * mgPhase) + (egScore * egPhase)) / MaxGamePhase);
 }
