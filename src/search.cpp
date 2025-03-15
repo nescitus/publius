@@ -169,7 +169,10 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
 
         if (eval > beta && depth > 1) {
 
+            // set null move reduction
             reduction = 3 + depth / 6;
+            if (eval - beta > 200) reduction++;
+
             pos->DoNull(ply);
             score = -Search(pos, ply + 1, -beta, -beta + 1, depth - reduction, true);
             pos->UndoNull(ply);

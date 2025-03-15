@@ -8,6 +8,7 @@
 #include "eval.h"
 #include "mask.h"
 #include "piece.h"
+#include <iostream>
 
 EvalHashTable EvalHash(1024);
 
