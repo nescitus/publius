@@ -295,7 +295,7 @@ void EvalKing(Position* pos, EvalData* e, Color color) {
 void EvalBasic(EvalData *e, const Color color, const int piece, const int sq) {
 
     e->phase += phaseTable[piece];
-    e->Add(color, mgPieceValue[piece], egPieceValue[piece]);
+    //e->Add(color, mgPieceValue[piece], egPieceValue[piece]); // merged with pst
     e->Add(color, Params.mgPst[color][piece][sq], 
                   Params.egPst[color][piece][sq]);
 }
