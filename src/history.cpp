@@ -48,7 +48,7 @@ void HistoryData::Update(Position *pos, const int move, const int depth, const i
 
     // Update history score
     cutoffHistory[piece][toSquare] += Inc(depth);
-
+ 
     // Keep history scores within range
     if (cutoffHistory[piece][toSquare] > HistLimit) {
         Trim();
@@ -63,14 +63,14 @@ void HistoryData::UpdateTries(Position *pos, const int move, const int depth)
 
     // Init
     Square fromSquare = GetFromSquare(move);
-    Square ToSquare = GetToSquare(move);
-    int pc = pos->GetPiece(fromSquare);
+    Square toSquare = GetToSquare(move);
+    int piece = pos->GetPiece(fromSquare);
 
     // Update tries history
-    triesHistory[pc][ToSquare] += Inc(depth);
-
+    triesHistory[piece][toSquare] += Inc(depth);
+ 
     // Keep history scores within range
-    if (triesHistory[pc][ToSquare] > HistLimit)
+    if (triesHistory[piece][toSquare] > HistLimit)
         Trim();
 }
 

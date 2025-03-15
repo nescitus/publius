@@ -167,15 +167,25 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
         // of zugzwang - se CanTryNullMove() function 
         // for details.
 
-        if (eval > beta &&  depth > 1) {
+        if (eval > beta && depth > 1) {
+
             reduction = 3 + depth / 6;
             pos->DoNull(ply);
             score = -Search(pos, ply + 1, -beta, -beta + 1, depth - reduction, true);
             pos->UndoNull(ply);
 
-            if (State.isStopping) {
+            if (State.isStopping)
                 return 0;
-            }
+
+            // NULL MOVE VERIFICATION - at higher depths
+            // we perform a normal search to a reduced
+            // depth. The idea is to have some safeguard
+            // against zugzwangs.
+            if (depth - reduction > 5 && score >= beta)
+                score = Search(pos, ply, alpha, beta, depth - reduction - 4, true);
+            
+            if (State.isStopping) 
+                return 0;
 
             if (score >= beta) {
                 return score;

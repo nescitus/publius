@@ -9,5 +9,5 @@ Square GetToSquare(const int move);
 int CreateMove(const Square fromSquare, const Square toSquare, const int flag);
 bool IsMovePromotion(const int move);
 bool IsMoveNoisy(Position* pos, const int move);
-std::string MoveToString(int move);
+std::string MoveToString(const int move);
 int StringToMove(Position* pos, const std::string& moveString);

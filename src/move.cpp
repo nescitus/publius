@@ -39,7 +39,7 @@ bool IsMoveNoisy(Position *pos, const int move) {
         || GetTypeOfMove(move) == tEnPassant);
 }
 
-std::string MoveToString(int move) {
+std::string MoveToString(const int move) {
 
     static const char prom_char[5] = "nbrq";
     std::string move_str = SquareName(GetFromSquare(move))
