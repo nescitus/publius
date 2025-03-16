@@ -1,6 +1,17 @@
-Publius is a dead simple bitboard chess engine for didactic purposes. Basically a boilerplate chess engine to build upon, no strings attached.
+Publius is a dead simple public domain bitboard chess engine for didactic purposes. Basically a boilerplate chess engine to build upon, no strings attached.
 
 The current rating estimate is 2720 on the CCRL scale, based on narrowly beating Fruit 2.1.
+
+"Simple" and "teaching engine" are vague concepts, so explanation of constraints is in order:
+
+- eval is done, if not necessarily tuned. It takes into account material, bishop pair, piece/square tables, mobility, passed, doubled and isolated pawns, intentionally primitive king safety and some detection of drawish endgames.
+- quiescence search is probably done, unless I make delta pruning work
+- search is under active developement and there will be more stuff added
+- board update relies on four functions: AddPiece, DeletePiece, MovePiece and ChangePiece
+- apart from the hash key, there are no incremental updates of evaluation stuff. If someone wants to slap NNUE on top of my code, there will be no need to delete them. If not, at least eval can be read in one piece.
+- movegen is slow, there is no specialized popcount. Simple kindergarten bitboard stuff would be a welcome addition.
+- I'm still not sure whether to generate discovered checks
+- more comments will be added.
 
 Functionalities up to date
 
