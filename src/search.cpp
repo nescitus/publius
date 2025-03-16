@@ -121,7 +121,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
         }
     }
 
-    // Safeguard against exceeding ply limit
+    // Safeguard against ply limit overflow
     if (ply >= PlyLimit - 1) {
         return Evaluate(pos, &e);
     }
@@ -169,10 +169,12 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
 
         if (eval > beta && depth > 1) {
 
-            // set null move reduction
+            // Set null move reduction
             reduction = 3 + depth / 6;
             if (eval - beta > 200) reduction++;
 
+            // Do null move search, giving the opponent
+            // two moves in a row
             pos->DoNull(ply);
             score = -Search(pos, ply + 1, -beta, -beta + 1, depth - reduction, true);
             pos->UndoNull(ply);
@@ -467,13 +469,12 @@ void DisplayPv(int score) {
               << " score "
               << scoreType << " " << score << " pv";
 
-    // print main line
+    // print the main line
     for (int j = 0; j < Pv.size[0]; ++j) {
         std::cout << " " << MoveToString(Pv.line[0][j]);
     }
 
     std::cout << std::endl;
-
 }
 
 void TryInterrupting(void) 

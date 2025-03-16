@@ -53,10 +53,6 @@ int InputAvailable(void) {
 #endif
 }
 
-int Clip(int v, int l) {
-    return (std::max(-l, std::min(v, l)));
-}
-
 // Function to convert a string to lowercase
 std::string ToLower(const std::string& str) {
     std::string lowerStr = str;

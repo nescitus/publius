@@ -18,7 +18,7 @@ void MoveList::SwapMoves(const int i, const int j) {
 
 void MoveList::AddMove(Square fromSquare, Square toSquare, int flag) {
 
-	moves[ind] = (flag << 12) | (toSquare << 6) | fromSquare;
+    moves[ind] = CreateMove(fromSquare, toSquare, flag);
 	ind++;
 }
 
@@ -49,10 +49,6 @@ int MoveList::GetMove() {
     if (loc > get) SwapMoves(loc, get);
     get++;
     return move; 
-};
-
-bool MoveList::HasMore() { 
-	return (get < ind); 
 };
 
 void MoveList::ScoreMoves(Position * pos, int ply, int ttMove) {

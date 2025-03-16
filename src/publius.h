@@ -136,7 +136,6 @@ public:
 	void AddMove(Square fromSquare, Square toSquare, int flag);
 	int GetInd();
 	int GetMove();
-	bool HasMore();
 	void ScoreMoves(Position *pos, int ply, int ttMove);
 };
 
@@ -150,8 +149,6 @@ void FillChecksAndCaptures(Position* pos, MoveList* list);
 
 bool IsBadCapture(Position *pos, int move);
 int Swap(Position *pos, Square fromSquare, Square toSquare);
-
-int Clip(int v, int l);
 
 void TryInterrupting(void);
 void DisplayPv(int score);

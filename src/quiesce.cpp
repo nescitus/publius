@@ -9,143 +9,154 @@
 #include "search.h"
 #include "trans.h"
 
-int Quiesce(Position *pos, int ply, int qdepth, int alpha, int beta) {
+int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
 
-  int bestScore, move, bestMove, ttMove = 0, hashFlag, score;
-  EvalData e;
-  MoveList list;
-  bool isInCheck;
-  bool isPv = (beta > alpha + 1);
+    int bestScore, move, bestMove, ttMove, hashFlag, score;
+    EvalData e;
+    MoveList list;
+    bool isInCheck, isPv;
 
-  // Statistics and attempt at quick exit
+    // Init
+    bestMove = 0;
+    ttMove = 0;
+    isPv = (beta > alpha + 1);
 
-  nodeCount++;
+    // Statistics and attempt at quick exit
+    nodeCount++;
 
-  // Check for timeout
-  TryInterrupting();
+    // Check for timeout
+    TryInterrupting();
 
-  // Exit to unwind search if it has timed out
-  if (State.isStopping) {
-      return 0;
-  }
+    // Exit to unwind search if it has timed out
+    if (State.isStopping) {
+        return 0;
+    }
 
-  if (TT.Retrieve(pos->boardHash, &ttMove, &score, &hashFlag, alpha, beta, 0, ply)) {
+    // Retrieve score from transposition table
+    // (not sure if isPv condition is relevant)
+    if (TT.Retrieve(pos->boardHash, &ttMove, &score, &hashFlag, alpha, beta, 0, ply)) {
 
-      if (!isPv || (score > alpha && score < beta)) {
-          return score;
-      }
-  }
+        if (!isPv || (score > alpha && score < beta)) {
+            return score;
+        }
+    }
 
-  Pv.size[ply] = ply;
-  
-  // Draw detection
-  if (pos->IsDraw()) {
+    Pv.size[ply] = ply;
 
-      // Too many early exits in a row 
-      // might cause a timeout, so we safeguard
-      if (Timeout())
-          State.isStopping = true;
+    // Draw detection
+    if (pos->IsDraw()) {
 
-      return ScoreDraw;
-  }
+        // Too many early exits in a row 
+        // might cause a timeout, so we safeguard
+        if (Timeout())
+            State.isStopping = true;
 
-  // Safeguarding against overflow
-  if (ply >= PlyLimit - 1) {
-      return Evaluate(pos, &e);
-  }
+        return ScoreDraw;
+    }
 
-  isInCheck = pos->IsInCheck();
+    // Safeguarding against ply limit overflow
+    if (ply >= PlyLimit - 1) {
+        return Evaluate(pos, &e);
+    }
 
-  // Get a stand-pat score and adjust bounds
-  // (exiting if eval exceeds beta
-  // but starting at the lowers possible value
-  // when in check)
-  if (isInCheck)
-      bestScore = -Infinity;
-  else
-      bestScore = Evaluate(pos, &e);
-  
-  if (bestScore >= beta) {
-      return bestScore;
-  }
+    // Are we in check? Then we must flee
+    isInCheck = pos->IsInCheck();
 
-  if (bestScore > alpha) {
-      alpha = bestScore;
-  }
+    // Get a stand-pat score and adjust bounds
+    // (exiting if eval exceeds beta
+    // but starting at the lowers possible value
+    // when in check)
+    if (isInCheck)
+        bestScore = -Infinity;
+    else
+        bestScore = Evaluate(pos, &e);
 
-  // Generate and sort move list
-  list.Clear();
-  if (isInCheck)
-      FillCompleteList(pos, &list);
-  else if (qdepth == 0)
-      FillChecksAndCaptures(pos, &list);
-  else
-      FillNoisyList(pos, &list);
+    // Static score cutoff
+    if (bestScore >= beta) {
+        return bestScore;
+    }
 
-  int length = list.GetInd();
-  list.ScoreMoves(pos, ply, ttMove);
+    // Guaranteed score if we don't find anything better
+    if (bestScore > alpha) {
+        alpha = bestScore;
+    }
 
-  // Main loop
-  if (length) {
+    // Generate and sort move list. We have three cases:
+    // 1) when in check, we look for evasions
+    // 2) when we have just started quiescence search,
+    //    we generate captures and (some) checks
+    // 3) otherwise it's just captures
+    list.Clear();
+    if (isInCheck)
+        FillCompleteList(pos, &list); // case 1)
+    else if (qdepth == 0) // <= 1 failed 2025-03-16
+        FillChecksAndCaptures(pos, &list); // case 2)
+    else
+        FillNoisyList(pos, &list); // case 3)
 
-	  for (int i = 0; i < length; i++) {
+    // Score moves to sort them well
+    int length = list.GetInd();
+    list.ScoreMoves(pos, ply, ttMove);
 
-		  move = list.GetMove();
+    // Main loop
+    if (length) {
 
-          if (!isInCheck && !pos->IsEmpty(GetToSquare(move))) {
-              if (IsBadCapture(pos, move))
-                  continue;
-          }
+        for (int i = 0; i < length; i++) {
 
-          // Make move, unless illegal
+            move = list.GetMove();
 
-		  pos->DoMove(move, ply);
-		  if (pos->LeavesKingInCheck()) { 
-              pos->UndoMove(move, ply); 
-              continue; 
-          }
+            // Bad capture pruning
+            if (!isInCheck && !pos->IsEmpty(GetToSquare(move))) {
+                if (IsBadCapture(pos, move))
+                    continue;
+            }
 
-          // Recursion
-		  score = -Quiesce(pos, ply + 1, qdepth+1, -beta, -alpha);
+            // Make move, unless illegal
+            pos->DoMove(move, ply);
+            if (pos->LeavesKingInCheck()) {
+                pos->UndoMove(move, ply);
+                continue;
+            }
 
-          // Unmake move
-		  pos->UndoMove(move, ply);
-          
-          // Exit if needed
-          if (State.isStopping) {
-              return 0;
-          }
+            // Recursion
+            score = -Quiesce(pos, ply + 1, qdepth + 1, -beta, -alpha);
 
-		  // Beta cutoff
-          if (score >= beta) {
-              TT.Store(pos->boardHash, move, score, upperBound, 0, ply);
+            // Unmake move
+            pos->UndoMove(move, ply);
 
-              return score;
-          }
+            // Exit if needed
+            if (State.isStopping) {
+                return 0;
+            }
 
-		  // Adjust alpha and score
-		  if (score > bestScore) {
-			  bestScore = score;
-			  if (score > alpha) {
-                  bestMove = move;
-				  alpha = score;
-				  Pv.Refresh(ply, move);
-			  }
-		  }
-	  }
-  }
+            // Beta cutoff
+            if (score >= beta) {
+                TT.Store(pos->boardHash, move, score, upperBound, 0, ply);
+                return score;
+            }
 
-  // Return correct checkmate/stalemate score
-  if (bestScore == -Infinity) {
-      return pos->IsInCheck() ? -MateScore + ply : 0;
-  }
+            // Adjust alpha and score
+            if (score > bestScore) {
+                bestScore = score;
+                if (score > alpha) {
+                    bestMove = move;
+                    alpha = score;
+                    Pv.Refresh(ply, move);
+                }
+            }
+        }
+    }
 
-  if (bestMove) {
-      TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, 0, ply);
-  }
-  else {
-      TT.Store(pos->boardHash, 0, bestScore, lowerBound, 0, ply);
-  }
+    // Return correct checkmate/stalemate score
+    if (bestScore == -Infinity) {
+        return pos->IsInCheck() ? -MateScore + ply : 0;
+    }
 
-  return bestScore;
+    if (bestMove) {
+        TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, 0, ply);
+    } else {
+        TT.Store(pos->boardHash, 0, bestScore, lowerBound, 0, ply);
+    }
+
+    return bestScore;
 }

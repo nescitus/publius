@@ -9,6 +9,7 @@
 #include "mask.h"
 #include "piece.h"
 #include <iostream>
+#include <algorithm>
 
 EvalHashTable EvalHash(1024);
 
@@ -16,6 +17,7 @@ int Evaluate(Position *pos, EvalData *e) {
 
     int score = 0;
 
+    // Try to retrieve the score from the evaluation hashtable
     if (EvalHash.Retrieve(pos->boardHash, &score)) {
         return score;
     }
@@ -49,6 +51,7 @@ int Evaluate(Position *pos, EvalData *e) {
     EvalKingAttacks(e, White);
     EvalKingAttacks(e, Black);
 
+    // Interpolate between midgame and endgame scores
     score = Interpolate(e);
 
   // Drawn and drawish endgame evaluation
@@ -64,12 +67,13 @@ int Evaluate(Position *pos, EvalData *e) {
   score = (score * multiplier) / 64;
 
   // Make sure eval doesn't exceed mate score
-  score = Clip(score, EvalLimit);
+  score = std::clamp(score, -EvalLimit, EvalLimit);
 
   // Make score relative to the side to move
   if (pos->GetSideToMove() == Black)
       score = -score;
 
+  // Save the score in the evaluation hashtable
   EvalHash.Save(pos->boardHash, score);
 
   return score;
@@ -82,6 +86,7 @@ void EvalPawn(Position* pos, EvalData* e, Color color) {
     b = pos->Map(color, Pawn);
 
     while (b) {
+        // Find the next pawn to evaluate
         Square sq = PopFirstBit(&b);
 
         // Pawn material and piece/square table value
@@ -114,6 +119,7 @@ void EvalKnight(Position* pos, EvalData* e, Color color) {
     b = pos->Map(color,Knight);
 
     while (b) {
+        // Find the next knight to evaluate
         Square sq = PopFirstBit(&b);
 
         // Knight material and piece/square table value
@@ -138,6 +144,7 @@ void EvalBishop(Position* pos, EvalData* e, Color color) {
     b = pos->Map(color, Bishop);
 
     while (b) {
+        // Find the next bishop to evaluate
         Square sq = PopFirstBit(&b);
 
         // Bishop material and piece/square table value
@@ -165,6 +172,7 @@ void EvalRook(Position* pos, EvalData* e, Color color) {
     b = pos->Map(color, Rook);
 
     while (b) {
+        // Find the next rook to evaluate
         Square sq = PopFirstBit(&b);
 
         // Rook material and piece/square table value
@@ -218,6 +226,7 @@ void EvalQueen(Position* pos, EvalData* e, Color color) {
     b = pos->Map(color, Queen);
 
     while (b) {
+        // Find the next queen to evaluate
         Square sq = PopFirstBit(&b);
 
         // Queen material and piece/square table value
@@ -250,43 +259,38 @@ void EvalQueen(Position* pos, EvalData* e, Color color) {
 
 void EvalKing(Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, mobility, file, next;
+    Bitboard b, shieldMask, kingsFile, nextFile;
 
-    b = pos->Map(color, King);
-
-    while (b) {
-        Square sq = PopFirstBit(&b);
+    Square sq = pos->KingSq(color);
         
-        // King piece/square table score
-        EvalBasic(e, color, King, sq);
+    // King piece/square table score
+    EvalBasic(e, color, King, sq);
 
-        // Penalising open files near the king
+    // Penalising open files near the king
+    kingsFile = FillNorth(Paint(sq)) | FillSouth(Paint(sq)) | Paint(sq);
+    if ((kingsFile & pos->Map(color, Pawn)) == 0)
+        e->mg[color] += kingOpenFilePenalty;
 
-        file = FillNorth(Paint(sq)) | FillSouth(Paint(sq)) | Paint(sq);
-        if ((file & pos->Map(color, Pawn)) == 0)
-            e->mg[color] += kingOpenFilePenalty;
-
-        next = EastOf(file);
-        if (next) {
-            if ((next & pos->Map(color, Pawn)) == 0)
-                e->mg[color] += kingNearOpenPenalty;
-        }
-
-        next = WestOf(file);
-        if (next) {
-            if ((next & pos->Map(color, Pawn)) == 0)
-                e->mg[color] += kingNearOpenPenalty;
-        }
-        
-        // (sorry equivalent of) king's pawn shield
-        // (pawns closer to the king are counted twice)
-
-        mobility = GenerateMoves.King(sq);
-        e->mg[color] += kingPseudoShield * PopCnt(mobility & pos->Map(color, Pawn));
-
-        mobility = ForwardOf(mobility, color);
-        e->mg[color] += kingPseudoShield * PopCnt(mobility & pos->Map(color, Pawn));
+    nextFile = EastOf(kingsFile);
+    if (nextFile) {
+        if ((nextFile & pos->Map(color, Pawn)) == 0)
+            e->mg[color] += kingNearOpenPenalty;
     }
+
+    nextFile = WestOf(kingsFile);
+    if (nextFile) {
+        if ((nextFile & pos->Map(color, Pawn)) == 0)
+            e->mg[color] += kingNearOpenPenalty;
+    }
+        
+    // (sorry equivalent of) king's pawn shield
+    // (pawns closer to the king are counted twice)
+
+    shieldMask = GenerateMoves.King(sq);
+    e->mg[color] += kingPseudoShield * PopCnt(shieldMask & pos->Map(color, Pawn));
+
+    shieldMask = ForwardOf(shieldMask, color);
+    e->mg[color] += kingPseudoShield * PopCnt(shieldMask & pos->Map(color, Pawn));
 }
 
 // Operations repeated while evaluating any piece:
