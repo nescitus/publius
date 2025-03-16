@@ -7,13 +7,15 @@
 #include "evaldata.h"
 #include "eval.h"
 #include "search.h"
+#include "trans.h"
 
 int Quiesce(Position *pos, int ply, int qdepth, int alpha, int beta) {
 
-  int best, move, score;
+  int bestScore, move, bestMove, ttMove = 0, hashFlag, score;
   EvalData e;
   MoveList list;
   bool isInCheck;
+  bool isPv = (beta > alpha + 1);
 
   // Statistics and attempt at quick exit
 
@@ -25,6 +27,13 @@ int Quiesce(Position *pos, int ply, int qdepth, int alpha, int beta) {
   // Exit to unwind search if it has timed out
   if (State.isStopping) {
       return 0;
+  }
+
+  if (TT.Retrieve(pos->boardHash, &ttMove, &score, &hashFlag, alpha, beta, 0, ply)) {
+
+      if (!isPv || (score > alpha && score < beta)) {
+          return score;
+      }
   }
 
   Pv.size[ply] = ply;
@@ -52,16 +61,16 @@ int Quiesce(Position *pos, int ply, int qdepth, int alpha, int beta) {
   // but starting at the lowers possible value
   // when in check)
   if (isInCheck)
-      best = -Infinity;
+      bestScore = -Infinity;
   else
-      best = Evaluate(pos, &e);
+      bestScore = Evaluate(pos, &e);
   
-  if (best >= beta) {
-      return best;
+  if (bestScore >= beta) {
+      return bestScore;
   }
 
-  if (best > alpha) {
-      alpha = best;
+  if (bestScore > alpha) {
+      alpha = bestScore;
   }
 
   // Generate and sort move list
@@ -74,7 +83,7 @@ int Quiesce(Position *pos, int ply, int qdepth, int alpha, int beta) {
       FillNoisyList(pos, &list);
 
   int length = list.GetInd();
-  list.ScoreMoves(pos, ply, 0);
+  list.ScoreMoves(pos, ply, ttMove);
 
   // Main loop
   if (length) {
@@ -109,13 +118,16 @@ int Quiesce(Position *pos, int ply, int qdepth, int alpha, int beta) {
 
 		  // Beta cutoff
           if (score >= beta) {
+              TT.Store(pos->boardHash, move, score, upperBound, 0, ply);
+
               return score;
           }
 
 		  // Adjust alpha and score
-		  if (score > best) {
-			  best = score;
+		  if (score > bestScore) {
+			  bestScore = score;
 			  if (score > alpha) {
+                  bestMove = move;
 				  alpha = score;
 				  Pv.Refresh(ply, move);
 			  }
@@ -124,9 +136,16 @@ int Quiesce(Position *pos, int ply, int qdepth, int alpha, int beta) {
   }
 
   // Return correct checkmate/stalemate score
-  if (best == -Infinity) {
+  if (bestScore == -Infinity) {
       return pos->IsInCheck() ? -MateScore + ply : 0;
   }
 
-  return best;
+  if (bestMove) {
+      TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, 0, ply);
+  }
+  else {
+      TT.Store(pos->boardHash, 0, bestScore, lowerBound, 0, ply);
+  }
+
+  return bestScore;
 }
