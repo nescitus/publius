@@ -28,6 +28,11 @@ const char* test[] = {
  NULL
 };
 
+// Bench function runs the analysis of several positions
+// to the desired depth. It has two uses:
+// - confirming that a change is indeed non-functional
+// - measuring the impact of a change to the engine's speed
+
 void Bench(Position* p, int depth) {
 
     nodeCount = 0;
@@ -50,11 +55,12 @@ void Bench(Position* p, int depth) {
     if (elapsed) nps = nodeCount * 1000 / elapsed;
 
     std::cout << "Bench at depth " << depth
-              << " took " << elapsed << " milliseconds, searching "
-              << nodeCount << " nodes at " << nps << " nodes per second." 
-              << std::endl;
+        << " took " << elapsed << " milliseconds, searching "
+        << nodeCount << " nodes at " << nps << " nodes per second."
+        << std::endl;
 }
 
+// print board
 void PrintBoard(Position* pos) {
 
     char* piece_name[] = { "P ", "p ", "N ", "n ", "B ", "b ", "R ", "r ", "Q ", "q ", "K ", "k ", ". " };
@@ -80,6 +86,10 @@ void PrintBoard(Position* pos) {
         << std::endl;
 }
 
+// Perft can be used to measure move generation and board update
+// speed, but more importantly, to confirm that the move generator
+// works correctly. This version comes with a "divide" enhancement,
+// printing out subtotals for each move.
 Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
 
     int move = 0;

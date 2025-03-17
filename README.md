@@ -13,20 +13,32 @@ The current rating estimate is 2720 on the CCRL scale, based on narrowly beating
 - I'm still not sure whether to generate discovered checks
 - more comments will be added.
 
-Functionalities up to date
+*Functionalities up to date*
+
+GENERAL:
 
 - basic UCI support
 - bitboard move generator
 - pseudo-legal move list
 - static exchange evaluator to detect bad captures
 - perft
+- bench
+
+SEARCH:
+
 - alpha-beta search with PVS
+- iterative deepening with aspiration windows
 - check-aware quiescence search with SEE pruning of bad captures
 - transposition table
 - draw detection
 - null move (with verification)
 - late move reduction
-- iterative deepening with aspiration windows
+- late move pruning
+- futility pruning
+- razoring
+
+EVAL
+
 - piece/square tables
 - mobility evaluation
 - rooks on open files and 7th rank
@@ -37,13 +49,14 @@ Functionalities up to date
 - very primitive evaluation of king's pawn shield
 - very basic evaluation of non-winnable positions
 
-Additional commands:
+*Additional commands:*
+
 - in addition to "position startpos" there is "position kivipete" to test perft
 - "step" command, accepting one or more moves and changing position on the board
 - "bench n", where n is the depth to which we search several positions
 - "perft n", where n is the depth of perft test
 
-Things to add if you want to contribute
+*Things to add if you want to contribute*
 
 1. a function to check whether a move is pseudolegal
 2. with (1) in place staged move generator

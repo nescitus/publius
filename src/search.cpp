@@ -154,6 +154,18 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
                 return score;
         }
 
+        // RAZORING - we drop directly to the quiescence
+        // search if eval score is really bad. ~8 Elo gain.
+        if (!ttMove && depth <= 3) {
+            int threshold = beta - 300 + 60 * depth;
+            if (eval < threshold) {
+                score = Quiesce(pos, ply, alpha, beta, 0);
+                if (score < threshold) {
+                    return score;
+                }
+            }
+        }
+
         // NULL MOVE PRUNING means allowing the opponent
         // to execute two moves in a row, for eample 
         // capturing something and escaping a recapture. 
