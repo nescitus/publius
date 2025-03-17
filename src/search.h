@@ -1,5 +1,7 @@
 #pragma once
 
+extern int oldEval[PlyLimit];
+
 void Iterate(Position* pos);
 int Widen(Position* pos, int depth, int lastScore);
 int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNull);

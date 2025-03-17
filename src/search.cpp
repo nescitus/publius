@@ -19,6 +19,8 @@ UndoStack undoStack[stackSize];
 
 Bitboard nodeCount;
 
+int oldEval[PlyLimit];
+
 int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull) {
 
     int bestScore, newDepth, eval, moveListLength;
@@ -130,6 +132,32 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     // for pruning/reduction/extension decisions
     isInCheck = pos->IsInCheck();
 
+    // Init eval and improving flag.
+    // Nodes where the side to move 
+    // is not improving the eval are
+    // probably less interesting and
+    // warrant more pruning.
+
+    bool improving = true; // default - less pruning.
+
+    // 
+    if (isInCheck)
+        eval = -Infinity;
+    else
+        eval = Evaluate(pos, &e);
+
+    // Save eval for the current ply.
+    oldEval[ply] = eval;
+
+    // We check whether the eval has
+    // deteriorated from two ples ago.
+    // If so, we will prune and reduce 
+    // a bit more.
+    if (ply > 1) {
+        if (oldEval[ply - 2] > eval)
+            improving = false;
+    }
+
     // NODE-LEVEL PRUNING. We try to avoid searching
     // the current node. All the techniques used for it
     // are speculative, but statistically they work.
@@ -138,8 +166,6 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
        !isPv &&
         pos->CanTryNullMove()) 
     {
-
-        eval = Evaluate(pos, &e);
 
         // STATIC NULL MOVE (or Reverse Futility Pruning 
         // or Beta Pruning) is similar to null move.
@@ -220,7 +246,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     if (depth <= 6 &&
         !isInCheck &&
         !isPv &&
-        Evaluate(pos, &e) + 75 * depth < beta) {
+        eval + 75 * depth < beta) {
         canDoFutility = true;
     }
 
@@ -299,7 +325,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
                !isInCheck &&
                !pos->IsInCheck() &&
                 moveType == moveQuiet && 
-                quietMovesTried > 4 * depth) 
+                quietMovesTried > (4+improving) * depth) 
             {
                 pos->UndoMove(move, ply);
                 continue;

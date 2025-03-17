@@ -105,7 +105,12 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
 
             move = list.GetMove();
 
-            // Bad capture pruning
+            // Bad capture pruning. If the capture
+            // is expected to lose material, we aren't
+            // trying it in the quiescence search.
+            // We don't do it while in check, because
+            // all the moves defending against the check
+            // need to be tried.
             if (!isInCheck && !pos->IsEmpty(GetToSquare(move))) {
                 if (IsBadCapture(pos, move))
                     continue;
@@ -152,6 +157,8 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
         return pos->IsInCheck() ? -MateScore + ply : 0;
     }
 
+    // Save result in the transpositon table 
+    // (depth 0 for quiescence search)
     if (bestMove) {
         TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, 0, ply);
     } else {
