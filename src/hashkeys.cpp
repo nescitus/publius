@@ -11,9 +11,9 @@ std::uniform_int_distribution<Bitboard> dist(std::llround(std::pow(2, 56)), std:
 void HashKeys::Init() {
 
     for (int piece = 0; piece < 12; piece++)
-        for (Square square = A1; square < sqNone; ++square)
+        for (Square square = A1; square < sqNone; ++square) {
             pieceKey[piece][square] = Random64();
-
+        }
 
     for (int i = 0; i < 16; i++) {
         castleKey[i] = Random64();
@@ -25,6 +25,5 @@ void HashKeys::Init() {
 }
 
 Bitboard HashKeys::Random64(void) {
-    Bitboard result = dist(e2);
-    return result;
+    return dist(e2);
 }

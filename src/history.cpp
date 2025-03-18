@@ -74,6 +74,11 @@ void HistoryData::UpdateTries(Position *pos, const int move, const int depth)
         Trim();
 }
 
+bool HistoryData::IsKiller(const int move, const int ply) 
+{
+    return (move == killer1[ply] || move == killer2[ply]);
+}
+
 int HistoryData::GetKiller1(const int ply) 
 {
     return killer1[ply];

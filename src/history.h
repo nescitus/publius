@@ -15,6 +15,7 @@ public:
 	int GetScore(Position *pos, const int move);
 	int GetKiller1(const int ply);
 	int GetKiller2(const int ply);
+	bool IsKiller(const int move, const int ply);
 };
 
 extern HistoryData History;

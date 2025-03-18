@@ -138,9 +138,9 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     // probably less interesting and
     // warrant more pruning.
 
-    bool improving = true; // default - less pruning.
+    bool improving = true; // default - less pruning
 
-    // 
+    // Evaluate position, unless in check
     if (isInCheck)
         eval = -Infinity;
     else
@@ -161,6 +161,9 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     // NODE-LEVEL PRUNING. We try to avoid searching
     // the current node. All the techniques used for it
     // are speculative, but statistically they work.
+    //
+    // We skip node level pruning after a null move,
+    // in check, in pv-nodes and in the late endgame.
     if (!wasNull &&
        !isInCheck &&
        !isPv &&
@@ -282,7 +285,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
         for (int i = 0; i < moveListLength; i++) {
 
             move = list.GetMove();
-            moveType = GetMoveType(pos, move, ttMove);
+            moveType = GetMoveType(pos, move, ttMove, ply);
 
             pos->DoMove(move, ply);
 
@@ -325,7 +328,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
                !isInCheck &&
                !pos->IsInCheck() &&
                 moveType == moveQuiet && 
-                quietMovesTried > (4+improving) * depth) 
+                quietMovesTried > (3 + improving) * depth) 
             {
                 pos->UndoMove(move, ply);
                 continue;
@@ -347,12 +350,11 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
                 reduction = Lmr.table[isPv]
                                      [std::min(depth,63)]
                                      [std::min(movesTried, 63)];
-                
+
                 // for now it is redundant
                 // but as you add more conditions,
                 // it will come handy
-                if (reduction >= newDepth)
-                    reduction = newDepth - 1;
+                reduction = std::min(reduction, newDepth - 1);
 
                 // do a reduced depth search
                 if (reduction > 0) {
@@ -466,15 +468,18 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
 }
 
 // We need to know the move type for the pruning decisions
-int GetMoveType(Position *pos, int move, int ttMove) {
+int GetMoveType(Position *pos, int move, int ttMove, int ply) {
 
     if (move == ttMove) 
-        return moveHash;  // move from the hash table
+        return moveHash;   // move from the hash table
 
     if (IsMoveNoisy(pos, move))
-        return moveNoisy; // capture or promotion
+        return moveNoisy;  // capture or promotion
+
+    if (History.IsKiller(move, ply))
+        return moveKiller; // killer move
    
-    return moveQuiet;     // quiet move
+    return moveQuiet;      // quiet move
 }
 
 void DisplayPv(int score) {
