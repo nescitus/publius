@@ -9,7 +9,7 @@ SRCS= \
 	endgame.cpp \
 	eval.cpp \
 	evaldata.cpp \
-	evalhash.cpp \	
+	evalhash.cpp \
 	gen.cpp \
 	hashkeys.cpp \
 	history.cpp \
