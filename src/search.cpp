@@ -237,7 +237,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
                 return score;
             }
         }   // end of null move code
-    }
+    } // end of node pruning block
 
     // SET FUTILITY PRUNING FLAG. We are going to bet
     // that if the static evaluation of a node is bad,
@@ -287,6 +287,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
             move = list.GetMove();
             moveType = GetMoveType(pos, move, ttMove, ply);
 
+            // Make move
             pos->DoMove(move, ply);
 
             // Filter out illegal moves

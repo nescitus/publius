@@ -53,10 +53,8 @@ void MaskData::InitPassedMask() {
 
 void MaskData::InitAdjacentMask() {
 
-    for (int f = 0; f < 8; f++) {
+    for (int f = 0; f < 8; f++)
         adjacent[f] = WestOf(file[f]) | EastOf(file[f]);
-        closeRanks[f] = adjacent[f] | file[f];
-    }
 }
 
 void MaskData::InitSupportMask() {
