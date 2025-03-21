@@ -7,7 +7,7 @@
 #include "bitboard.h"
 #include "bitgen.h"
 
-const int tp_value[6] = { 100, 300, 300, 500, 900, 0 };
+const int pieceValue[6] = { 100, 300, 300, 500, 900, 0 };
 
 // IsBadCapture() is used in two places:
 // - in Quiesce() to prune captures that appear to lose material
@@ -21,7 +21,7 @@ bool IsBadCapture(Position* pos, int move) {
     int prey = pos->PieceTypeOnSq(toSquare);
 
     // good or equal capture, based on simple piece values
-    if (tp_value[prey] >= tp_value[hunter])
+    if (pieceValue[prey] >= pieceValue[hunter])
         return false;
 
     // en passant is an equal capture
@@ -51,7 +51,7 @@ int Swap(Position *pos, Square fromSquare, Square toSquare) {
 
     // put the value of the piece we are about to capture
     // on the stack
-    score[0] = tp_value[pos->PieceTypeOnSq(toSquare)];
+    score[0] = pieceValue[pos->PieceTypeOnSq(toSquare)];
 
     // identify the capturing piece
     hunter = pos->PieceTypeOnSq(fromSquare);
@@ -81,7 +81,7 @@ int Swap(Position *pos, Square fromSquare, Square toSquare) {
         }
         
         // update the score
-        score[ply] = -score[ply - 1] + tp_value[hunter];
+        score[ply] = -score[ply - 1] + pieceValue[hunter];
         
         // find the lowest attacker type
         for (hunter = Pawn; hunter <= King; hunter++)
@@ -90,7 +90,8 @@ int Swap(Position *pos, Square fromSquare, Square toSquare) {
 
         // remove the new "hunter" from the occupancy map,
         // one piece at a time (there can be more than one
-        // piece of the same type attacking the toSquare)
+        // piece of the same type attacking the toSquare).
+        // This acts as a replacement to a move.
         occupancy ^= (newHunterMap & -newHunterMap);
         
         // check if there are new captures available,

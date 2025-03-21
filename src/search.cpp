@@ -32,7 +32,6 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     int moveList[256];
 
     // Init
-
     move = 0;
     ttMove = 0;
     bestMove = 0;

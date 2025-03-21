@@ -82,7 +82,8 @@ int Evaluate(Position *pos, EvalData *e) {
 void EvalPawn(Position* pos, EvalData* e, Color color) {
 
     Bitboard b, span, support;
- 
+    bool isUnopposed;
+
     b = pos->Map(color, Pawn);
 
     while (b) {
@@ -94,12 +95,13 @@ void EvalPawn(Position* pos, EvalData* e, Color color) {
 
         // Doubled pawn
         span = FrontSpan(Paint(sq), color);
+        isUnopposed = ((span & pos->Map(~color, Pawn)) == 0);
         if (span & pos->Map(color, Pawn)) {
             e->Add(color, doubledPawnMg, doubledPawnEg);
         }
 
         // Isolated pawn
-        if ((Mask.adjacent[FileOf(sq)] & pos->Map(color, Pawn)) == 0) {
+        if ((Mask.adjacentFiles[FileOf(sq)] & pos->Map(color, Pawn)) == 0) {
             e->Add(color, isolPawnMg, isolPawnEg);
         }
 
