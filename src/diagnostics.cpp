@@ -2,6 +2,7 @@
 #include "square.h"
 #include "limits.h"
 #include "publius.h"
+#include "bitboard.h"
 #include "move.h"
 #include "timer.h"
 #include "search.h"
@@ -130,4 +131,18 @@ Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
     }
 
     return moveCount;
+}
+
+#define REL_SQ(sq,cl)   ( (sq) ^ ((cl) * 56) )
+#define RelSqBb(sq,cl)  ( Paint(REL_SQ(sq,cl) ) )
+
+void PrintBitboard(Bitboard b) {
+   
+    for (Square sq = A1; sq < 64; ++sq) {
+        if (b & RelSqBb(sq, Black)) std::cout << "+ ";
+        else                        std::cout << ". ";
+        if ((sq + 1) % 8 == 0) 
+            std::cout << 9 - ((sq + 1) / 8) << std:: endl;
+    }
+    std::cout  << "\na b c d e f g h" << std::endl;
 }

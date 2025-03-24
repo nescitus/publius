@@ -161,6 +161,7 @@ void OnNewGame(void);
 void Bench(Position* p, int depth);
 void PrintBoard(Position *pos);
 Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy);
+void PrintBitboard(Bitboard b);
 
 extern const int bitTable[64];
 extern int rootDepth;
