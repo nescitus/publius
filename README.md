@@ -1,6 +1,6 @@
 Publius is a dead simple public domain bitboard chess engine for didactic purposes. Basically a boilerplate chess engine to build upon, no strings attached.
 
-The current rating estimate is 2720 on the CCRL scale, based on narrowly beating Fruit 2.1.
+The current rating estimate is 2750 on the CCRL scale, based on narrowly beating Fruit 2.1.
 
 "Simple" and "teaching engine" are vague concepts, so explanation of constraints is in order:
 
@@ -18,7 +18,7 @@ The current rating estimate is 2720 on the CCRL scale, based on narrowly beating
 GENERAL:
 
 - basic UCI support
-- bitboard move generator
+- kindergarten bitboard move generator
 - pseudo-legal move list
 - static exchange evaluator to detect bad captures
 - perft
@@ -32,10 +32,12 @@ SEARCH:
 - transposition table
 - draw detection
 - null move (with verification)
+- static null move / reverse futility pruning
+- razoring
 - late move reduction
 - late move pruning
 - futility pruning
-- razoring
+- internal iterative reduction (slightly unusual form)
 
 EVAL
 
@@ -60,6 +62,5 @@ EVAL
 
 1. a function to check whether a move is pseudolegal
 2. with (1) in place staged move generator
-3. comments
+3. comments, especially more on the kindergarten bitboards
 4. backward pawns
-5. faster bitboard move generator (kindergarten or magic)
