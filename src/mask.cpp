@@ -10,6 +10,7 @@ void MaskData::Init() {
     InitRanks();
     InitPassedMask();
     InitAdjacentMask();
+    InitStrongPawn();
 }
 
 void MaskData::InitRanks() {
@@ -54,4 +55,14 @@ void MaskData::InitAdjacentMask() {
 
     for (int f = 0; f < 8; f++)
         adjacentFiles[f] = WestOf(file[f]) | EastOf(file[f]);
+}
+
+void MaskData::InitStrongPawn() {
+
+    for (Square sq = A1; sq < 64; ++sq) {
+        strongPawn[White][sq] = SidesOf(Paint(sq));
+        strongPawn[Black][sq] = SidesOf(Paint(sq));
+        strongPawn[White][sq] |= ForwardOf(strongPawn[White][sq], Black);
+        strongPawn[Black][sq] |= ForwardOf(strongPawn[Black][sq], White);
+    }
 }

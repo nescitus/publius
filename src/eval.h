@@ -35,8 +35,8 @@ void EvalKingAttacks(EvalData* e, Color color);
 int GetDrawMul(Position* pos, Color strong, Color weak);
 int Interpolate(EvalData* e);
 
-const int mgPieceValue[6] = {  93, 400, 401, 599, 1250, 0 };
-const int egPieceValue[6] = { 105, 350, 374, 630, 1215, 0 };
+const int mgPieceValue[6] = { 93, 402, 407, 595, 1250, 0 };
+const int egPieceValue[6] = { 104, 345, 375, 651, 1240, 0 };
 
 // Game phase is used to interpolate between middlegame
 // and endgame scores. See Interpolate() for details.
@@ -78,17 +78,28 @@ const int kingPseudoShield = 8;
 const int kingOpenFilePenalty = -8;
 const int kingNearOpenPenalty = -6;
 
+const int p_support[64] = {
+  0,   0,   0,   0,   0,   0,   0,   0,
+  0,   1,   0,  -2,   0,   1,   2,   1,
+  0,   0,   0,   2,   2,   0,   1,   1,
+  0,   0,   2,   6,   6,   2,   0,   0,
+  0,   1,   3,   7,   7,   3,   1,   0,
+  3,   5,   5,   6,   6,   5,   4,   3,
+  4,   5,   6,   7,   7,   6,   5,   4,
+  0,   0,   0,   0,   0,   0,   0,   0,
+};
+
 const int mgPawnPst[64] = {
-//A1                                H1
-  0,   0,   0,   0,   0,   0,   0,   0,
- -7, -10, -15, -10, -15,   8,   0, -19,
- -7, -12, -11,   0,   1,   6,  -1, -15,
- -3,  -2,   0,   5,  10,   6,  -5, -10,
-  1,   6,   3,  13,  20,  12,   2, -15,
- 12,  17,  28,  21,  31,  39,  17,  -9,
- 31,  41,  41,  25,  27,  37,  10,  11,
-  0,   0,   0,   0,   0,   0,   0,   0,
-//A8                                H8
+    //A1                                H1
+      0,   0,   0,   0,   0,   0,   0,   0,
+     -7, -10, -15, -10, -15,   9,   2, -19,
+     -7, -12, -11,   0,   0,   6,  -1, -15,
+     -3,  -2,   0,   5,  11,   6,  -5, -10,
+      1,   6,   3,  13,  20,  12,   2, -15,
+     12,  17,  28,  21,  31,  39,  17,  -9,
+     31,  41,  41,  25,  27,  37,  10,  11,
+      0,   0,   0,   0,   0,   0,   0,   0,
+      //A8                                H8
 };
 
 const int egPawnPst[64] = {
@@ -126,7 +137,7 @@ const int egKnightPst[64] = {
 
 const int mgBishopPst[64] = {
   4,  -8,  -7,  -9, -10,  -4, -29,   2,
-  4,   5,  -1,  -7,  -4,  -1,  15,   3,
+  4,   6,  -1,  -7,  -4,  -1,  16,   3,
  -5,  -6,  -4,  -5,  -3,   2,   5,   7,
 -16,   3,  -2,   6,   6,  -3,   3,  -8,
 -22,   0,  -5,  22,   7,  -5,  -1, -20,

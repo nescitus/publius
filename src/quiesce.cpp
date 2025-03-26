@@ -33,7 +33,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     }
 
     // Retrieve score from transposition table
-    // (not sure if isPv condition is relevant)
+    // (isPv condition helps)
     if (TT.Retrieve(pos->boardHash, &ttMove, &score, &hashFlag, alpha, beta, 0, ply)) {
 
         if (!isPv || (score > alpha && score < beta)) {
@@ -64,12 +64,9 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
 
     // Get a stand-pat score and adjust bounds
     // (exiting if eval exceeds beta
-    // but starting at the lowers possible value
+    // but starting at the lowest possible value
     // when in check)
-    if (isInCheck)
-        bestScore = -Infinity;
-    else
-        bestScore = Evaluate(pos, &e);
+    bestScore = isInCheck ? -Infinity : Evaluate(pos, &e);
 
     // Static score cutoff
     if (bestScore >= beta) {

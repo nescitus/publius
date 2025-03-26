@@ -51,7 +51,9 @@ int MoveList::GetMove() {
     return move; 
 };
 
-void MoveList::ScoreMoves(Position * pos, int ply, int ttMove) {
+void MoveList::ScoreMoves(Position *pos, 
+                          const int ply, 
+                          const int ttMove) {
 
 	Square fromSquare, toSquare;
 	int mType, hunter, prey;

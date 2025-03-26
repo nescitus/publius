@@ -31,6 +31,7 @@ private:
 	void InitPst();
 public:
 	void Init();
+	int pawnSupport[2][64];
 	int mgPst[2][6][64];
 	int egPst[2][6][64];
 };

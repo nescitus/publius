@@ -100,8 +100,13 @@ void EvalPawn(Position* pos, EvalData* e, Color color) {
             e->Add(color, doubledPawnMg, doubledPawnEg);
         }
 
+        // Strong pawn (phalanx or defended)
+        if (Mask.strongPawn[color][sq] & pos->Map(color, Pawn)) {
+            e->Add(color, Params.pawnSupport[color][sq], 0);
+        }
+
         // Isolated pawn
-        if ((Mask.adjacentFiles[FileOf(sq)] & pos->Map(color, Pawn)) == 0) {
+        else if ((Mask.adjacentFiles[FileOf(sq)] & pos->Map(color, Pawn)) == 0) {
             e->Add(color, isolPawnMg, isolPawnEg);
         }
 
