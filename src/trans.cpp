@@ -38,16 +38,15 @@ bool TransTable::Retrieve(Bitboard key, int *move, int *score, int *flag, int al
 
 	hashRecord *slot;
 
+    // Find slot
 	slot = table + (key & (tableSize-4));
 
-    // if hash entry is related to current board position,
+    // If hash entry is related to current board position,
     // try retrieving information
-
     if (slot->key == key) {
 
-        // we don't know yet if score can be reused,
+        // We don't know yet if score can be reused,
         // but move can come handy for sorting purposes
-
 		*move = slot->move;
 		*flag = slot->flags;
 
@@ -69,8 +68,7 @@ bool TransTable::Retrieve(Bitboard key, int *move, int *score, int *flag, int al
                 }
             }
 
-            // score from transposition table can be used in search
-
+            // Score from the transposition table can be used in search
 			if ((slot->flags & lowerBound && *score <= alpha)
 			||  (slot->flags & upperBound && *score >= beta))
 				return true;
@@ -83,8 +81,7 @@ void TransTable::Store(Bitboard key, int move, int score, int flags, int depth, 
 
 	hashRecord *slot;
 
-    // adjust checkmate score for root distance
-
+    // Adjust checkmate score for root distance
     if (score < -EvalLimit) {
         score -= ply;
     } else {
@@ -93,9 +90,15 @@ void TransTable::Store(Bitboard key, int move, int score, int flags, int depth, 
         }
     }
 
-    // save data in transposition table
-
+    // Save data in the transposition table
 	slot = table + (key & (tableSize - 4));
+
+    // Don't overwrite better entries
+    if (slot->key == key && slot->depth > depth) {
+        return;
+    }
+
+    // Save the data
     slot->key = key;
     slot->move = move;
     slot->score = score;

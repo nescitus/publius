@@ -351,6 +351,9 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
                                      [std::min(depth,63)]
                                      [std::min(movesTried, 63)];
 
+                //if (reduction > 1 && improving) 
+                //    reduction--;
+
                 // for now it is redundant
                 // but as you add more conditions,
                 // it will come handy
