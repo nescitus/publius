@@ -21,7 +21,7 @@ Bitboard nodeCount;
 
 int oldEval[PlyLimit];
 
-int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull) {
+int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNullMove) {
 
     int bestScore, newDepth, eval, moveListLength;
     int isInCheck, hashFlag, reduction, score, moveType;
@@ -163,7 +163,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     //
     // We skip node level pruning after a null move,
     // in check, in pv-nodes and in the late endgame.
-    if (!wasNull &&
+    if (!wasNullMove &&
        !isInCheck &&
        !isPv &&
         pos->CanTryNullMove()) 
@@ -246,8 +246,8 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNull)
     bool canDoFutility = false;
 
     if (depth <= 6 &&
-        !isInCheck &&
-        !isPv &&
+       !isInCheck &&
+       !isPv &&
         eval + 75 * depth < beta) {
         canDoFutility = true;
     }

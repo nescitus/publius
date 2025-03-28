@@ -21,7 +21,8 @@ void TransTable::Allocate(int mbsize) {
 	for (tableSize = 2; tableSize <= mbsize; tableSize *= 2)
 		;
 
-    // Calculate the number of hash records that can fit in the allocated memory
+    // Calculate the number of hash records that can fit 
+    // in the allocated memory
 	tableSize = ((tableSize/2) * 1024 * 1024) / sizeof(hashRecord);
 
     // Free any previously allocated memory
