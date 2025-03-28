@@ -20,6 +20,9 @@ class TransTable {
 private:
 	hashRecord* table;
 	int tableSize;
+	int ScoreFromTT(int score, int ply);
+	int ScoreToTT(int score, int ply);
+	hashRecord* FindSlot(Bitboard key);
 public:
 	void Clear(void);
 	void Allocate(int mbsize);

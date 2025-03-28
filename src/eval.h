@@ -32,7 +32,7 @@ void EvalRook(Position* pos, EvalData* e, Color color);
 void EvalQueen(Position* pos, EvalData* e, Color color);
 void EvalKing(Position* pos, EvalData* e, Color color);
 void EvalKingAttacks(EvalData* e, Color color);
-int GetDrawMul(Position* pos, Color strong, Color weak);
+int GetDrawMul(Position* pos, const Color strong, const Color weak);
 int Interpolate(EvalData* e);
 
 const int mgPieceValue[6] = { 93, 402, 407, 595, 1250, 0 };

@@ -4,16 +4,33 @@
 #include "publius.h"
 #include "trans.h"
 
+// Transposition table remembers results
+// of the previous searches. If the engine
+// encounters the possition it has already
+// searched, it can reuse some of the infomation.
+// The best case is returning the score, but
+// even remembering the best move improves
+// move ordering.
+
 void TransTable::Allocate(int mbsize) {
 
+    // Cap the size to a maximum of 1024 MB
 	mbsize = std::min(mbsize, 1024);
 
+    // Find the largest power of two less than or equal to mbsize
 	for (tableSize = 2; tableSize <= mbsize; tableSize *= 2)
 		;
 
+    // Calculate the number of hash records that can fit in the allocated memory
 	tableSize = ((tableSize/2) * 1024 * 1024) / sizeof(hashRecord);
+
+    // Free any previously allocated memory
 	free(table);
+
+    // Allocate memory for the transposition table
 	table = (hashRecord *)malloc(tableSize * sizeof(hashRecord));
+
+    // Init empty transposition table
 	Clear();
 }
 
@@ -39,10 +56,9 @@ bool TransTable::Retrieve(Bitboard key, int *move, int *score, int *flag, int al
 	hashRecord *slot;
 
     // Find slot
-	slot = table + (key & (tableSize-4));
+    slot = FindSlot(key);
 
-    // If hash entry is related to current board position,
-    // try retrieving information
+    // Make sure hash entry describes current board position
     if (slot->key == key) {
 
         // We don't know yet if score can be reused,
@@ -51,22 +67,9 @@ bool TransTable::Retrieve(Bitboard key, int *move, int *score, int *flag, int al
 		*flag = slot->flags;
 
 		if (slot->depth >= depth) {
-			*score = slot->score;
 
-            // ADJUST CHECKMATE SCORE. We must be careful 
-            // about checkmate scoring. "Mate in n" returned 
-            // from the transposition table means "mate in n 
-            // if we start counting n right now". Yet search 
-            // always returns mate scores as distance 
-            // from the root, so we must convert to that metric.
-
-            if (*score < -EvalLimit) {
-                *score += ply;
-            } else {
-                if (*score > EvalLimit) {
-                    *score -= ply;
-                }
-            }
+            // Return score, adjusting it for checkmate
+			*score = ScoreFromTT(slot->score, ply);
 
             // Score from the transposition table can be used in search
 			if ((slot->flags & lowerBound && *score <= alpha)
@@ -82,16 +85,10 @@ void TransTable::Store(Bitboard key, int move, int score, int flags, int depth, 
 	hashRecord *slot;
 
     // Adjust checkmate score for root distance
-    if (score < -EvalLimit) {
-        score -= ply;
-    } else {
-        if (score > EvalLimit) {
-            score += ply;
-        }
-    }
+    score = ScoreToTT(score, ply);
 
-    // Save data in the transposition table
-	slot = table + (key & (tableSize - 4));
+    // Find a slot
+    slot = FindSlot(key);
 
     // Don't overwrite better entries
     if (slot->key == key && slot->depth > depth) {
@@ -104,4 +101,38 @@ void TransTable::Store(Bitboard key, int move, int score, int flags, int depth, 
     slot->score = score;
     slot->flags = flags;
     slot->depth = depth;
+}
+
+// Calculate the slot index using a bitwise AND operation.
+// Note that it relies on tableSize being a power of 2.
+hashRecord* TransTable::FindSlot(Bitboard key) {
+    return table + (key & (tableSize - 4));
+}
+
+// ADJUST CHECKMATE SCORE. We must be careful 
+// about checkmate scoring. "Mate in n" returned 
+// from the transposition table means "mate in n 
+// if we start counting n right now". Yet search 
+// always returns mate scores as distance 
+// from the root, so we must convert to that metric.
+
+int TransTable::ScoreFromTT(int score, int ply) {
+
+    if (score < -EvalLimit)
+        score += ply;
+    else if (score > EvalLimit)
+        score -= ply;
+
+    return score;
+}
+
+// Adjust saved checkmate score for root distance
+int TransTable::ScoreToTT(int score, int ply) {
+    
+    if (score < -EvalLimit) 
+        score -= ply;
+    else if (score > EvalLimit)
+        score += ply;
+
+    return score;
 }

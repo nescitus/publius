@@ -4,7 +4,22 @@
 #include "limits.h"
 #include "publius.h"
 
-int GetDrawMul(Position *pos, Color strong, Color weak) {
+// In the endgames with reduced material, normal
+// evaluation odten does not apply. Therefore
+// we have some heuristics to detect when to divide
+// evaluation score to reflect increased drawing
+// chances. We cater for the most obvious piece vs piece
+// or two pieces vs piece combinations. Additionally,
+// we pull the score closer to draw in positions
+// with low and almost equal material, so that
+// the engine will not go for an illusory advantage
+// in, say, rook vs rook endgame.
+//
+// Fully realized draw detector would recognize
+// at least some rook endgames and bishop of wrong color
+// with an edge pawn.
+
+int GetDrawMul(Position *pos, const Color strong, const Color weak) {
 
     // Stronger side has no pawns
     if (pos->Count(strong, Pawn) == 0) {
@@ -41,28 +56,52 @@ int GetDrawMul(Position *pos, Color strong, Color weak) {
             pos->CountMinors(weak) == 0 
             ) return 16;
 
+        // No pawns of either side
         if (pos->Count(weak, Pawn) == 0) {
+
+            // No minors of either color
             if (pos->CountMinors(strong) == 0 &&
+                pos->CountMinors(weak) == 0) {
+
+                // Equal count of rooks and queens -> pull towards draw,
+                // as wins are achievable mainly by short term tactics
+                if (pos->Count(strong, Rook) == pos->Count(weak, Rook) &&
+                    pos->Count(strong, Queen) == pos->Count(weak, Queen))
+                    return 16;
+            }
+
+            // No major pieces of either color
+            if (pos->CountMajors(strong) == 0 &&
                 pos->CountMajors(weak) == 0) {
 
+                // Equal count of minor pieces - pull towards draw
                 if (pos->CountMinors(strong) == pos->CountMinors(weak))
                     return 16;
 
+                // Stronger side has two minor pieces
                 if (pos->CountMinors(strong) == 2) {
+                    
+                    // Two knights will not win,
+                    // alone or against a minor piece
+                    // (note that two knights vs a pawn
+                    // is already excluded by the earlier 
+                    // conditions)
                     if (pos->Count(strong, Knight) == 2)
                         return 0;
+                    
+                    // Two minors vs one is generally a draw,
+                    // but we give a chance to two bishops
+                    // against a knight
                     if (pos->CountMinors(weak) == 1) {
                         if (pos->Count(weak, Bishop) == 1)
                             return 16;
                         if (pos->Count(strong, Knight) > 0)
                             return 16;
                     }
-                }
-       
-
-            }
-        }
-    }
+                } // stronger side has two minors
+            } // no major pieces of either color
+        } // no pawns of either color
+    } // no pawns od stronger side
 
     return 64;
 }
