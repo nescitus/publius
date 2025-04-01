@@ -64,27 +64,27 @@ void Bench(Position* p, int depth) {
 // print board
 void PrintBoard(Position* pos) {
 
-    char* piece_name[] = { "P ", "p ", "N ", "n ", "B ", "b ", "R ", "r ", "Q ", "q ", "K ", "k ", ". " };
+    const std::string piece_name[] = { "P ", "p ", "N ", "n ", "B ", "b ", "R ", "r ", "Q ", "q ", "K ", "k ", ". " };
 
+    // print horizontal line (and spaces before the first square)
     std::cout << "--------------------------------------------" << std::endl << "  ";
 
     for (Square sq = A1; sq < 64; ++sq) {
 
+        // print square content
         Square mapSq = sq ^ 56;
+        std::cout << piece_name[pos->GetPiece(mapSq)];
 
-        if (pos->IsEmpty(mapSq))
-            std::cout << piece_name[pos->GetPiece(mapSq)];
-        else
-            std::cout << piece_name[pos->GetPiece(mapSq)];
-
+        // print numbers and start new line with spaces
         if ((sq + 1) % 8 == 0) {
             std::cout << "  " << 9 - ((sq + 1) / 8) << std::endl << "  ";
         }
     }
-
-    std::cout << std::endl << "  a b c d e f g h" << std::endl << std::endl
-        << "--------------------------------------------"
-        << std::endl;
+    // print letters
+    std::cout << std::endl << "  a b c d e f g h" << std::endl << std::endl;
+    
+    // print horizontal line
+    std::cout << "--------------------------------------------" << std::endl;
 }
 
 // Perft can be used to measure move generation and board update
