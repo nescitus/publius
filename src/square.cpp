@@ -57,3 +57,7 @@ std::string SquareName(Square sq) {
     result += RankOf(sq) + '1';
     return result;
 }
+
+int AbsoluteDelta(Square s1, Square s2) {
+    return std::abs((int)s1 - (int(s2)));
+}

@@ -44,3 +44,4 @@ int FileOf(const Square square);
 Square InvertSquare(const Square square);
 Square RelativeSq(const Color color, const Square square);
 std::string SquareName(Square sq);
+int AbsoluteDelta(Square s1, Square s2);

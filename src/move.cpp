@@ -63,16 +63,23 @@ int StringToMove(Position* pos, const std::string& moveString) {
     to = MakeSquare(move_str[2] - 'a', move_str[3] - '1');
     type = tNormal;
 
-    if (pos->PieceTypeOnSq(from) == King && std::abs(to - from) == 2) {
+    // a king moves by two squares - must be castling
+    if (pos->PieceTypeOnSq(from) == King && 
+        AbsoluteDelta(to, from) == 2) {
         type = tCastle;
     }
+
+    // there are many special pawn moves:
     else if (pos->PieceTypeOnSq(from) == Pawn) {
+        // en passant capture
         if (to == pos->EnPassantSq()) {
             type = tEnPassant;
         }
-        else if (std::abs(to - from) == 16) {
+        // double move whuch might set en passant square
+        else if (AbsoluteDelta(to, from) == 16) {
             type = tPawnjump;
         }
+        // promotion
         else if (move_str.length() > 4 && move_str[4] != '\0') {
             switch (move_str[4]) {
             case 'n':

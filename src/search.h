@@ -10,3 +10,4 @@ int GetMoveType(Position* pos, int move, int ttMove, int ply);
 void PrintRootInfo(int elapsed, int nps);
 void Think(Position* pos);
 int Timeout(void);
+bool ScoreIsTerminal(int score);
