@@ -7,7 +7,7 @@
 #include "timer.h"
 #include "search.h"
 
-const char* test[] = {
+std::string test[] = {
  "r1bqkbnr/pp1ppppp/2n5/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq -",           // 1.e4 c5 2.Nf3 Nc6
  "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -",       // multiple captures
  "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -",                                  // rook endgame
@@ -26,7 +26,6 @@ const char* test[] = {
  "3q2k1/pb3p1p/4pbp1/2r5/PpN2N2/1P2P2P/5PP1/Q2R2K1 b - - 4 26",            // both queens en prise
  "1r2r2k/1b4q1/pp5p/2pPp1p1/P3Pn2/1P1B1Q1P/2R3P1/4BR1K b - - 1 37",       // closed middlegame
  "8/k7/3p4/p2P1p2/P2P1P2/8/8/K7 w - -",                                   // Fine # 70
- NULL
 };
 
 // Bench function runs the analysis of several positions
@@ -43,7 +42,7 @@ void Bench(Position* p, int depth) {
     Timer.SetData(moveTime, 3600000); // more than one hour of benchmark would be useless ;)
     Timer.SetData(isInfinite, 1);
 
-    for (int i = 0; test[i]; ++i) {
+    for (int i = 0; i < std::size(test); ++i) {
 
         std::cout << test[i] << std::endl;
         OnNewGame();
@@ -56,9 +55,9 @@ void Bench(Position* p, int depth) {
     if (elapsed) nps = nodeCount * 1000 / elapsed;
 
     std::cout << "Bench at depth " << depth
-        << " took " << elapsed << " milliseconds, searching "
-        << nodeCount << " nodes at " << nps << " nodes per second."
-        << std::endl;
+              << " took " << elapsed << " milliseconds, searching "
+              << nodeCount << " nodes at " << nps << " nodes per second."
+              << std::endl;
 }
 
 // print board

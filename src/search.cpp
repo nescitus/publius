@@ -109,7 +109,11 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNullM
     //  the previous search to be good and we will
     //  try it first.
     
+    bool foundTTrecord = false;
+
     if (TT.Retrieve(pos->boardHash, &ttMove, &score, &hashFlag, alpha, beta, depth, ply)) {
+
+        foundTTrecord = true;
 
         // Remember that pv-nodes don't use some 
         // pruning/reduction techniques. Because 
@@ -143,7 +147,16 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNullM
     if (isInCheck)
         eval = -Infinity;
     else
-        eval = Evaluate(pos, &e);
+        eval = Evaluate(pos, &e);    
+    
+    // Adjust node eval by using score
+    // from the transposition table.
+    // It modifies a few things, including
+    // null move probability.
+    if (foundTTrecord) {
+        if (hashFlag & (score > eval ? lowerBound : upperBound))
+            eval = score;
+    }
 
     // Save eval for the current ply.
     oldEval[ply] = eval;
