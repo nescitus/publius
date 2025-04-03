@@ -12,16 +12,16 @@
 
 int rootDepth;
 
-void Think(Position *p) {
+void Think(Position *pos) {
 
     State.isStopping = false;
     History.Clear();
     nodeCount = 0;
     Timer.SetStartTime();
-    Iterate(p);
+    Iterate(pos);
 }
 
-void Iterate(Position *p) {
+void Iterate(Position *pos) {
 
     int val = 0, curVal = 0;
     Bitboard nps = 0;
@@ -38,7 +38,7 @@ void Iterate(Position *p) {
 
         PrintRootInfo(elapsed, nps);
 
-	    curVal = Widen(p, rootDepth, curVal);
+	    curVal = Widen(pos, rootDepth, curVal);
 
         if (State.isStopping) {
             break;

@@ -5,6 +5,12 @@
 #include "move.h"
 #include "history.h"
 
+// constructor
+HistoryData::HistoryData() {
+    Clear();
+}
+
+// clear all values
 void HistoryData::Clear(void) 
 {
     for (int piece = 0; piece < 12; piece++)
@@ -19,6 +25,7 @@ void HistoryData::Clear(void)
     }
 }
 
+// halve history values (used when they grow too high)
 void HistoryData::Trim(void) 
 {
     for (int piece = 0; piece < 12; piece++)

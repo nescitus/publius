@@ -9,6 +9,7 @@ private:
 	void Trim(void);
 	int Inc(const int depth);
 public:
+	HistoryData(); // constructor
 	void Clear(void);
 	void Update(Position *pos, const int move, const int depth, const int ply);
 	void UpdateTries(Position *pos, const int move, const int depth);

@@ -37,7 +37,7 @@ void Position::Clear() {
 	sideToMove = White;
 }
 
-void Position::Set(const std::string str) {
+void Position::Set(const std::string& str) {
 
 	Clear();
 	

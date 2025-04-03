@@ -30,7 +30,6 @@ int main()
   Key.Init();
   Params.Init();
   GenerateMoves.Init();
-  Lmr.Init();
   State.Init();
   UciLoop();
   TT.Exit();

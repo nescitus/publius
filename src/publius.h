@@ -73,7 +73,7 @@ private:
 public:
 	Bitboard boardHash;
 	bool SquareIsAttacked(const Square sq, Color color) const;
-	void Set(const std::string str);
+	void Set(const std::string& str);
 	void DoMove(const int move, const int ply);
 	void DoNull(const int ply);
 	void UndoMove(const int move, const int ply);

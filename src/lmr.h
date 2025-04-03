@@ -2,7 +2,7 @@
 
 class LmrData {
 public:
-	void Init();
+	LmrData(); // constructor
 	int table[2][64][64];
 };
 

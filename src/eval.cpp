@@ -81,8 +81,7 @@ int Evaluate(Position *pos, EvalData *e) {
 
 void EvalPawn(Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, span, support;
-    bool isUnopposed;
+    Bitboard b, span;
 
     b = pos->Map(color, Pawn);
 
@@ -95,7 +94,6 @@ void EvalPawn(Position* pos, EvalData* e, Color color) {
 
         // Doubled pawn
         span = FrontSpan(Paint(sq), color);
-        isUnopposed = ((span & pos->Map(~color, Pawn)) == 0);
         if (span & pos->Map(color, Pawn)) {
             e->Add(color, doubledPawnMg, doubledPawnEg);
         }
@@ -266,7 +264,7 @@ void EvalQueen(Position* pos, EvalData* e, Color color) {
 
 void EvalKing(Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, shieldMask, kingsFile, nextFile;
+    Bitboard shieldMask, kingsFile, nextFile;
 
     Square sq = pos->KingSq(color);
         
