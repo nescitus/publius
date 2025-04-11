@@ -7,7 +7,9 @@ struct UCItimer {
 private:
     int data[timerDataSize]; // various data used to set actual time per move (see eTimeData)
     int startTime;           // when we have begun searching
-    int timeForMove;         // basic time allocated for a move
+    int hardTimeLimit;       // basic time allocated for a move
+    int softTimeLimit;
+    bool isStrict;
 public:
     void Clear(void);
     void SetStartTime();
@@ -15,10 +17,11 @@ public:
 	int Now(void);
     int Elapsed(void);
     int IsInfiniteMode(void);
-    int TimeHasElapsed(void);
+    bool ShouldFinishIteration(void);
+    bool TimeHasElapsed(void);
     int GetData(const int slot);
     void SetData(const int slot, const int val);
-    void SetSideData(const Color color);
+    void SetDataForColor(const Color color);
 };
 
 extern UCItimer Timer;

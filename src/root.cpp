@@ -40,7 +40,7 @@ void Iterate(Position *pos) {
 
 	    curVal = Widen(pos, rootDepth, curVal);
 
-        if (State.isStopping) {
+        if (State.isStopping || Timer.ShouldFinishIteration()) {
             break;
         }
 

@@ -189,7 +189,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // loss, increasing with depth. If side to move
         // can accept that loss, then we prune.
 
-        if (depth <= 6) { // was 4, testing
+        if (depth <= 6) {
             score = eval - 125 * depth;
             if (score > beta)
                 return score;

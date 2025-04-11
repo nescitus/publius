@@ -51,7 +51,7 @@ bool ParseCommand(std::istringstream& stream, Position* pos) {
 
 void OnUciCommand() {
 
-    std::cout << "id name Publius 0.052" << std::endl;
+    std::cout << "id name Publius 0.053" << std::endl;
     std::cout << "id author Pawel Koziol" << std::endl;
     std::cout << "option name Hash type spin default 16 min 1 max 4096" << std::endl;
     std::cout << "option name Clear Hash type button" << std::endl;
@@ -149,7 +149,13 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
         stream >> param;
     }
 
-    Timer.SetSideData(pos->GetSideToMove());
+    // UCI protocol differentiates between
+    // basic time and increment for black
+    // and for white. Translate that to
+    // engine time / engine increment
+    Timer.SetDataForColor(pos->GetSideToMove());
+    
+    // How much time do we want to spend searching?
     Timer.SetMoveTiming();
 
     Pv.line[0][0] = 0; // clear engine move
@@ -157,11 +163,13 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
     Think(pos);
 
     if (Pv.line[0][1]) {
+        // print best move and ponder move
         std::cout << "bestmove " << MoveToString(Pv.line[0][0])
                   << " ponder "  << MoveToString(Pv.line[0][1]) 
                   << std::endl;
     }
     else
+        // print just best move
         std::cout << "bestmove " << MoveToString(Pv.line[0][0]) 
                   << std::endl;
 }

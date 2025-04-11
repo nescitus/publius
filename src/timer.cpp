@@ -15,16 +15,19 @@
 #endif
 
 void UCItimer::Clear(void) {
+
     SetData(maxDepth, 64);
-    timeForMove = -1;
+    hardTimeLimit = -1;
+    softTimeLimit = -1;
     SetData(wTime, -1);
     SetData(bTime, -1);
     SetData(wIncrement, 0);
     SetData(bIncrement, 0);
     SetData(moveTime, 0);
     SetData(maxNodes, 0);
-    SetData(movesToGo, 40);
+    SetData(movesToGo, 30);
     SetData(isInfinite, 0);
+    isStrict = false;
 }
 
 void UCItimer::SetStartTime(void) {
@@ -33,17 +36,32 @@ void UCItimer::SetStartTime(void) {
 
 void UCItimer::SetMoveTiming(void) {
 
-    // User-defined time per move, no tricks available
+    // Certain settings forbid using tricks to finish earlier
+    if (data[maxDepth] < 64 || // depth limit set
+        data[maxNodes] > 0 ||  // node limit set
+        data[moveTime])        // time per move set
+        isStrict = true;
+    else
+        isStrict = false;
 
+    // User-defined time per move
     if (data[moveTime]) {
-        timeForMove = data[moveTime];
+        hardTimeLimit = data[moveTime];
+        softTimeLimit = data[moveTime];
         return;
     }
 
-    // We are operating within some time limit. There is some scope for using
-    // remaining  time  in a clever way, but current  implementation  focuses
-    // on staying out of trouble: counteracting the GUI lag and being careful
-    // under the incremental time control near the end of the game.
+    // We are operating within some time limit. 
+    // We set two limits: hardTimeLimit (break
+    // the search no matter what) and softTimeLimit
+    // (don't start the next iteration). There is
+    // some scope for smarter tricks taking into
+    // account root move changes and fail lows, 
+    // but our current implementation focuses
+    // on staying out of trouble: counteracting 
+    // the GUI lag and being extra careful under 
+    // the incremental time control near the end 
+    // of the game.
 
     if (data[engTime] >= 0) {
 
@@ -52,23 +70,30 @@ void UCItimer::SetMoveTiming(void) {
         }
 
         // calculate move time
-        timeForMove = (data[engTime] + data[engInc] * (data[movesToGo] - 1)) / data[movesToGo];
+        hardTimeLimit = (data[engTime] + data[engInc] * (data[movesToGo] - 1)) / data[movesToGo];
 
         // while in time trouble, try to save a bit on increment
-        if (timeForMove < data[engInc]) {
-            timeForMove -= ((data[engInc] * 4) / 5);
+        if (hardTimeLimit < data[engInc]) {
+            hardTimeLimit -= ((data[engInc] * 4) / 5);
         }
 
         // ensure that our limit does not exceed total time available
-        if (timeForMove > data[engTime]) {
-            timeForMove = data[engTime];
+        if (hardTimeLimit > data[engTime]) {
+            hardTimeLimit = data[engTime];
         }
 
         // safeguard against a lag
-        timeForMove -= 10;
+        hardTimeLimit -= 10;
+
+        // calculate soft time limit,
+        // used to determine when to finish iteration
+        softTimeLimit = hardTimeLimit / 2;
 
         // ensure that we have non-zero time
-        if (timeForMove < 1) timeForMove = 1;
+        if (hardTimeLimit < 1) {
+            hardTimeLimit = 1;
+            softTimeLimit = 1;
+        }
     }
 }
 
@@ -95,8 +120,18 @@ int UCItimer::IsInfiniteMode(void) {
     return(data[isInfinite]);
 }
 
-int UCItimer::TimeHasElapsed(void) {
-    return (Elapsed() >= timeForMove);
+bool UCItimer::TimeHasElapsed(void) {
+    return (Elapsed() >= hardTimeLimit);
+}
+
+bool UCItimer::ShouldFinishIteration(void) {
+    
+    // not applicable
+    if (isStrict || IsInfiniteMode() ) 
+        return false;
+    
+    // applicable
+    return (Elapsed() >= softTimeLimit);
 }
 
 int UCItimer::GetData(const int slot) {
@@ -107,7 +142,7 @@ void UCItimer::SetData(const int slot, const int val) {
     data[slot] = val;
 }
 
-void UCItimer::SetSideData(const Color color) {
+void UCItimer::SetDataForColor(const Color color) {
     data[engTime] = (bool)(color == White) ? GetData(wTime) : GetData(bTime);
     data[engInc] =  (bool)(color == White) ? GetData(wIncrement) : GetData(bIncrement);
 }
