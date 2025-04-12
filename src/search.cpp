@@ -17,8 +17,11 @@
 // stack to hold information necessary to undo moves
 UndoStack undoStack[stackSize];
 
+// counter of nodes visited during search
+// (for statistic purposes and enforcing nodes limit)
 Bitboard nodeCount;
 
+// eval for each ply, to see if we are improving or not
 int oldEval[PlyLimit];
 
 int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNullMove) {
@@ -26,7 +29,6 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNullM
     int bestScore, newDepth, eval, moveListLength;
     int isInCheck, hashFlag, reduction, score, moveType;
     int move, ttMove, bestMove, movesTried, quietMovesTried;
-    bool isRoot, isPv;
     EvalData e;
     MoveList list;
     int moveList[256];
@@ -37,7 +39,10 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNullM
     bestMove = 0;
     movesTried = 0;
     quietMovesTried = 0;
-    isRoot = !ply;
+
+    // Root node is different because
+    // we need to record the best move
+    const bool isRoot = !ply;
 
     // We distinguish two kinds of nodes:
     // zero window nodes and principal variation
@@ -45,7 +50,7 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // or fail low, as there is no distance between
     // alpha and beta. Only pv-nodes can return
     // an exact score.
-    isPv = (beta > alpha + 1);
+    const bool isPv = (beta > alpha + 1);
 
     // QUIESCENCE SEARCH entry point. Ideally
     // we want to evaluate a quiet position
@@ -55,7 +60,6 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // why at leaf nodes we initiate 
     // a capture-only search instead of
     // returning the evaluation score here. 
-
     if (depth <= 0) {
         return Quiesce(pos, ply, 0, alpha, beta);
     }
@@ -141,8 +145,6 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // probably less interesting and
     // warrant more pruning.
 
-    bool improving = true; // default - less pruning
-
     // Evaluate position, unless in check
     if (isInCheck)
         eval = -Infinity;
@@ -162,13 +164,12 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNullM
     oldEval[ply] = eval;
 
     // We check whether the eval has
-    // deteriorated from two ples ago.
-    // If so, we will prune and reduce 
-    // a bit more.
-    if (ply > 1) {
-        if (oldEval[ply - 2] > eval)
-            improving = false;
-    }
+    // improved from two ples ago.
+    // As of now, it affects late move 
+    // pruning only, but some more uses
+    // will be tested.
+
+    const bool improving = SetImproving(eval, ply);
 
     // NODE-LEVEL PRUNING. We try to avoid searching
     // the current node. All the techniques used for it
@@ -481,6 +482,14 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNullM
     }
 
     return bestScore;
+}
+
+bool SetImproving(int eval, int ply) {
+
+    if (ply > 1 && oldEval[ply - 2] > eval)
+       return false;
+    
+    return true;
 }
 
 // We need to know the move type for the pruning decisions
