@@ -33,7 +33,7 @@ std::string test[] = {
 // - confirming that a change is indeed non-functional
 // - measuring the impact of a change to the engine's speed
 
-void Bench(Position *p, int depth) {
+void Bench(Position* p, int depth) {
 
     nodeCount = 0;
     State.isStopping = false;
@@ -61,7 +61,7 @@ void Bench(Position *p, int depth) {
 }
 
 // print board
-void PrintBoard(Position *pos) {
+void PrintBoard(Position* pos) {
 
     const std::string piece_name[] = { "P ", "p ", "N ", "n ", "B ", "b ", "R ", "r ", "Q ", "q ", "K ", "k ", ". " };
 
@@ -90,7 +90,7 @@ void PrintBoard(Position *pos) {
 // speed, but more importantly, to confirm that the move generator
 // works correctly. This version comes with a "divide" enhancement,
 // printing out subtotals for each move.
-Bitboard Perft(Position *pos, int ply, int depth, bool isNoisy) {
+Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
 
     int move = 0;
     MoveList list;

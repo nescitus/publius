@@ -11,9 +11,9 @@ private:
 public:
 	HistoryData(); // constructor
 	void Clear(void);
-	void Update(Position *pos, const int move, const int depth, const int ply);
-	void UpdateTries(Position *pos, const int move, const int depth);
-	int GetScore(Position *pos, const int move);
+	void Update(Position* pos, const int move, const int depth, const int ply);
+	void UpdateTries(Position* pos, const int move, const int depth);
+	int GetScore(Position* pos, const int move);
 	int GetKiller1(const int ply);
 	int GetKiller2(const int ply);
 	bool IsKiller(const int move, const int ply);

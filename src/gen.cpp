@@ -9,7 +9,7 @@
 #include "bitgen.h"
 #include "piece.h"
 
-void AddPromotions(MoveList * list, Square fromSquare, Square toSquare) {
+void AddPromotions(MoveList* list, Square fromSquare, Square toSquare) {
 
     list->AddMove( fromSquare, toSquare, tPromQ );
     list->AddMove( fromSquare, toSquare, tPromR );
@@ -17,7 +17,7 @@ void AddPromotions(MoveList * list, Square fromSquare, Square toSquare) {
     list->AddMove( fromSquare, toSquare, tPromN );
 }
 
-void FillNoisyList(Position *pos, MoveList * list) {
+void FillNoisyList(Position* pos, MoveList* list) {
 
     Bitboard pieces, moves;
     Square fromSquare, toSquare;
@@ -87,7 +87,6 @@ void FillNoisyList(Position *pos, MoveList * list) {
         // Black pawn promotions with capture (SW)
 
         moves = SWOf(pieces) & prey;
-
         while (moves) {
             toSquare = PopFirstBit(&moves);
 	        AddPromotions(list, toSquare + 9, toSquare);
@@ -179,7 +178,7 @@ void FillNoisyList(Position *pos, MoveList * list) {
 
 }
 
-void FillQuietList(Position *pos, MoveList *list) {
+void FillQuietList(Position* pos, MoveList* list) {
 
     Bitboard pieces, moves;
     Square fromSquare, toSquare;
@@ -404,13 +403,13 @@ void FillCheckList(Position* pos, MoveList* list) {
     */
 }
 
-void FillCompleteList(Position *pos, MoveList *list) {
+void FillCompleteList(Position* pos, MoveList* list) {
 
     FillNoisyList(pos, list);
     FillQuietList(pos, list);
 }
 
-void FillChecksAndCaptures(Position* pos, MoveList *list) {
+void FillChecksAndCaptures(Position* pos, MoveList* list) {
 
     FillNoisyList(pos, list);
     FillCheckList(pos, list);

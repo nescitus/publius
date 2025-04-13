@@ -24,7 +24,7 @@ Bitboard nodeCount;
 // eval for each ply, to see if we are improving or not
 int oldEval[PlyLimit];
 
-int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNullMove) {
+int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullMove) {
 
     int bestScore, newDepth, eval, moveListLength;
     int isInCheck, hashFlag, reduction, score, moveType;
@@ -246,9 +246,8 @@ int Search(Position *pos, int ply, int alpha, int beta, int depth, bool wasNullM
             if (State.isStopping) 
                 return 0;
 
-            if (score >= beta) {
+            if (score >= beta)
                 return score;
-            }
         }   // end of null move code
     } // end of node pruning block
 
@@ -493,7 +492,7 @@ bool SetImproving(int eval, int ply) {
 }
 
 // We need to know the move type for the pruning decisions
-int GetMoveType(Position *pos, int move, int ttMove, int ply) {
+int GetMoveType(Position* pos, int move, int ttMove, int ply) {
 
     if (move == ttMove) 
         return moveHash;   // move from the hash table

@@ -51,7 +51,7 @@ int MoveList::GetMove() {
     return move; 
 };
 
-void MoveList::ScoreMoves(Position *pos, 
+void MoveList::ScoreMoves(Position* pos, 
                           const int ply, 
                           const int ttMove) {
 

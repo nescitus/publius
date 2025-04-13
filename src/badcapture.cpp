@@ -40,7 +40,7 @@ bool IsBadCapture(Position* pos, int move) {
 // the moves. It is blind to tactics, such as checks, pins,
 // promotions and overloaded defenders.
 
-int Swap(Position *pos, Square fromSquare, Square toSquare) {
+int Swap(Position* pos, Square fromSquare, Square toSquare) {
 
     Color color;
     int ply, hunter, score[32];

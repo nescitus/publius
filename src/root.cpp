@@ -12,7 +12,7 @@
 
 int rootDepth;
 
-void Think(Position *pos) {
+void Think(Position* pos) {
 
     State.isStopping = false;
     History.Clear();
@@ -21,7 +21,7 @@ void Think(Position *pos) {
     Iterate(pos);
 }
 
-void Iterate(Position *pos) {
+void Iterate(Position* pos) {
 
     int val = 0, curVal = 0;
     Bitboard nps = 0;
@@ -57,7 +57,7 @@ void PrintRootInfo(int elapsed, int nps) {
         << std::endl;
 }
 
-int Widen(Position *pos, int depth, int lastScore) {
+int Widen(Position* pos, int depth, int lastScore) {
 
     int currentDepthScore = lastScore, alpha, beta;
 

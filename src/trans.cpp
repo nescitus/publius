@@ -29,7 +29,7 @@ void TransTable::Allocate(int mbsize) {
 	free(table);
 
     // Allocate memory for the transposition table
-	table = (hashRecord *)malloc(tableSize * sizeof(hashRecord));
+	table = (hashRecord*) malloc(tableSize * sizeof(hashRecord));
 
     // Init empty transposition table
 	Clear();
@@ -52,7 +52,7 @@ void TransTable::Clear(void) {
     }
 }
 
-bool TransTable::Retrieve(Bitboard key, int *move, int *score, int *flag, int alpha, int beta, int depth, int ply) {
+bool TransTable::Retrieve(Bitboard key, int* move, int* score, int* flag, int alpha, int beta, int depth, int ply) {
 
 	hashRecord *slot;
 

@@ -23,7 +23,7 @@ const int certainDrawMultiplier = 0;
 const int drawishMultiplier = 16;
 const int noDrawMultiplier = 64;
 
-int GetDrawMul(Position *pos, const Color strong, const Color weak) {
+int GetDrawMul(Position* pos, const Color strong, const Color weak) {
 
     // Stronger side has no pawns
     if (pos->Count(strong, Pawn) == 0) {

@@ -1,5 +1,9 @@
 #pragma once
 
+// REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
+// 3647 lines of source code
+// -147 diagnostics = 3500
+
 typedef unsigned long long Bitboard;
 
 #include <iostream>
@@ -137,19 +141,19 @@ public:
 	void AddMove(Square fromSquare, Square toSquare, int flag);
 	int GetInd();
 	int GetMove();
-	void ScoreMoves(Position *pos, int ply, int ttMove);
+	void ScoreMoves(Position* pos, int ply, int ttMove);
 };
 
 // move generation
 
-void FillQuietList(Position *pos, MoveList *list);
-void FillNoisyList(Position *pos, MoveList *list);
+void FillQuietList(Position* pos, MoveList* list);
+void FillNoisyList(Position* pos, MoveList* list);
 void FillCheckList(Position* pos, MoveList* list);
-void FillCompleteList(Position *pos, MoveList *list);
+void FillCompleteList(Position* pos, MoveList* list);
 void FillChecksAndCaptures(Position* pos, MoveList* list);
 
-bool IsBadCapture(Position *pos, int move);
-int Swap(Position *pos, Square fromSquare, Square toSquare);
+bool IsBadCapture(Position* pos, int move);
+int Swap(Position* pos, Square fromSquare, Square toSquare);
 
 void TryInterrupting(void);
 void DisplayPv(int score);
@@ -160,7 +164,7 @@ void OnNewGame(void);
 // diagnostics
 
 void Bench(Position* p, int depth);
-void PrintBoard(Position *pos);
+void PrintBoard(Position* pos);
 Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy);
 void PrintBitboard(Bitboard b);
 
