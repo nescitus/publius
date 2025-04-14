@@ -34,9 +34,9 @@ bool IsMovePromotion(const int move) {
 // does this move change material balance?
 bool IsMoveNoisy(Position* pos, const int move) {
 
-    return (pos->GetPiece(GetToSquare(move)) != noPiece
-        || IsMovePromotion(move)
-        || GetTypeOfMove(move) == tEnPassant);
+    return (pos->GetPiece(GetToSquare(move)) != noPiece ||
+           IsMovePromotion(move) ||
+           GetTypeOfMove(move) == tEnPassant);
 }
 
 std::string MoveToString(const int move) {

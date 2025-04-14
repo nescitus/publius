@@ -11,7 +11,7 @@ typedef unsigned long long Bitboard;
 
 enum eMoveType { tNormal, tCastle, tEnPassant, tPawnjump, tPromN, tPromB, tPromR, tPromQ };
 enum eCastleFlag { wShortCastle = 1, wLongCastle = 2, bShortCastle = 4, bLongCastle = 8};
-enum eMoveFlag { moveQuiet, moveHash, moveNoisy, moveKiller};
+enum eMoveFlag { moveQuiet, moveHash, moveNoisy, moveBadcapt, moveKiller};
 
 static constexpr auto startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -";
 static constexpr auto kiwipeteFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";

@@ -215,8 +215,8 @@ void EvalRook(Position* pos, EvalData* e, Color color) {
 
         // Rook on 7th rank attacking pawns or cutting off enemy king
         if (Paint(sq) & Mask.rr[color][rank7]) {
-            if (pos->Map(~color, Pawn) & Mask.rr[color][rank7]
-                || pos->Map(~color, King) & Mask.rr[color][rank8]) {
+            if (pos->Map(~color, Pawn) & Mask.rr[color][rank7] ||
+                pos->Map(~color, King) & Mask.rr[color][rank8]) {
                 e->Add(color, rook7thMg, rook7thEg);
             }
         }

@@ -141,8 +141,8 @@ bool Position::IsDrawByRepetition() const {
 bool Position::IsDrawByInsufficientMaterial() const {
 
     if (!LeavesKingInCheck()) {
-        if (CountAllPawns() + CountMajors(White) + CountMajors(Black) == 0
-            && CountMinors(White) + CountMinors(Black) <= 1) return true;
+        if (CountAllPawns() + CountMajors(White) + CountMajors(Black) == 0 &&
+            CountMinors(White) + CountMinors(Black) <= 1) return true;
     }
 
     return false;
@@ -162,11 +162,11 @@ bool Position::IsOnSq(const Color color, const int piece, const Square square) c
 
 bool Position::SquareIsAttacked(const Square sq, const Color color) const {
 
-    return (Map(color, Pawn) & GenerateMoves.Pawn(~color, sq))
-        || (Map(color, Knight) & GenerateMoves.Knight(sq))
-        || (MapDiagonalMovers(color) & GenerateMoves.Bish(Occupied(), sq))
-        || (MapStraightMovers(color) & GenerateMoves.Rook(Occupied(), sq))
-        || (Map(color, King) & GenerateMoves.King(sq));
+    return (Map(color, Pawn) & GenerateMoves.Pawn(~color, sq)) ||
+           (Map(color, Knight) & GenerateMoves.Knight(sq)) ||
+           (MapDiagonalMovers(color) & GenerateMoves.Bish(Occupied(), sq)) ||
+           (MapStraightMovers(color) & GenerateMoves.Rook(Occupied(), sq)) ||
+           (Map(color, King) & GenerateMoves.King(sq));
 }
 
 Bitboard Position::AttacksTo(const Square sq) const {

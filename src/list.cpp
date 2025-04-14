@@ -77,8 +77,14 @@ void MoveList::ScoreMoves(Position* pos,
                 // capture
                 if (prey != noPieceType) {
 
+                    // NOTE: current setup lead to mixing
+                    // bas captures with moves having 
+                    // very low history score. However,
+                    // fixing it did not pass the test.
+                    // Eventually, the problem might
+                    // get solved by staged move generation.
                     if (IsBadCapture(pos, moves[i]))
-                        values[i] = 0 + 100 + 10 * prey - hunter;
+                        values[i] = 100 + 10 * prey - hunter;
                     else
                         values[i] = IntLimit / 2 + 100 + 10 * prey - hunter;
                 }

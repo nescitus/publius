@@ -186,7 +186,7 @@ Bitboard MoveGenerator::RankAttacks(const Bitboard occ, const Square sq) {
     const int occupancyIndex = (((bbFileA & (occ >> FileOf(sq))) * bbB8H2diag) >> 58);
     
     // fileAttacks[RankOf(sq)][occupancyIndex] contains the same
-    // information for all the files, so that it returns moves
+    // bit pattern for all the files, so that it returns moves
     // for all the squares on the same rank, given the identical
     // occupancy mask. Therefore we need to 'and' it with the mask 
     // of a file that we are interested in.

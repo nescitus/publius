@@ -38,7 +38,8 @@ int FileOf(const Square square) {
 }
 
 // get vertical reflection of a square
-// (i.e. reflection of C2 is C7)
+// - InvertSquare(C2) is C7,
+// - InvertSquare(C7) is C2
 Square InvertSquare(const Square square) {
     return square ^ 56;
 }
