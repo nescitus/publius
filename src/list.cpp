@@ -51,6 +51,20 @@ int MoveList::GetMove() {
     return move; 
 };
 
+// Intended move ordering is:
+// - move from transposition table
+// - good and equal captures
+// - killer moves
+// - quiet moves
+// - bad captures
+//
+// However, bad captures can mix
+// with quiet moves that have very low
+// history score. This is illogical, 
+// but fixing it failed. The issue
+// will be revisited when implementing
+// staged move generation.
+
 void MoveList::ScoreMoves(Position* pos, 
                           const int ply, 
                           const int ttMove) {
@@ -78,24 +92,21 @@ void MoveList::ScoreMoves(Position* pos,
                 if (prey != noPieceType) {
 
                     // NOTE: current setup lead to mixing
-                    // bas captures with moves having 
-                    // very low history score. However,
-                    // fixing it did not pass the test.
-                    // Eventually, the problem might
-                    // get solved by staged move generation.
+                    // bad captures with moves having 
+                    // very low history score.
                     if (IsBadCapture(pos, moves[i]))
-                        values[i] = 100 + 10 * prey - hunter;
+                        values[i] = BadCaptureValue + 10 * prey - hunter;
                     else
-                        values[i] = IntLimit / 2 + 100 + 10 * prey - hunter;
+                        values[i] = GoodCaptureValue + 10 * prey - hunter;
                 }
                 // quiet move
                 else {
                     // first killer move
                     if (moves[i] == History.GetKiller1(ply))
-                        values[i] = IntLimit / 2;
+                        values[i] = Killer1Value;
                     // second killer move
                     else if (moves[i] == History.GetKiller2(ply))
-                        values[i] = IntLimit / 2 - 1;
+                        values[i] = Killer2Value;
                     // normal move
                     else
                         values[i] = History.GetScore(pos, moves[i]);
@@ -104,14 +115,14 @@ void MoveList::ScoreMoves(Position* pos,
 
             // en passant capture
 			if (mType == tEnPassant) 
-                values[i] = IntLimit / 2 + 106;
+                values[i] = HighValue + 106;
 
             // promotions
 			if (IsMovePromotion(moves[i])) {
-				if (mType == tPromQ) values[i] = IntLimit / 2 + 110; // TODO: table will be shorter
-				if (mType == tPromN) values[i] = IntLimit / 2 + 109;
-				if (mType == tPromR) values[i] = IntLimit / 2 + 108;
-				if (mType == tPromB) values[i] = IntLimit / 2 + 107;
+				if (mType == tPromQ) values[i] = QueenPromValue;
+				if (mType == tPromN) values[i] = KnightPromValue;
+				if (mType == tPromR) values[i] = RookPromValue;
+				if (mType == tPromB) values[i] = BishopPromValue;
 			}
 		}
 	}
