@@ -52,7 +52,7 @@ void TransTable::Clear(void) {
     }
 }
 
-bool TransTable::Retrieve(Bitboard key, int* move, int* score, int* flag, int alpha, int beta, int depth, int ply) {
+bool TransTable::Retrieve(Bitboard key, Move* move, int* score, int* flag, int alpha, int beta, int depth, int ply) {
 
 	hashRecord *slot;
 
@@ -81,7 +81,7 @@ bool TransTable::Retrieve(Bitboard key, int* move, int* score, int* flag, int al
 	return false;
 }
 
-void TransTable::Store(Bitboard key, int move, int score, int flags, int depth, int ply) {
+void TransTable::Store(Bitboard key, Move move, int score, int flags, int depth, int ply) {
 
 	hashRecord *slot;
 

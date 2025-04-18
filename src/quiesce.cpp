@@ -11,7 +11,8 @@
 
 int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
 
-    int bestScore, move, bestMove, ttMove, hashFlag, score;
+    int bestScore, hashFlag, score;
+    Move move, bestMove, ttMove;
     EvalData e;
     MoveList list;
     bool isInCheck, isPv;

@@ -1,10 +1,11 @@
 #pragma once
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3647 lines of source code
-// -147 diagnostics = 3500
+// 3488 lines of source code
+// -147 diagnostics = 3341
 
 typedef unsigned long long Bitboard;
+typedef int Move;
 
 #include <iostream>
 #include <algorithm>
@@ -19,7 +20,7 @@ static constexpr auto kiwipeteFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PP
 // stack
 
 typedef struct {
-	int move;
+	Move move;
 	int prey;
 	int castleFlags;
 	Square enPassantSq;
@@ -78,9 +79,9 @@ public:
 	Bitboard boardHash;
 	bool SquareIsAttacked(const Square sq, Color color) const;
 	void Set(const std::string& str);
-	void DoMove(const int move, const int ply);
+	void DoMove(const Move move, const int ply);
 	void DoNull(const int ply);
-	void UndoMove(const int move, const int ply);
+	void UndoMove(const Move move, const int ply);
 	void UndoNull(const int ply);
 	bool IsDraw() const;
 	bool CanTryNullMove(void) const;
@@ -130,7 +131,7 @@ extern EngineState State;
 
 class MoveList {
 private:
-	int moves[MovesLimit];
+	Move moves[MovesLimit];
 	int values[MovesLimit];
 	int ind;
 	int get;
@@ -140,8 +141,8 @@ public:
 	void Clear();
 	void AddMove(Square fromSquare, Square toSquare, int flag);
 	int GetInd();
-	int GetMove();
-	void ScoreMoves(Position* pos, int ply, int ttMove);
+	Move GetMove();
+	void ScoreMoves(Position* pos, int ply, Move ttMove);
 };
 
 // move generation
@@ -152,7 +153,7 @@ void FillCheckList(Position* pos, MoveList* list);
 void FillCompleteList(Position* pos, MoveList* list);
 void FillChecksAndCaptures(Position* pos, MoveList* list);
 
-bool IsBadCapture(Position* pos, int move);
+bool IsBadCapture(Position* pos, Move move);
 int Swap(Position* pos, Square fromSquare, Square toSquare);
 
 void TryInterrupting(void);

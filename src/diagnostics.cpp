@@ -92,7 +92,7 @@ void PrintBoard(Position* pos) {
 // printing out subtotals for each move.
 Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
 
-    int move = 0;
+    Move move = 0;
     MoveList list;
     Bitboard localCount = 0;
     Bitboard moveCount = 0;

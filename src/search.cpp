@@ -28,10 +28,11 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
     int bestScore, newDepth, eval, moveListLength;
     int isInCheck, hashFlag, reduction, score, moveType;
-    int move, ttMove, bestMove, movesTried, quietMovesTried;
+    Move move, ttMove, bestMove; 
+    int movesTried, quietMovesTried;
     EvalData e;
     MoveList list;
-    int moveList[256];
+    Move listOfTriedMoves[256];
 
     // Init
     move = 0;
@@ -309,7 +310,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             }
 
             // Update move statistics
-            moveList[movesTried] = move;
+            listOfTriedMoves[movesTried] = move;
             movesTried++;
             if (moveType == moveQuiet) {
                 quietMovesTried++;
@@ -419,7 +420,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 // next time we encounter it.
                 History.Update(pos, move, depth, ply);
                 for (int i = 0; i < movesTried; i++) {
-                    History.UpdateTries(pos, moveList[i], depth);
+                    History.UpdateTries(pos, listOfTriedMoves[i], depth);
                 }
 
                 // Store move in the transposition table
@@ -492,7 +493,7 @@ bool SetImproving(int eval, int ply) {
 }
 
 // We need to know the move type for the pruning decisions
-int GetMoveType(Position* pos, int move, int ttMove, int ply) {
+int GetMoveType(Position* pos, Move move, Move ttMove, int ply) {
 
     if (move == ttMove) 
         return moveHash;   // move from the hash table

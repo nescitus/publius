@@ -35,7 +35,7 @@ void HistoryData::Trim(void)
         }
 }
 
-void HistoryData::Update(Position* pos, const int move, const int depth, const int ply) {
+void HistoryData::Update(Position* pos, const Move move, const int depth, const int ply) {
 
     // History is updated only for quiet moves
     if (IsMoveNoisy(pos, move))
@@ -62,7 +62,7 @@ void HistoryData::Update(Position* pos, const int move, const int depth, const i
     }
 }
 
-void HistoryData::UpdateTries(Position* pos, const int move, const int depth)
+void HistoryData::UpdateTries(Position* pos, const Move move, const int depth)
 {
     // History is updated only for quiet moves
     if (IsMoveNoisy(pos, move)) 
@@ -81,22 +81,22 @@ void HistoryData::UpdateTries(Position* pos, const int move, const int depth)
         Trim();
 }
 
-bool HistoryData::IsKiller(const int move, const int ply) 
+bool HistoryData::IsKiller(const Move move, const int ply) 
 {
     return (move == killer1[ply] || move == killer2[ply]);
 }
 
-int HistoryData::GetKiller1(const int ply) 
+Move HistoryData::GetKiller1(const int ply) 
 {
     return killer1[ply];
 }
 
-int HistoryData::GetKiller2(const int ply)
+Move HistoryData::GetKiller2(const int ply)
 {
     return killer2[ply];
 }
 
-int HistoryData::GetScore(Position* pos, const int move) 
+int HistoryData::GetScore(Position* pos, const Move move) 
 {
     // Init square variables
     Square fromSquare = GetFromSquare(move);

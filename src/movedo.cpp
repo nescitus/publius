@@ -8,7 +8,7 @@
 #include "piece.h"
 #include "move.h"
 
-void Position::DoMove(const int move, const int ply) {
+void Position::DoMove(const Move move, const int ply) {
 
     // Init variables
     Color color = sideToMove;

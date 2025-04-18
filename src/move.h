@@ -2,12 +2,12 @@
 
 // move
 
-int GetTypeOfMove(const int move);
-int GetPromotedPiece(const int move);
-Square GetFromSquare(const int move);
-Square GetToSquare(const int move);
-int CreateMove(const Square fromSquare, const Square toSquare, const int flag);
-bool IsMovePromotion(const int move);
-bool IsMoveNoisy(Position* pos, const int move);
-std::string MoveToString(const int move);
-int StringToMove(Position* pos, const std::string& moveString);
+int GetTypeOfMove(const Move move);
+int GetPromotedPiece(const Move move);
+Square GetFromSquare(const Move move);
+Square GetToSquare(const Move move);
+Move CreateMove(const Square fromSquare, const Square toSquare, const int flag);
+bool IsMovePromotion(const Move move);
+bool IsMoveNoisy(Position* pos, const Move move);
+std::string MoveToString(const Move move);
+Move StringToMove(Position* pos, const std::string& moveString);

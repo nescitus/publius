@@ -5,41 +5,41 @@
 #include "move.h"
 #include "piece.h"
 
-int GetTypeOfMove(const int move) {
+int GetTypeOfMove(const Move move) {
     return move >> 12;
 }
 
-Square GetFromSquare(const int move) {
+Square GetFromSquare(const Move move) {
     return static_cast<Square>(move & 63);
 }
 
-Square GetToSquare(const int move) {
+Square GetToSquare(const Move move) {
     return static_cast<Square>((move >> 6) & 63);
 }
 
-int GetPromotedPiece(const int move) {
+int GetPromotedPiece(const Move move) {
 	return (move >> 12) - 3;
 }
 
-int CreateMove(const Square fromSquare, 
+Move CreateMove(const Square fromSquare, 
                const Square toSquare, 
                const int flag) {
     return (flag << 12) | (toSquare << 6) | fromSquare;
 }
 
-bool IsMovePromotion(const int move) {
+bool IsMovePromotion(const Move move) {
 	return move & 0x4000;
 }
 
 // does this move change material balance?
-bool IsMoveNoisy(Position* pos, const int move) {
+bool IsMoveNoisy(Position* pos, const Move move) {
 
     return (pos->GetPiece(GetToSquare(move)) != noPiece ||
            IsMovePromotion(move) ||
            GetTypeOfMove(move) == tEnPassant);
 }
 
-std::string MoveToString(const int move) {
+std::string MoveToString(const Move move) {
 
     static const char prom_char[5] = "nbrq";
     std::string move_str = SquareName(GetFromSquare(move))
@@ -52,7 +52,7 @@ std::string MoveToString(const int move) {
     return move_str;
 }
 
-int StringToMove(Position* pos, const std::string& moveString) {
+Move StringToMove(Position* pos, const std::string& moveString) {
 
     Square from, to;
     int type;

@@ -8,7 +8,7 @@
 
 void MoveList::SwapMoves(const int i, const int j) {
 
-    int tmpMove = moves[i];
+    Move tmpMove = moves[i];
     int tmpVal = values[i];
     moves[i] = moves[j];
     values[i] = values[j];
@@ -30,9 +30,9 @@ int MoveList::GetInd() {
     return ind;
 }
 
-int MoveList::GetMove() { 
+Move MoveList::GetMove() { 
 
-    int move;
+    Move move;
     int min = -4 * HistLimit;
     int score = min;
     int loc = 0;
@@ -67,10 +67,10 @@ int MoveList::GetMove() {
 
 void MoveList::ScoreMoves(Position* pos, 
                           const int ply, 
-                          const int ttMove) {
+                          const Move ttMove) {
 
 	Square fromSquare, toSquare;
-	int mType, hunter, prey;
+	int moveType, hunter, prey;
 
 	for (int i = 0; i < ind; i++) {
         // hash move
@@ -79,9 +79,9 @@ void MoveList::ScoreMoves(Position* pos,
 		else {
 			values[i] = 0; // default, shouldn't be used
 
-			mType = GetTypeOfMove(moves[i]);
+			moveType = GetTypeOfMove(moves[i]);
 
-			if (mType == tNormal || mType == tPawnjump || mType == tCastle) {
+			if (moveType == tNormal || moveType == tPawnjump || moveType == tCastle) {
 
 				fromSquare = GetFromSquare(moves[i]);
 				toSquare = GetToSquare(moves[i]);
@@ -114,15 +114,15 @@ void MoveList::ScoreMoves(Position* pos,
 			}
 
             // en passant capture
-			if (mType == tEnPassant) 
+			if (moveType == tEnPassant) 
                 values[i] = HighValue + 106;
 
             // promotions
 			if (IsMovePromotion(moves[i])) {
-				if (mType == tPromQ) values[i] = QueenPromValue;
-				if (mType == tPromN) values[i] = KnightPromValue;
-				if (mType == tPromR) values[i] = RookPromValue;
-				if (mType == tPromB) values[i] = BishopPromValue;
+				if (moveType == tPromQ) values[i] = QueenPromValue;
+				if (moveType == tPromN) values[i] = KnightPromValue;
+				if (moveType == tPromR) values[i] = RookPromValue;
+				if (moveType == tPromB) values[i] = BishopPromValue;
 			}
 		}
 	}

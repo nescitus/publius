@@ -1,4 +1,7 @@
+#include "color.h"
+#include "square.h"
 #include "limits.h"
+#include "publius.h"
 #include "pv.h"
 #include <iostream>
 
@@ -9,7 +12,7 @@ void PvCollector::Clear() {
             line[i][j] = 0;
 }
 
-void PvCollector::Refresh(const int ply, const int move) {
+void PvCollector::Refresh(const int ply, const Move move) {
 
     line[ply][ply] = move;
 

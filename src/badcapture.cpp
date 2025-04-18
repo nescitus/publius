@@ -13,7 +13,7 @@ const int pieceValue[6] = { 100, 300, 300, 500, 900, 0 };
 // - in Quiesce() to prune captures that appear to lose material
 // - in ScoreMoves() to sort such captures below the quiet moves
 
-bool IsBadCapture(Position* pos, int move) {
+bool IsBadCapture(Position* pos, Move move) {
 
     Square fromSquare = GetFromSquare(move);
     Square toSquare = GetToSquare(move);

@@ -5,7 +5,7 @@
 #include "move.h"
 #include "piece.h"
 
-void Position::UndoMove(const int move, const int ply) {
+void Position::UndoMove(const Move move, const int ply) {
 
     // Init variables
     Color color = ~sideToMove;
