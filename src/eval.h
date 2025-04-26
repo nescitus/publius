@@ -25,12 +25,12 @@ extern EvalHashTable EvalHash;
 
 int Evaluate(Position* pos, EvalData* e);
 void EvalBasic(EvalData* e, const Color color, const int piece, const int sq);
-void EvalPawn(Position* pos, EvalData* e, Color color);
-void EvalKnight(Position* pos, EvalData* e, Color color);
-void EvalBishop(Position* pos, EvalData* e, Color color);
-void EvalRook(Position* pos, EvalData* e, Color color);
-void EvalQueen(Position* pos, EvalData* e, Color color);
-void EvalKing(Position* pos, EvalData* e, Color color);
+void EvalPawn(const Position* pos, EvalData* e, Color color);
+void EvalKnight(const Position* pos, EvalData* e, Color color);
+void EvalBishop(const Position* pos, EvalData* e, Color color);
+void EvalRook(const Position* pos, EvalData* e, Color color);
+void EvalQueen(const Position* pos, EvalData* e, Color color);
+void EvalKing(const Position* pos, EvalData* e, Color color);
 void EvalKingAttacks(EvalData* e, Color color);
 int GetDrawMul(Position* pos, const Color strong, const Color weak);
 int Interpolate(EvalData* e);

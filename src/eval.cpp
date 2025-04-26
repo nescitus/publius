@@ -79,7 +79,7 @@ int Evaluate(Position* pos, EvalData* e) {
   return score;
 }
 
-void EvalPawn(Position* pos, EvalData* e, Color color) {
+void EvalPawn(const Position* pos, EvalData* e, Color color) {
 
     Bitboard b, span;
 
@@ -116,7 +116,7 @@ void EvalPawn(Position* pos, EvalData* e, Color color) {
     }
 }
 
-void EvalKnight(Position* pos, EvalData* e, Color color) {
+void EvalKnight(const Position* pos, EvalData* e, Color color) {
 
     int cnt;
     Bitboard b, mobility;
@@ -141,7 +141,7 @@ void EvalKnight(Position* pos, EvalData* e, Color color) {
     }
 }
 
-void EvalBishop(Position* pos, EvalData* e, Color color) {
+void EvalBishop(const Position* pos, EvalData* e, Color color) {
 
     int cnt;
     Bitboard b, mobility, occupancy, att;
@@ -169,7 +169,7 @@ void EvalBishop(Position* pos, EvalData* e, Color color) {
     }
 }
 
-void EvalRook(Position* pos, EvalData* e, Color color) {
+void EvalRook(const Position* pos, EvalData* e, Color color) {
 
     int cnt;
     Bitboard b, mobility, transparent, occupancy, att, file;
@@ -223,7 +223,7 @@ void EvalRook(Position* pos, EvalData* e, Color color) {
     }
 }
 
-void EvalQueen(Position* pos, EvalData* e, Color color) {
+void EvalQueen(const Position* pos, EvalData* e, Color color) {
 
     int cnt;
     Bitboard b, mobility, transparent, occupancy, att;
@@ -262,7 +262,7 @@ void EvalQueen(Position* pos, EvalData* e, Color color) {
     }
 }
 
-void EvalKing(Position* pos, EvalData* e, Color color) {
+void EvalKing(const Position* pos, EvalData* e, Color color) {
 
     Bitboard shieldMask, kingsFile, nextFile;
 

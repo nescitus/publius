@@ -15,12 +15,13 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     Move move, bestMove, ttMove;
     EvalData e;
     MoveList list;
-    bool isInCheck, isPv;
 
     // Init
     bestMove = 0;
     ttMove = 0;
-    isPv = (beta > alpha + 1);
+
+    // Are we in a pv-node? See search.cpp for comments
+    const bool isPv = (beta > alpha + 1);
 
     // Statistics and attempt at quick exit
     nodeCount++;
@@ -61,7 +62,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     }
 
     // Are we in check? Then we must flee
-    isInCheck = pos->IsInCheck();
+    const bool isInCheck = pos->IsInCheck();
 
     // Get a stand-pat score and adjust bounds
     // (exiting if eval exceeds beta

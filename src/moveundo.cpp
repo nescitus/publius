@@ -8,12 +8,12 @@
 void Position::UndoMove(const Move move, const int ply) {
 
     // Init variables
-    Color color = ~sideToMove;
-    Square fromSquare = GetFromSquare(move);
-    Square toSquare = GetToSquare(move);
-    int hunter = TypeOfPiece(pieceLocation[toSquare]);
-    int prey = undoStack[ply].prey;
-    int moveType = GetTypeOfMove(move);
+    const Color color = ~sideToMove;
+    const Square fromSquare = GetFromSquare(move);
+    const Square toSquare = GetToSquare(move);
+    const int hunter = TypeOfPiece(pieceLocation[toSquare]);
+    const int prey = undoStack[ply].prey;
+    const int moveType = GetTypeOfMove(move);
 
     // Copy stuff needed to undo the move
     castleFlags = undoStack[ply].castleFlags;

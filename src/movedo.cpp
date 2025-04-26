@@ -11,12 +11,12 @@
 void Position::DoMove(const Move move, const int ply) {
 
     // Init variables
-    Color color = sideToMove;
-    Square fromSquare = GetFromSquare(move);
-    Square toSquare = GetToSquare(move);
-    int hunter = TypeOfPiece(pieceLocation[fromSquare]);
-    int prey = TypeOfPiece(pieceLocation[toSquare]);
-    int moveType = GetTypeOfMove(move);
+    const Color color = sideToMove;
+    const Square fromSquare = GetFromSquare(move);
+    const Square toSquare = GetToSquare(move);
+    const int hunter = TypeOfPiece(pieceLocation[fromSquare]);
+    const int prey = TypeOfPiece(pieceLocation[toSquare]);
+    const int moveType = GetTypeOfMove(move);
 
     // Save data needed for undoing a move
     undoStack[ply].move = move;
@@ -74,10 +74,10 @@ void Position::DoMove(const Move move, const int ply) {
 
     // Promotion
     if (IsMovePromotion(move)) {
-        hunter = GetPromotedPiece(move);
+        const int promoted = GetPromotedPiece(move);
         boardHash ^= Key.pieceKey[CreatePiece(color, Pawn)][toSquare]
-                   ^ Key.pieceKey[CreatePiece(color, hunter)][toSquare];
-        ChangePieceNoHash(Pawn, hunter, color, toSquare);
+                   ^ Key.pieceKey[CreatePiece(color, promoted)][toSquare];
+        ChangePieceNoHash(Pawn, promoted, color, toSquare);
     }
 
     // Switch side to move

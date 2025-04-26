@@ -154,7 +154,7 @@ void FillCompleteList(Position* pos, MoveList* list);
 void FillChecksAndCaptures(Position* pos, MoveList* list);
 
 bool IsBadCapture(Position* pos, Move move);
-int Swap(Position* pos, Square fromSquare, Square toSquare);
+int Swap(const Position* pos, const Square fromSquare, const Square toSquare);
 
 void TryInterrupting(void);
 void DisplayPv(int score);

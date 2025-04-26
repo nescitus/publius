@@ -15,10 +15,10 @@ const int pieceValue[6] = { 100, 300, 300, 500, 900, 0 };
 
 bool IsBadCapture(Position* pos, Move move) {
 
-    Square fromSquare = GetFromSquare(move);
-    Square toSquare = GetToSquare(move);
-    int hunter = pos->PieceTypeOnSq(fromSquare);
-    int prey = pos->PieceTypeOnSq(toSquare);
+    const Square fromSquare = GetFromSquare(move);
+    const Square toSquare = GetToSquare(move);
+    const int hunter = pos->PieceTypeOnSq(fromSquare);
+    const int prey = pos->PieceTypeOnSq(toSquare);
 
     // good or equal capture, based on simple piece values
     if (pieceValue[prey] >= pieceValue[hunter])
@@ -40,7 +40,7 @@ bool IsBadCapture(Position* pos, Move move) {
 // the moves. It is blind to tactics, such as checks, pins,
 // promotions and overloaded defenders.
 
-int Swap(Position* pos, Square fromSquare, Square toSquare) {
+int Swap(const Position* pos, const Square fromSquare, const Square toSquare) {
 
     Color color;
     int ply, hunter, score[32];

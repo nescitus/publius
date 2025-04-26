@@ -27,7 +27,7 @@ int oldEval[PlyLimit];
 int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullMove) {
 
     int bestScore, newDepth, eval, moveListLength;
-    int isInCheck, hashFlag, reduction, score, moveType;
+    int hashFlag, reduction, score, moveType;
     Move move, ttMove, bestMove; 
     int movesTried, quietMovesTried;
     EvalData e;
@@ -138,7 +138,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
     // Are we in check? Knowing that is useful 
     // for pruning/reduction/extension decisions
-    isInCheck = pos->IsInCheck();
+    const bool isInCheck = pos->IsInCheck();
 
     // Init eval and improving flag.
     // Nodes where the side to move 
