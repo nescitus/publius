@@ -37,3 +37,5 @@ Bitboard FillOcclSE(Bitboard b, Bitboard o);
 Bitboard FillOcclWest(Bitboard b, Bitboard o);
 Bitboard FillOcclNW(Bitboard b, Bitboard o);
 Bitboard FillOcclSW(Bitboard b, Bitboard o);
+
+Bitboard RelSqBb(const Color cl, const Square sq);

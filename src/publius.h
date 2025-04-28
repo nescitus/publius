@@ -135,7 +135,7 @@ private:
 	int values[MovesLimit];
 	int ind;
 	int get;
-	void AddPromotions(MoveList* list, Square fromSquare, Square toSquare);
+	void AddPromotions(MoveList* list, const Square fromSquare, const Square toSquare);
 	void SwapMoves(const int i, const int j);
 public:
 	void Clear();
@@ -164,7 +164,7 @@ void OnNewGame(void);
 
 // diagnostics
 
-void Bench(Position* p, int depth);
+void Bench(Position* pos, int depth);
 void PrintBoard(Position* pos);
 Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy);
 void PrintBitboard(Bitboard b);

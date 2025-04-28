@@ -24,19 +24,19 @@ TransTable TT;
 LmrData Lmr;
 PvCollector Pv;
 
-int main() 
+int main()
 {
-  Mask.Init();
-  Key.Init();
-  Params.Init();
-  GenerateMoves.Init();
-  State.Init();
-  UciLoop();
-  TT.Exit();
-  return 0;
+    Mask.Init();
+    Key.Init();
+    Params.Init();
+    GenerateMoves.Init();
+    State.Init();
+    UciLoop();
+    TT.Exit();
+    return 0;
 }
 
-void EngineState::Init() 
+void EngineState::Init()
 {
     isStopping = false;
     isPondering = false;

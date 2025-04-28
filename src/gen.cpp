@@ -9,7 +9,8 @@
 #include "bitgen.h"
 #include "piece.h"
 
-void AddPromotions(MoveList* list, Square fromSquare, Square toSquare) {
+void AddPromotions(MoveList* list, const Square fromSquare, 
+                                   const Square toSquare) {
 
     list->AddMove( fromSquare, toSquare, tPromQ );
     list->AddMove( fromSquare, toSquare, tPromR );

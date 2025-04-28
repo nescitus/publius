@@ -32,20 +32,20 @@ void UciLoop(void) {
 
 bool ParseCommand(std::istringstream& stream, Position* pos) {
 
-    std::string cmd;
-    stream >> cmd;
+    std::string command;
+    stream >> command;
 
-    if (cmd == "isready") std::cout << "readyok" << std::endl;
-    else if (cmd == "ucinewgame") OnNewGame();
-    else if (cmd == "uci") OnUciCommand();
-    else if (cmd == "position") OnPositionCommand(stream, pos);
-    else if (cmd == "go") OnGoCommand(stream, pos);
-    else if (cmd == "setoption") OnSetOptionCommand(stream);
-    else if (cmd == "print") PrintBoard(pos);
-    else if (cmd == "perft") OnPerftCommand(stream, pos);
-    else if (cmd == "bench") OnBenchCommand(stream, pos);
-    else if (cmd == "step") OnStepCommand(stream, pos);
-    else if (cmd == "quit") { return false; }
+    if (command == "isready") std::cout << "readyok" << std::endl;
+    else if (command == "ucinewgame") OnNewGame();
+    else if (command == "uci") OnUciCommand();
+    else if (command == "position") OnPositionCommand(stream, pos);
+    else if (command == "go") OnGoCommand(stream, pos);
+    else if (command == "setoption") OnSetOptionCommand(stream);
+    else if (command == "print") PrintBoard(pos);
+    else if (command == "perft") OnPerftCommand(stream, pos);
+    else if (command == "bench") OnBenchCommand(stream, pos);
+    else if (command == "step") OnStepCommand(stream, pos);
+    else if (command == "quit") { return false; }
     return true;
 }
 
@@ -100,7 +100,7 @@ void OnStepCommand(std::istringstream& stream, Position* pos) {
 
 void OnGoCommand(std::istringstream& stream, Position* pos) {
 
-    std::string param, read;
+    std::string param, value;
 
     Timer.Clear();
     State.isPondering = false;
@@ -109,40 +109,40 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
     stream >> param;
     while (!param.empty()) {
         if (param == "wtime") {
-            stream >> read;
-            Timer.SetData(wTime, std::stoi(read));
+            stream >> value;
+            Timer.SetData(wTime, std::stoi(value));
         }
         else if (param == "btime") {
-            stream >> read;
-            Timer.SetData(bTime, std::stoi(read));
+            stream >> value;
+            Timer.SetData(bTime, std::stoi(value));
         }
         else if (param == "winc") {
-            stream >> read;
-            Timer.SetData(wIncrement, std::stoi(read));
+            stream >> value;
+            Timer.SetData(wIncrement, std::stoi(value));
         }
         else if (param == "binc") {
-            stream >> read;
-            Timer.SetData(bIncrement, std::stoi(read));
+            stream >> value;
+            Timer.SetData(bIncrement, std::stoi(value));
         }
         else if (param == "movestogo") {
-            stream >> read;
-            Timer.SetData(movesToGo, std::stoi(read));
+            stream >> value;
+            Timer.SetData(movesToGo, std::stoi(value));
         }
         else if (param == "ponder") {
             State.isPondering = true;
         }
         else if (param == "depth") {
-            stream >> read;
+            stream >> value;
             Timer.SetData(isInfinite, 1);
-            Timer.SetData(maxDepth, std::stoi(read));
+            Timer.SetData(maxDepth, std::stoi(value));
         }
         else if (param == "movetime") {
-            stream >> read;
-            Timer.SetData(moveTime, std::stoi(read));
+            stream >> value;
+            Timer.SetData(moveTime, std::stoi(value));
         }
         else if (param == "nodes") {
-            stream >> read;
-            Timer.SetData(maxNodes, std::stoi(read));
+            stream >> value;
+            Timer.SetData(maxNodes, std::stoi(value));
         }
 
         param.clear();
@@ -194,24 +194,22 @@ void OnSetOptionCommand(std::istringstream& stream) {
 
 void OnBenchCommand(std::istringstream& stream, Position* pos) {
 
-    int depth;
-
-    depth = 4;
+    int depth = 4; // default
     stream >> depth;
     std::cout << "Running perft test at depth " << depth << std::endl;
     Bench(pos, depth);
 }
 
-void OnPerftCommand(std::istringstream& stream, Position* p) {
+void OnPerftCommand(std::istringstream& stream, Position* pos) {
 
-    int depth, moveCount;
+    int moveCount;
+    int depth = 4; // default
 
-    depth = 4;
     stream >> depth;
     std::cout << "Running perft test at depth " << depth << std::endl;
 
     Timer.SetStartTime();
-    moveCount = Perft(p, 0, depth, true);
+    moveCount = Perft(pos, 0, depth, true);
 
     std::cout << "Perft " << depth 
               << " completed in " << Timer.Elapsed() 

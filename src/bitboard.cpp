@@ -232,3 +232,8 @@ Bitboard FillOcclNW(Bitboard b, Bitboard o) {
     b |= o & (b << 28);
     return b;
 }
+
+// get bitboard of a relative square
+Bitboard RelSqBb(const Color cl, const Square sq) {
+    return (Paint(RelativeSq(cl, sq)));
+}

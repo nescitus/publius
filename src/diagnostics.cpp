@@ -33,7 +33,7 @@ std::string test[] = {
 // - confirming that a change is indeed non-functional
 // - measuring the impact of a change to the engine's speed
 
-void Bench(Position* p, int depth) {
+void Bench(Position* pos, int depth) {
 
     nodeCount = 0;
     State.isStopping = false;
@@ -46,8 +46,8 @@ void Bench(Position* p, int depth) {
 
         std::cout << test[i] << std::endl;
         OnNewGame();
-        p->Set(test[i]);
-        Iterate(p);
+        pos->Set(test[i]);
+        Iterate(pos);
     }
 
     int elapsed = Timer.Elapsed();
@@ -71,7 +71,7 @@ void PrintBoard(Position* pos) {
     for (Square sq = A1; sq < 64; ++sq) {
 
         // print square content
-        Square mapSq = sq ^ 56;
+        Square mapSq = InvertSquare(sq);
         std::cout << piece_name[pos->GetPiece(mapSq)];
 
         // print numbers and start new line with spaces
@@ -132,13 +132,10 @@ Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
     return moveCount;
 }
 
-#define REL_SQ(sq,cl)   ( (sq) ^ ((cl) * 56) )
-#define RelSqBb(sq,cl)  ( Paint(REL_SQ(sq,cl) ) )
-
 void PrintBitboard(Bitboard b) {
    
     for (Square sq = A1; sq < 64; ++sq) {
-        if (b & RelSqBb(sq, Black)) std::cout << "+ ";
+        if (b & RelSqBb(Black, sq)) std::cout << "+ ";
         else                        std::cout << ". ";
         if ((sq + 1) % 8 == 0) 
             std::cout << 9 - ((sq + 1) / 8) << std:: endl;
