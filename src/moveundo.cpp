@@ -20,6 +20,7 @@ void Position::UndoMove(const Move move, const int ply) {
     enPassantSq = undoStack[ply].enPassantSq;
     reversibleMoves = undoStack[ply].reversibleMoves;
     boardHash = undoStack[ply].boardHash;
+    pawnHash = undoStack[ply].pawnHash;
     repetitionIndex--;
 
     // Move piece

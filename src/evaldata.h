@@ -4,6 +4,8 @@ class EvalData {
 public:
 	int mg[2];
 	int eg[2];
+	int mgPawn[2];
+	int egPawn[2];
 	Bitboard enemyKingZone[2];
 	int minorAttacks[2];
 	int rookAttacks[2];
@@ -11,4 +13,5 @@ public:
 	int phase; // game phase (24 for starting position)
 	void Clear();
 	void Add(Color color, int mgVal, int egVal);
+	void AddPawn(Color color, int mgVal, int egVal);
 };

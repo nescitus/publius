@@ -26,6 +26,7 @@ typedef struct {
 	Square enPassantSq;
 	int reversibleMoves;
 	Bitboard boardHash;
+	Bitboard pawnHash;
 } UndoStack;
 
 static const int stackSize = 2048;
@@ -71,12 +72,14 @@ private:
 	void SetEnPassantSquare(const Color color, Square toSquare);
 	void UpdateCastlingRights(const Square fromSquare, const Square toSquare);
 	Bitboard CalculateHashKey();
+	Bitboard CalculatePawnKey();
 	
 	bool IsDrawBy50MoveRule() const;
 	bool IsDrawByRepetition() const;
 	bool IsDrawByInsufficientMaterial() const;
 public:
 	Bitboard boardHash;
+	Bitboard pawnHash;
 	bool SquareIsAttacked(const Square sq, Color color) const;
 	void Set(const std::string& str);
 	void DoMove(const Move move, const int ply);

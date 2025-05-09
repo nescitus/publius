@@ -174,6 +174,7 @@ void Position::Set(const std::string& str) {
 	}
 	
 	boardHash = CalculateHashKey();
+    pawnHash = CalculatePawnKey();
 }
 
 Bitboard Position::CalculateHashKey() {
@@ -191,6 +192,19 @@ Bitboard Position::CalculateHashKey() {
 
     if (sideToMove == Black)
         key ^= sideRandom;
+
+    return key;
+}
+
+Bitboard Position::CalculatePawnKey() {
+
+    Bitboard key = 0;
+
+    for (Square s = A1; s < 64; ++s)
+        if (pieceLocation[s] != noPiece) {
+            if (PieceTypeOnSq(s) == Pawn || PieceTypeOnSq(s) == King)
+            key ^= Key.pieceKey[pieceLocation[s]][s];
+        }
 
     return key;
 }

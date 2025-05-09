@@ -12,6 +12,7 @@
 #include <algorithm>
 
 EvalHashTable EvalHash(1024);
+sPawnHashEntry PawnTT[PAWN_HASH_SIZE];
 
 int Evaluate(Position* pos, EvalData* e) {
 
@@ -30,7 +31,9 @@ int Evaluate(Position* pos, EvalData* e) {
     // Tempo bonus
     e->Add(pos->GetSideToMove(), tempoMg, tempoEg);
 
-    // Evaluate pieces and pawns
+    EvalPawnStructure(pos, e);
+
+    // Evaluate pieces
     for (Color color = White; color < colorNone; ++color) {
 
         // Bishops pair
@@ -39,12 +42,10 @@ int Evaluate(Position* pos, EvalData* e) {
         }
 
         // Piece eval
-        EvalPawn(pos, e, color);
         EvalKnight(pos, e, color);
         EvalBishop(pos, e, color);
         EvalRook(pos, e, color);
         EvalQueen(pos, e, color);
-        EvalKing(pos, e, color);
     }
 
     // Finalize king attacks eval
@@ -79,6 +80,36 @@ int Evaluate(Position* pos, EvalData* e) {
   return score;
 }
 
+void EvalPawnStructure(const Position* pos, EvalData* e) {
+
+    int addr = pos->pawnHash % PAWN_HASH_SIZE;
+
+    if (PawnTT[addr].key == pos->pawnHash) {
+        e->mgPawn[White] = PawnTT[addr].mg[White];
+        e->mgPawn[Black] = PawnTT[addr].mg[Black];
+        e->egPawn[White] = PawnTT[addr].eg[White];
+        e->egPawn[Black] = PawnTT[addr].eg[Black];
+    }
+    else
+    {
+        EvalPawn(pos, e, White);
+        EvalPawn(pos, e, Black);
+        EvalKing(pos, e, White);
+        EvalKing(pos, e, Black);
+
+        PawnTT[addr].key = pos->pawnHash;
+        PawnTT[addr].mg[White] = e->mgPawn[White];
+        PawnTT[addr].mg[Black] = e->mgPawn[Black];
+        PawnTT[addr].eg[White] = e->egPawn[White];
+        PawnTT[addr].eg[Black] = e->egPawn[Black];
+    }
+
+    e->mg[White] += e->mgPawn[White];
+    e->eg[White] += e->egPawn[White];
+    e->mg[Black] += e->mgPawn[Black];
+    e->eg[Black] += e->egPawn[Black];
+}
+
 void EvalPawn(const Position* pos, EvalData* e, Color color) {
 
     Bitboard b, span;
@@ -90,28 +121,29 @@ void EvalPawn(const Position* pos, EvalData* e, Color color) {
         Square sq = PopFirstBit(&b);
 
         // Pawn material and piece/square table value
-        EvalBasic(e, color, Pawn, sq);
+        e->AddPawn(color, Params.mgPst[color][Pawn][sq],
+                          Params.egPst[color][Pawn][sq]);
 
         // Doubled pawn
         span = FrontSpan(Paint(sq), color);
         if (span & pos->Map(color, Pawn)) {
-            e->Add(color, doubledPawnMg, doubledPawnEg);
+            e->AddPawn(color, doubledPawnMg, doubledPawnEg);
         }
 
         // Strong pawn (phalanx or defended)
         if (Mask.strongPawn[color][sq] & pos->Map(color, Pawn)) {
-            e->Add(color, Params.pawnSupport[color][sq], 0);
+            e->AddPawn(color, Params.pawnSupport[color][sq], 0);
         }
 
         // Isolated pawn
         else if ((Mask.adjacentFiles[FileOf(sq)] & pos->Map(color, Pawn)) == 0) {
-            e->Add(color, isolPawnMg, isolPawnEg);
+            e->AddPawn(color, isolPawnMg, isolPawnEg);
         }
 
         // Passed pawn
         if (!(Mask.passed[color][sq] & pos->Map(~color, Pawn))) {
-            e->mg[color] += passedBonusMg[color][RankOf(sq)];
-            e->eg[color] += passedBonusEg[color][RankOf(sq)];
+            e->mgPawn[color] += passedBonusMg[color][RankOf(sq)];
+            e->egPawn[color] += passedBonusEg[color][RankOf(sq)];
         }
     }
 }
@@ -269,33 +301,34 @@ void EvalKing(const Position* pos, EvalData* e, Color color) {
     Square sq = pos->KingSq(color);
         
     // King piece/square table score
-    EvalBasic(e, color, King, sq);
+    e->AddPawn(color, Params.mgPst[color][King][sq],
+                      Params.egPst[color][King][sq]);
 
     // Penalising open files near the king
     kingsFile = FillNorth(Paint(sq)) | FillSouth(Paint(sq)) | Paint(sq);
     if ((kingsFile & pos->Map(color, Pawn)) == 0)
-        e->mg[color] += kingOpenFilePenalty;
+        e->mgPawn[color] += kingOpenFilePenalty;
 
     nextFile = EastOf(kingsFile);
     if (nextFile) {
         if ((nextFile & pos->Map(color, Pawn)) == 0)
-            e->mg[color] += kingNearOpenPenalty;
+            e->mgPawn[color] += kingNearOpenPenalty;
     }
 
     nextFile = WestOf(kingsFile);
     if (nextFile) {
         if ((nextFile & pos->Map(color, Pawn)) == 0)
-            e->mg[color] += kingNearOpenPenalty;
+            e->mgPawn[color] += kingNearOpenPenalty;
     }
         
     // (sorry equivalent of) king's pawn shield
     // (pawns closer to the king are counted twice)
 
     shieldMask = GenerateMoves.King(sq);
-    e->mg[color] += kingPseudoShield * PopCnt(shieldMask & pos->Map(color, Pawn));
+    e->mgPawn[color] += kingPseudoShield * PopCnt(shieldMask & pos->Map(color, Pawn));
 
     shieldMask = ForwardOf(shieldMask, color);
-    e->mg[color] += kingPseudoShield * PopCnt(shieldMask & pos->Map(color, Pawn));
+    e->mgPawn[color] += kingPseudoShield * PopCnt(shieldMask & pos->Map(color, Pawn));
 }
 
 // Operations repeated while evaluating any piece:

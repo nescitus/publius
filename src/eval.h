@@ -2,11 +2,23 @@
 
 #include <cstdint>
 
+// Define the pawn hash entry
+
+struct sPawnHashEntry {
+    Bitboard key;
+    int mg[2];
+    int eg[2];
+};
+
 // Define the eval hash entry
 struct EvalTTEntry {
     Bitboard key;
     int val;
 };
+
+const int PAWN_HASH_SIZE = 1024;
+
+extern sPawnHashEntry PawnTT[PAWN_HASH_SIZE];
 
 class EvalHashTable {
 public:
@@ -25,6 +37,7 @@ extern EvalHashTable EvalHash;
 
 int Evaluate(Position* pos, EvalData* e);
 void EvalBasic(EvalData* e, const Color color, const int piece, const int sq);
+void EvalPawnStructure(const Position* pos, EvalData* e);
 void EvalPawn(const Position* pos, EvalData* e, Color color);
 void EvalKnight(const Position* pos, EvalData* e, Color color);
 void EvalBishop(const Position* pos, EvalData* e, Color color);
