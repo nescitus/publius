@@ -181,9 +181,9 @@ Bitboard Position::CalculateHashKey() {
 
     Bitboard key = 0;
 
-    for (Square s = A1; s < 64; ++s)
-        if (pieceLocation[s] != noPiece)
-            key ^= Key.pieceKey[pieceLocation[s]][s];
+    for (Square square = A1; square < 64; ++square)
+        if (pieceLocation[square] != noPiece)
+            key ^= Key.pieceKey[pieceLocation[square]][square];
 
     key ^= Key.castleKey[castleFlags];
 
@@ -200,10 +200,10 @@ Bitboard Position::CalculatePawnKey() {
 
     Bitboard key = 0;
 
-    for (Square s = A1; s < 64; ++s)
-        if (pieceLocation[s] != noPiece) {
-            if (PieceTypeOnSq(s) == Pawn || PieceTypeOnSq(s) == King)
-            key ^= Key.pieceKey[pieceLocation[s]][s];
+    for (Square square = A1; square < 64; ++square)
+        if (pieceLocation[square] != noPiece) {
+            if (PieceTypeOnSq(square) == Pawn || PieceTypeOnSq(square) == King)
+            key ^= Key.pieceKey[pieceLocation[square]][square];
         }
 
     return key;

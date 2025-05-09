@@ -68,15 +68,15 @@ void PrintBoard(Position* pos) {
     // print horizontal line (and spaces before the first square)
     std::cout << "--------------------------------------------" << std::endl << "  ";
 
-    for (Square sq = A1; sq < 64; ++sq) {
+    for (Square square = A1; square < 64; ++square) {
 
         // print square content
-        Square mapSq = InvertSquare(sq);
-        std::cout << piece_name[pos->GetPiece(mapSq)];
+        Square mappedSquare = InvertSquare(square);
+        std::cout << piece_name[pos->GetPiece(mappedSquare)];
 
         // print numbers and start new line with spaces
-        if ((sq + 1) % 8 == 0) {
-            std::cout << "  " << 9 - ((sq + 1) / 8) << std::endl << "  ";
+        if ((square + 1) % 8 == 0) {
+            std::cout << "  " << 9 - ((square + 1) / 8) << std::endl << "  ";
         }
     }
     // print letters
@@ -134,11 +134,11 @@ Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
 
 void PrintBitboard(Bitboard b) {
    
-    for (Square sq = A1; sq < 64; ++sq) {
-        if (b & RelSqBb(Black, sq)) std::cout << "+ ";
+    for (Square square = A1; square < 64; ++square) {
+        if (b & RelSqBb(Black, square)) std::cout << "+ ";
         else                        std::cout << ". ";
-        if ((sq + 1) % 8 == 0) 
-            std::cout << 9 - ((sq + 1) / 8) << std:: endl;
+        if ((square + 1) % 8 == 0) 
+            std::cout << 9 - ((square + 1) / 8) << std:: endl;
     }
     std::cout  << "\na b c d e f g h" << std::endl;
 }

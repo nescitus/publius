@@ -310,13 +310,13 @@ void FillCheckList(Position* pos, MoveList* list) {
     Bitboard pieces, moves;
     Square fromSquare, toSquare;
     Color color = pos->GetSideToMove();
-    Square ksq = pos->KingSq(~color);
+    Square kingSquare = pos->KingSq(~color);
     
     // find locations from where the direct checks can be given
-    Bitboard pawnChecks = ForwardOf(SidesOf(Paint(ksq)), ~color);
-    Bitboard knightCheck = GenerateMoves.Knight(ksq);
-    Bitboard diagCheck = GenerateMoves.Bish(pos->Occupied(), ksq);
-    Bitboard straightCheck = GenerateMoves.Rook(pos->Occupied(), ksq);
+    Bitboard pawnChecks = ForwardOf(SidesOf(Paint(kingSquare)), ~color);
+    Bitboard knightCheck = GenerateMoves.Knight(kingSquare);
+    Bitboard diagCheck = GenerateMoves.Bish(pos->Occupied(), kingSquare);
+    Bitboard straightCheck = GenerateMoves.Rook(pos->Occupied(), kingSquare);
     
     if (color == White) {
 

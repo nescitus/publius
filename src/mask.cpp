@@ -59,10 +59,10 @@ void MaskData::InitAdjacentMask() {
 
 void MaskData::InitStrongPawn() {
 
-    for (Square sq = A1; sq < 64; ++sq) {
-        strongPawn[White][sq] = SidesOf(Paint(sq));
-        strongPawn[Black][sq] = SidesOf(Paint(sq));
-        strongPawn[White][sq] |= ForwardOf(strongPawn[White][sq], Black);
-        strongPawn[Black][sq] |= ForwardOf(strongPawn[Black][sq], White);
+    for (Square square = A1; square < 64; ++square) {
+        strongPawn[White][square] = SidesOf(Paint(square));
+        strongPawn[Black][square] = SidesOf(Paint(square));
+        strongPawn[White][square] |= ForwardOf(strongPawn[White][square], Black);
+        strongPawn[Black][square] |= ForwardOf(strongPawn[Black][square], White);
     }
 }
