@@ -1,18 +1,9 @@
 #pragma once
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3488 lines of source code
-// -147 diagnostics = 3341
-
-typedef unsigned long long Bitboard;
-typedef int Move;
 
 #include <iostream>
 #include <algorithm>
-
-enum eMoveType { tNormal, tCastle, tEnPassant, tPawnjump, tPromN, tPromB, tPromR, tPromQ };
-enum eCastleFlag { wShortCastle = 1, wLongCastle = 2, bShortCastle = 4, bLongCastle = 8};
-enum eMoveFlag { moveQuiet, moveHash, moveNoisy, moveBadcapt, moveKiller};
 
 static constexpr auto startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -";
 static constexpr auto kiwipeteFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
@@ -59,7 +50,6 @@ private:
 	int repetitionIndex;
 	Bitboard repetitionList[256];
 
-    
 	void Clear();
 	void SwitchSide();
 	void ClearEnPassant();
@@ -80,7 +70,7 @@ private:
 public:
 	Bitboard boardHash;
 	Bitboard pawnHash;
-	bool SquareIsAttacked(const Square sq, Color color) const;
+	bool SquareIsAttacked(const Square sq, const Color color) const;
 	void Set(const std::string& str);
 	void DoMove(const Move move, const int ply);
 	void DoNull(const int ply);
@@ -138,7 +128,6 @@ private:
 	int values[MovesLimit];
 	int ind;
 	int get;
-	void AddPromotions(MoveList* list, const Square fromSquare, const Square toSquare);
 	void SwapMoves(const int i, const int j);
 public:
 	void Clear();

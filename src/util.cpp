@@ -6,7 +6,7 @@
 #  include <unistd.h>
 #  include <sys/time.h>
 #endif
-#include "color.h"
+#include "types.h"
 #include "square.h"
 #include "limits.h"
 #include "publius.h"

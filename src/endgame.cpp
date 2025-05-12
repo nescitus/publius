@@ -1,4 +1,4 @@
-#include "color.h"
+#include "types.h"
 #include "piece.h"
 #include "square.h"
 #include "limits.h"

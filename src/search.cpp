@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "color.h"
+#include "types.h"
 #include "square.h"
 #include "limits.h"
 #include "publius.h"

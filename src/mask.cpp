@@ -1,4 +1,4 @@
-#include "color.h"
+#include "types.h"
 #include "square.h"
 #include "limits.h"
 #include "publius.h"
@@ -15,6 +15,7 @@ void MaskData::Init() {
 
 void MaskData::InitRanks() {
 
+    // rank
     rank[rank1] = 0x00000000000000FFULL;
     rank[rank2] = 0x000000000000FF00ULL;
     rank[rank3] = 0x0000000000FF0000ULL;
@@ -24,6 +25,7 @@ void MaskData::InitRanks() {
     rank[rank7] = 0x00FF000000000000ULL;
     rank[rank8] = 0xFF00000000000000ULL;
 
+    // file
     file[fileA] = 0x0101010101010101ULL;
     file[fileB] = 0x0202020202020202ULL;
     file[fileC] = 0x0404040404040404ULL;
@@ -34,7 +36,6 @@ void MaskData::InitRanks() {
     file[fileH] = 0x8080808080808080ULL;
 
     // relative rank
-
     for (int i = 0; i < 8; i++) {
         rr[White][i] = rank[i];
         rr[Black][i] = rank[7 - i];
@@ -43,11 +44,11 @@ void MaskData::InitRanks() {
 
 void MaskData::InitPassedMask() {
 
-    for (Square s = A1; s < sqNone; ++s) {
-        passed[White][s] = FillNorth(NorthOf(Paint(s)));
-        passed[White][s] |= SidesOf(passed[White][s]);
-        passed[Black][s] = FillSouth(SouthOf(Paint(s)));
-        passed[Black][s] |= SidesOf(passed[Black][s]);
+    for (Square square = A1; square < sqNone; ++square) {
+        passed[White][square] = FillNorth(NorthOf(Paint(square)));
+        passed[White][square] |= SidesOf(passed[White][square]);
+        passed[Black][square] = FillSouth(SouthOf(Paint(square)));
+        passed[Black][square] |= SidesOf(passed[Black][square]);
     }
 }
 

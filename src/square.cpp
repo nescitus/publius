@@ -1,4 +1,4 @@
-#include "color.h"
+#include "types.h"
 #include "square.h"
 #include <iostream>
 

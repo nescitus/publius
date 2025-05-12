@@ -1,4 +1,4 @@
-#include "color.h"
+#include "types.h"
 
 Color operator~(Color c) {
     return Color(c ^ Black);

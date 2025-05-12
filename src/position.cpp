@@ -1,4 +1,4 @@
-#include "color.h"
+#include "types.h"
 #include "square.h"
 #include "limits.h"
 #include "publius.h"
@@ -6,6 +6,7 @@
 #include "bitgen.h"
 #include "hashkeys.h"
 #include "piece.h"
+
 
 // For Position class members observe the following 
 // naming convention: if the function to manipulate

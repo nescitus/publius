@@ -156,7 +156,6 @@
   <ItemGroup>
     <ClInclude Include="src\bitboard.h" />
     <ClInclude Include="src\bitgen.h" />
-    <ClInclude Include="src\color.h" />
     <ClInclude Include="src\eval.h" />
     <ClInclude Include="src\evaldata.h" />
     <ClInclude Include="src\hashkeys.h" />
@@ -172,6 +171,7 @@
     <ClInclude Include="src\square.h" />
     <ClInclude Include="src\timer.h" />
     <ClInclude Include="src\trans.h" />
+    <ClInclude Include="src\types.h" />
     <ClInclude Include="src\uci.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
