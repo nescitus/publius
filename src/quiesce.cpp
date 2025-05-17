@@ -23,7 +23,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     // Are we in a pv-node? See search.cpp for comments
     const bool isPv = (beta > alpha + 1);
 
-    // Statistics and attempt at quick exit
+    // Statistics
     nodeCount++;
 
     // Check for timeout

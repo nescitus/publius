@@ -225,8 +225,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         if (eval > beta && depth > 1) {
 
             // Set null move reduction
-            reduction = 3 + depth / 6;
-            if (eval - beta > 200) reduction++;
+            reduction = 3 + depth / 6 + (eval - beta > 200);
 
             // Do null move search, giving the opponent
             // two moves in a row
@@ -275,6 +274,9 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         depth--;
     }
 
+    // Check extension
+    if (isInCheck && (isPv || depth < 7)) depth++;
+
     // Init moves and variables before entering main loop
     bestScore = -Infinity;
     list.Clear();
@@ -289,9 +291,6 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         list.ScoreMoves(pos, ply, Pv.line[0][0]);
     else      
         list.ScoreMoves(pos, ply, ttMove);
-
-    // Check extension
-    if (isInCheck && (isPv || depth < 7)) depth++;
 
     // Main loop
     if (moveListLength) {
@@ -362,7 +361,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                !pos->IsInCheck())
             {   
                 reduction = Lmr.table[isPv]
-                                     [std::min(depth,63)]
+                                     [std::min(depth, 63)]
                                      [std::min(movesTried, 63)];
 
                 //if (reduction > 1 && improving) 
