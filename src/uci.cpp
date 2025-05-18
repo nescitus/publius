@@ -142,6 +142,7 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
         }
         else if (param == "nodes") {
             stream >> value;
+            Timer.SetData(isInfinite, 1);
             Timer.SetData(maxNodes, std::stoi(value));
         }
 
