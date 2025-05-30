@@ -40,16 +40,7 @@ void TransTable::Exit(void) {
 }
 
 void TransTable::Clear(void) {
-
-    hashRecord *slot;
-
-    for (slot = table; slot < table + tableSize; slot++) {
-        slot->key = 0;
-        slot->move = 0;
-        slot->score = 0;
-        slot->flags = 0;
-        slot->depth = 0;
-    }
+    std::fill(table, table + tableSize, hashRecord{});
 }
 
 bool TransTable::Retrieve(Bitboard key, Move* move, int* score, int* flag, int alpha, int beta, int depth, int ply) {
