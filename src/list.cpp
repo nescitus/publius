@@ -19,11 +19,13 @@ void MoveList::SwapMoves(const int i, const int j) {
 void MoveList::AddMove(Square fromSquare, Square toSquare, int flag) {
 
     moves[ind] = CreateMove(fromSquare, toSquare, flag);
+    values[ind] = 0;
 	ind++;
 }
 
 void MoveList::Clear() { 
-    ind = 0; get = 0; 
+    ind = 0; 
+    get = 0; 
 }
 
 int MoveList::GetInd() {
@@ -46,7 +48,8 @@ Move MoveList::GetMove() {
 
     values[loc] = min;
     move = moves[loc];
-    if (loc > get) SwapMoves(loc, get);
+    if (loc > get) 
+        SwapMoves(loc, get);
     get++;
     return move; 
 };
