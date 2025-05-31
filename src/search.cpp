@@ -15,7 +15,7 @@
 #include "search.h"
 
 const int singularDepth = 7;
-Move dummyMove = CreateMove(A1, B8, 0);
+Move dummyMove = CreateMove(A1, B8, 0); // clearly illegal
 Move excludedMove = dummyMove;
 
 // stack to hold information necessary to undo moves
@@ -172,10 +172,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // warrant more pruning.
 
     // Evaluate position, unless in check
-    if (isInCheck)
-        eval = -Infinity;
-    else
-        eval = Evaluate(pos, &e);    
+    eval = isInCheck ? -Infinity : Evaluate(pos, &e);
     
     // Adjust node eval by using score
     // from the transposition table.
@@ -325,17 +322,19 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             move = list.GetMove();
             moveType = GetMoveType(pos, move, ttMove, ply);
 
-            // This happens in singular search
+            // In singular search we omit the best move
+            // checking ehether there are viable alternatives
             if (move == excludedMove && isExcluded)
                 continue;
 
-            bool extend = false;
+            // Are we doing singular textension?
+            bool doSingularExtension = false;
 
             // Singular extension: tried once per search
             if (depth > singularDepth &&
                 singularMove &&
-                move == singularMove && // we are
-                singularExtension &&
+                move == singularMove && // we are about to ssearch the best move from tt
+                singularExtension &&    // conditions for the singular search are met
                 excludedMove == dummyMove) {
 
                 // Move from the transposition table
@@ -373,7 +372,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 // a shame if a deeper search revealed
                 // a refutation.
                 if (sc <= newAlpha) {
-                    extend = true;
+                    doSingularExtension = true;
                 }
             }
 
@@ -397,7 +396,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             newDepth = depth - 1;
 
             // Apply singular extension
-            if (extend)
+            if (doSingularExtension)
                 newDepth++;
 
             // Check extension
