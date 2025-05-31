@@ -126,6 +126,7 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
         }
         else if (param == "movestogo") {
             stream >> value;
+            Timer.isRepeating = true; // probable bugfix
             Timer.SetData(movesToGo, std::stoi(value));
         }
         else if (param == "ponder") {

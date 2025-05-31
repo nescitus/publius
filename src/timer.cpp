@@ -28,6 +28,11 @@ void UCItimer::Clear(void) {
     SetData(movesToGo, 30);
     SetData(isInfinite, 0);
     isStrict = false;
+    isRepeating = false;
+}
+
+void UCItimer::SetRepeating() {
+    isRepeating = true;
 }
 
 void UCItimer::SetStartTime(void) {
@@ -39,7 +44,8 @@ void UCItimer::SetMoveTiming(void) {
     // Certain settings forbid using tricks to finish earlier
     if (data[maxDepth] < 64 || // depth limit set
         data[maxNodes] > 0 ||  // node limit set
-        data[moveTime])        // time per move set
+        data[moveTime]     ||  // time per move set
+        isRepeating)           // repeating time control
         isStrict = true;
     else
         isStrict = false;

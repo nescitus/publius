@@ -8,9 +8,11 @@ private:
     int data[timerDataSize]; // various data used to set actual time per move (see eTimeData)
     int startTime;           // when we have begun searching
     int hardTimeLimit;       // basic time allocated for a move
-    int softTimeLimit;
+    int softTimeLimit;       // but we won't start the next iteration after exceeding this
     bool isStrict;
+    bool isRepeating;        // repeating TC requires strict mode...
 public:
+    void SetRepeating(void); //...and we won't detect it just by checking movestogo
     void Clear(void);
     void SetStartTime();
     void SetMoveTiming(void);
