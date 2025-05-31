@@ -71,7 +71,7 @@ int Widen(Position* pos, int depth, int lastScore) {
         for (int margin = 10; margin < 500; margin *= 2) {
             alpha = lastScore - margin;
             beta = lastScore + margin;
-            currentDepthScore = Search(pos, 0, alpha, beta, depth, false);
+            currentDepthScore = Search(pos, 0, alpha, beta, depth, false, false);
 
             if (State.isStopping) {
                 break;
@@ -93,6 +93,6 @@ int Widen(Position* pos, int depth, int lastScore) {
 
     // full window search
 
-    return Search(pos, 0, -Infinity, Infinity, depth, false);
+    return Search(pos, 0, -Infinity, Infinity, depth, false, false);
     
 }

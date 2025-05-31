@@ -14,6 +14,10 @@
 #include "eval.h"
 #include "search.h"
 
+const int singularDepth = 7;
+Move dummyMove = CreateMove(A1, B8, 0);
+Move excludedMove = dummyMove;
+
 // stack to hold information necessary to undo moves
 UndoStack undoStack[stackSize];
 
@@ -24,15 +28,16 @@ Bitboard nodeCount;
 // eval for each ply, to see if we are improving or not
 int oldEval[PlyLimit];
 
-int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullMove) {
+int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded) {
 
     int bestScore, newDepth, eval, moveListLength;
-    int hashFlag, reduction, score, moveType;
-    Move move, ttMove, bestMove; 
+    int hashFlag, reduction, score, moveType, singularScore;
+    Move move, ttMove, bestMove, singularMove; 
     int movesTried, quietMovesTried;
     EvalData e;
     MoveList list;
     Move listOfTriedMoves[256];
+    bool singularExtension;
 
     // Init
     move = 0;
@@ -40,6 +45,9 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     bestMove = 0;
     movesTried = 0;
     quietMovesTried = 0;
+    singularExtension = false;
+    singularScore = -Infinity;
+    singularMove = 0;
 
     // Root node is different because
     // we need to record the best move
@@ -127,13 +135,25 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // nominal depth, they represent more
         // shallow and less precise search.
         if (!isPv || (score > alpha && score < beta)) {
-            return score;
+            if (!isExcluded)
+               return score;
         }
     }
 
     // Safeguard against ply limit overflow
     if (ply >= PlyLimit - 1) {
         return Evaluate(pos, &e);
+    }
+
+    // Prepare for singular extension
+    if (ply && depth > singularDepth && excludedMove == dummyMove) {
+        if (TT.Retrieve(pos->boardHash, &singularMove, &singularScore, &hashFlag, alpha, beta, depth - 4, ply)) {
+
+            if ((hashFlag & lowerBound) && singularScore < EvalLimit)
+            {
+                singularExtension = true;
+            }
+        }
     }
 
     // Are we in check? Knowing that is useful 
@@ -181,6 +201,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     if (!wasNullMove &&
        !isInCheck &&
        !isPv &&
+       !isExcluded &&
         pos->CanTryNullMove()) 
     {
 
@@ -230,7 +251,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // Do null move search, giving the opponent
             // two moves in a row
             pos->DoNull(ply);
-            score = -Search(pos, ply + 1, -beta, -beta + 1, depth - reduction, true);
+            score = -Search(pos, ply + 1, -beta, -beta + 1, depth - reduction, true, false);
             pos->UndoNull(ply);
 
             if (State.isStopping)
@@ -241,7 +262,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // depth. The idea is to have some safeguard
             // against zugzwangs.
             if (depth - reduction > 5 && score >= beta)
-                score = Search(pos, ply, alpha, beta, depth - reduction - 4, true);
+                score = Search(pos, ply, alpha, beta, depth - reduction - 4, true, false);
             
             if (State.isStopping) 
                 return 0;
@@ -275,7 +296,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     }
 
     // Check extension
-    if (isInCheck && (isPv || depth < 7)) depth++;
+   // if (isInCheck && (isPv || depth < 7)) depth++;
 
     // Init moves and variables before entering main loop
     bestScore = -Infinity;
@@ -299,6 +320,34 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             move = list.GetMove();
             moveType = GetMoveType(pos, move, ttMove, ply);
 
+            // This happens in singular search
+            if (move == excludedMove && isExcluded)
+                continue;
+
+            bool extend = false;
+
+            // Singular extension ~4 Elo
+            if (depth > singularDepth &&
+                singularMove &&
+                move == singularMove &&
+                singularExtension &&
+                excludedMove == dummyMove) {
+
+                int newAlpha = -singularScore - 50;
+                excludedMove = move;
+                int sc = Search(pos, ply + 1, newAlpha, newAlpha + 1, (depth - 1) / 2, false, true);
+                excludedMove = dummyMove;
+
+                if (State.isStopping)
+                    return 0;
+
+                if (sc <= newAlpha) {
+                    PrintBoard(pos);
+                    std::cout << MoveToString(move) << std::endl;
+                    extend = true;
+                }
+            }
+
             // Make move
             pos->DoMove(move, ply);
 
@@ -317,6 +366,14 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
             // Set new search depth
             newDepth = depth - 1;
+
+            // Apply singular extension
+            if (extend)
+                newDepth++;
+
+            // Check extension
+            else if (pos->IsInCheck() && (isPv || depth < 4))
+                newDepth++;
 
             // Futility pruning
             if (canDoFutility &&
@@ -374,7 +431,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
                 // do a reduced depth search
                 if (reduction > 0) {
-                    score = -Search(pos, ply + 1, -alpha - 1, -alpha, newDepth - reduction, false);
+                    score = -Search(pos, ply + 1, -alpha - 1, -alpha, newDepth - reduction, false, false);
                     
                     // if the reduced search score falls
                     // below alpha, don't bother with
@@ -397,11 +454,11 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // Zero window searches are still conducted
             // with a zero window.
             if (bestScore == -Infinity)
-                score = -Search(pos, ply + 1, -beta, -alpha, newDepth, false);
+                score = -Search(pos, ply + 1, -beta, -alpha, newDepth, false, false);
             else {
-                score = -Search(pos, ply + 1, -alpha - 1, -alpha, newDepth, false);
+                score = -Search(pos, ply + 1, -alpha - 1, -alpha, newDepth, false, false);
                 if (!State.isStopping && score > alpha)
-                    score = -Search(pos, ply + 1, -beta, -alpha, newDepth, false);
+                    score = -Search(pos, ply + 1, -beta, -alpha, newDepth, false, false);
             }
 
             // Undo move
@@ -423,7 +480,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 }
 
                 // Store move in the transposition table
-                TT.Store(pos->boardHash, move, score, upperBound, depth, ply);
+                if (!isExcluded)
+                    TT.Store(pos->boardHash, move, score, upperBound, depth, ply);
 
                 // If beta cutoff occurs at the root, 
                 // change the best move and display
@@ -474,10 +532,13 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // unwinding the search due to timeout.
     // This is a common source of bugs. If you wish,
     // you can add an explicit test for that.
-    if (bestMove) {
-        TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, depth, ply);
-    } else {
-        TT.Store(pos->boardHash, 0, bestScore, lowerBound, depth, ply);
+    if (!isExcluded)
+    {
+        if (bestMove) {
+            TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, depth, ply);
+        } else {
+            TT.Store(pos->boardHash, 0, bestScore, lowerBound, depth, ply);
+        }
     }
 
     return bestScore;

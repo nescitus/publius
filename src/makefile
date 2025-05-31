@@ -18,7 +18,7 @@ SRCS= \
 	main.cpp \
 	mask.cpp \
 	move.cpp \
-	movedo.cpp \
+	movedo.cpp \	
 	moveundo.cpp \
 	piece.cpp \
 	position.cpp \
