@@ -146,12 +146,17 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     }
 
     // Prepare for singular extension
-    if (ply && depth > singularDepth && excludedMove == dummyMove) {
-        if (TT.Retrieve(pos->boardHash, &singularMove, &singularScore, &hashFlag, alpha, beta, depth - 4, ply)) {
+    if (!isRoot &&                  // we are not at the root
+         depth > singularDepth &&   // sufficient remaining depth
+         excludedMove == dummyMove) // we are not in the singular search
+    {
+        
+         if (TT.Retrieve(pos->boardHash, &singularMove, &singularScore, &hashFlag, alpha, beta, depth - 4, ply)) {
 
-            if ((hashFlag & lowerBound) && singularScore < EvalLimit)
+            if ((hashFlag & lowerBound) &&  // we have found lower bound hash entry 
+                 singularScore < EvalLimit) // and it is not a checkmate score
             {
-                singularExtension = true;
+                singularExtension = true;   // we can try the singular extension
             }
         }
     }
@@ -295,8 +300,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         depth--;
     }
 
-    // Check extension
-   // if (isInCheck && (isPv || depth < 7)) depth++;
+    // Check extension - moved downstream, can be retested here
+    // if (isInCheck && (isPv || depth < 7)) depth++;
 
     // Init moves and variables before entering main loop
     bestScore = -Infinity;
@@ -326,24 +331,48 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
             bool extend = false;
 
-            // Singular extension ~4 Elo
+            // Singular extension: tried once per search
             if (depth > singularDepth &&
                 singularMove &&
-                move == singularMove &&
+                move == singularMove && // we are
                 singularExtension &&
                 excludedMove == dummyMove) {
 
+                // Move from the transposition table
+                // is a candidate for the singular
+                // move. We are checking whether any 
+                // move comes close to it. If not,
+                // we will extend.
                 int newAlpha = -singularScore - 50;
+                
+                // We are checking for decent alternatives,
+                // so we do not test the singular move
+                // candidate.
                 excludedMove = move;
+
+                // The only instance when we search
+                // with isExcluded flag set to "true".
+                // The flag switches off all the node-level
+                // pruning techniques, including reading
+                // score from the transposition table.
+                // After all, to test alternatives
+                // to the singular move, we need to
+                // search them. We will also refrain
+                // from saving the result of this search
+                // in the transposition table, because
+                // it actively avoids searching the best move.
                 int sc = Search(pos, ply + 1, newAlpha, newAlpha + 1, (depth - 1) / 2, false, true);
                 excludedMove = dummyMove;
 
                 if (State.isStopping)
                     return 0;
 
+                // No move scores close to the singular
+                // move, so we extend. The search result
+                // relies on a single move - it would be
+                // a shame if a deeper search revealed
+                // a refutation.
                 if (sc <= newAlpha) {
-                    PrintBoard(pos);
-                    std::cout << MoveToString(move) << std::endl;
                     extend = true;
                 }
             }
