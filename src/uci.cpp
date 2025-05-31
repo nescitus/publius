@@ -51,7 +51,7 @@ bool ParseCommand(std::istringstream& stream, Position* pos) {
 
 void OnUciCommand() {
 
-    std::cout << "id name Publius 0.059" << std::endl;
+    std::cout << "id name Publius 0.060" << std::endl;
     std::cout << "id author Pawel Koziol" << std::endl;
     std::cout << "option name Hash type spin default 16 min 1 max 4096" << std::endl;
     std::cout << "option name Clear Hash type button" << std::endl;
@@ -126,7 +126,7 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
         }
         else if (param == "movestogo") {
             stream >> value;
-            Timer.isRepeating = true; // probable bugfix
+            Timer.SetRepeating(); // probable bugfix
             Timer.SetData(movesToGo, std::stoi(value));
         }
         else if (param == "ponder") {
