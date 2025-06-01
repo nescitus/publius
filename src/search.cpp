@@ -163,7 +163,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
     // Are we in check? Knowing that is useful 
     // for pruning/reduction/extension decisions
-    const bool isInCheck = pos->IsInCheck();
+    const bool isInCheckBeforeMoving = pos->IsInCheck();
 
     // Init eval and improving flag.
     // Nodes where the side to move 
@@ -172,7 +172,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // warrant more pruning.
 
     // Evaluate position, unless in check
-    eval = isInCheck ? -Infinity : Evaluate(pos, &e);
+    eval = isInCheckBeforeMoving ? -Infinity : Evaluate(pos, &e);
     
     // Adjust node eval by using score
     // from the transposition table.
@@ -201,7 +201,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // We skip node level pruning after a null move,
     // in check, in pv-nodes and in the late endgame.
     if (!wasNullMove &&
-       !isInCheck &&
+       !isInCheckBeforeMoving &&
        !isPv &&
        !isExcluded &&
         pos->CanTryNullMove()) 
@@ -282,7 +282,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     bool canDoFutility = false;
 
     if (depth <= 6 &&
-       !isInCheck &&
+       !isInCheckBeforeMoving &&
        !isPv &&
         eval + 75 * depth < beta) {
         canDoFutility = true;
@@ -293,7 +293,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // Please note that the implementation is non-standard,
     // as normally pv-nodes are not excluded, but this is
     // what worked for this engine.
-    if (depth > 5 && !isPv && ttMove == 0 && !isInCheck) {
+    if (depth > 5 && !isPv && ttMove == 0 && !isInCheckBeforeMoving) {
         depth--;
     }
 
@@ -407,7 +407,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             if (canDoFutility &&
                 movesTried > 1 &&
                !isPv &&
-               !isInCheck &&
+               !isInCheckBeforeMoving &&
                !pos->IsInCheck() &&
                 moveType == moveQuiet) 
             {
@@ -423,7 +423,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // and a deeper search will fix the error.
             if (depth <= 3 &&
                !isPv && 
-               !isInCheck &&
+               !isInCheckBeforeMoving &&
                !pos->IsInCheck() &&
                 moveType == moveQuiet && 
                 quietMovesTried > (3 + improving) * depth) 
@@ -442,7 +442,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             if (depth > 1 && 
                 quietMovesTried > 3 && 
                 moveType == moveQuiet && 
-               !isInCheck && 
+               !isInCheckBeforeMoving && 
                !pos->IsInCheck())
             {   
                 reduction = Lmr.table[isPv]
