@@ -28,6 +28,16 @@ int Evaluate(Position* pos, EvalData* e) {
     e->enemyKingZone[White] = GenerateMoves.King(pos->KingSq(Black));
     e->enemyKingZone[Black] = GenerateMoves.King(pos->KingSq(White));
 
+    for (int i = 0; i < 6; i++) {
+        e->control[White][i] = 0;
+        e->control[Black][i] = 0;
+    }
+
+    e->control[White][Pawn] = GetWPAttacks(pos->Map(White, Pawn));
+    e->control[Black][Pawn] = GetBPAttacks(pos->Map(Black, Pawn));
+    e->control[White][King] = GenerateMoves.King(pos->KingSq(White));
+    e->control[Black][King] = GenerateMoves.King(pos->KingSq(Black));
+
     // Tempo bonus
     e->Add(pos->GetSideToMove(), tempoMg, tempoEg);
 
@@ -47,6 +57,19 @@ int Evaluate(Position* pos, EvalData* e) {
         EvalRook(pos, e, color);
         EvalQueen(pos, e, color);
     }
+
+    // Precalculate board control bitboards
+
+    e->allAtt[White] = e->control[White][Pawn] | e->control[White][Knight] | 
+                       e->control[White][Bishop] | e->control[White][Rook] | 
+                       e->control[White][Queen] | e->control[White][King];
+
+    e->allAtt[Black] = e->control[Black][Pawn] | e->control[Black][Knight] | 
+                       e->control[Black][Bishop] | e->control[Black][Rook] | 
+                       e->control[Black][Queen] | e->control[Black][King];
+
+    EvalPressure(pos, e, White);
+    EvalPressure(pos, e, Black);
 
     // Finalize king attacks eval
     EvalKingAttacks(e, White);
@@ -167,6 +190,9 @@ void EvalKnight(const Position* pos, EvalData* e, Color color) {
         cnt = PopCnt(mobility);
         e->Add(color, knightMobMg[cnt], knightMobEg[cnt] );
 
+        // Board control update
+        e->control[color][Knight] |= GenerateMoves.Knight(square);
+
         // Knight attacks on the enemy king zone
         if (GenerateMoves.Knight(square) & e->enemyKingZone[color])
             e->minorAttacks[color]++;
@@ -191,6 +217,9 @@ void EvalBishop(const Position* pos, EvalData* e, Color color) {
         mobility = GenerateMoves.Bish(pos->Occupied(), square);
         cnt = PopCnt(mobility);
         e->Add(color, bishMobMg[cnt], bishMobEg[cnt]);
+
+        // Board control update
+        e->control[color][Bishop] |= mobility;
 
         // Bishop attacks on the enemy king zone
         // including attacks through own queen
@@ -219,6 +248,9 @@ void EvalRook(const Position* pos, EvalData* e, Color color) {
         mobility = GenerateMoves.Rook(pos->Occupied(), square);
         cnt = PopCnt(mobility);
         e->Add(color, rookMobMg[cnt], rookMobEg[cnt]);
+
+        // Board control update
+        e->control[color][Rook] |= mobility;
 
         // Rook's attacks on the enemy king's zone
         // including attacks through own rook or queen
@@ -273,6 +305,9 @@ void EvalQueen(const Position* pos, EvalData* e, Color color) {
         mobility = GenerateMoves.Queen(pos->Occupied(), square);
         cnt = PopCnt(mobility);
         e->Add(color, queenMobMg[cnt], queenMobEg[cnt]);
+
+        // Board control update
+        e->control[color][Queen] |= mobility;
 
         // Queen attacks on enemy king zone
         // including attacks through own lesser pieces
@@ -329,6 +364,33 @@ void EvalKing(const Position* pos, EvalData* e, Color color) {
 
     shieldMask = ForwardOf(shieldMask, color);
     e->mgPawn[color] += kingPseudoShield * PopCnt(shieldMask & pos->Map(color, Pawn));
+}
+
+void EvalPressure(Position* p, EvalData *e, Color side) {
+
+    Color oppo;
+    Square sq;
+    int pieceType, pressureMg, pressureEg;
+    Bitboard enemyPieces, ctrl, hang, behind;
+
+    pressureMg = 0;
+    pressureEg = 0;
+    oppo = ~side;
+    enemyPieces = p->Map(oppo);
+
+    ctrl = e->allAtt[side] & ~e->allAtt[oppo];
+    hang = (enemyPieces & ctrl) | (enemyPieces & e->control[side][Pawn]);
+
+    // enemy pieces, hanging and attacked
+
+    while (hang) {
+        sq = PopFirstBit(&hang);
+        pieceType = p->PieceTypeOnSq(sq);
+        pressureMg += mgPressure[pieceType];
+        pressureEg += egPressure[pieceType];
+    }
+
+    e->Add(side, pressureMg, pressureEg);
 }
 
 // Operations repeated while evaluating any piece:

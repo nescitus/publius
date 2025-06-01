@@ -45,15 +45,19 @@ void EvalRook(const Position* pos, EvalData* e, Color color);
 void EvalQueen(const Position* pos, EvalData* e, Color color);
 void EvalKing(const Position* pos, EvalData* e, Color color);
 void EvalKingAttacks(EvalData* e, Color color);
+void EvalPressure(Position* p, EvalData* e, Color side);
 int GetDrawMul(Position* pos, const Color strong, const Color weak);
 int Interpolate(EvalData* e);
 
 const int mgPieceValue[6] = { 93, 402, 407, 595, 1250, 0 };
 const int egPieceValue[6] = { 104, 345, 375, 651, 1240, 0 };
+const int mgPressure[7] = { 1, 10, 10, 12, 20, 0, 0 };
+const int egPressure[7] = { 2, 14, 14, 17, 24, 0, 0 };
+
 
 // Game phase is used to interpolate between middlegame
 // and endgame scores. See Interpolate() for details.
-const int phaseTable[6]   = {   0,   1,   1,   2,   4,  0 };
+const int phaseTable[6] = { 0,   1,   1,   2,   4,  0 };
 const int MaxGamePhase = 24;
 
 const int passedBonusMg[2][8] = { { 0, 10, 10, 30, 50, 80, 120, 0},
@@ -64,11 +68,11 @@ const int passedBonusEg[2][8] = { { 0, 11, 11, 37, 62, 107, 165, 0 },
 
 const int knightMobMg[9] = { -28,  -6,  -3,  -2,  16,  17,  17,  20,  25 };
 const int knightMobEg[9] = { -28,  -8, -10,   6,   0,   5,   8,   9,   8, };
-const int bishMobMg[15]  = { -30, -29, -23, -11,  -5,   2,   8,  12,  20,  19,  23,  28,  35,  44,  40, };
-const int bishMobEg[15]  = { -30, -37, -38, -21, -20,  -8,   6,  12,  14,  15,  25,  18,  24,  20,  25, };
-const int rookMobMg[15] =  { -14, -12, -13, -11,  -8,  -6,  -8,  -3,   2,   2,   7,  14,  17,  17,  10, };
-const int rookMobEg [15] = { -28, -24, -25, -19, -11,  -4,   3,  10,  10,  16,  18,  21,  28,  34,  37, };
-const int queenMobMg[28] = { -14, -13, -12, -30, -28,  -17, -11, -2,  -6,   0,   3,   1,   1,   1,   4,   6,   5,   0,   3,   2,   7,   3,   6,   2,  15,  21,  12,  14};
+const int bishMobMg[15] = { -30, -29, -23, -11,  -5,   2,   8,  12,  20,  19,  23,  28,  35,  44,  40, };
+const int bishMobEg[15] = { -30, -37, -38, -21, -20,  -8,   6,  12,  14,  15,  25,  18,  24,  20,  25, };
+const int rookMobMg[15] = { -14, -12, -13, -11,  -8,  -6,  -8,  -3,   2,   2,   7,  14,  17,  17,  10, };
+const int rookMobEg[15] = { -28, -24, -25, -19, -11,  -4,   3,  10,  10,  16,  18,  21,  28,  34,  37, };
+const int queenMobMg[28] = { -14, -13, -12, -30, -28,  -17, -11, -2,  -6,   0,   3,   1,   1,   1,   4,   6,   5,   0,   3,   2,   7,   3,   6,   2,  15,  21,  12,  14 };
 const int queenMobEg[28] = { -28, -26, -24, -30, -43,  -26, -23, -28, -34, -21, -24, -22, -7,  -2,  -9,  -1,   3,  19,  25,  19,  20,  31,  26,  29,  21,  13,  17,  22, };
 
 const int tempoMg = 5;
