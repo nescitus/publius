@@ -1,6 +1,6 @@
 Publius is a dead simple public domain bitboard chess engine created for didactic purposes. Basically a boilerplate chess engine to build upon, no strings attached.
 
-The current rating estimate is 2790 on the CCRL scale, based on the score against Fruit 2.1.
+The current rating estimate is 2815 on the CCRL scale, based on the score against Fruit 2.1.
 
 "Simple" and "teaching engine" are vague concepts, so explanation of constraints is in order:
 
@@ -38,6 +38,7 @@ SEARCH:
 - late move pruning
 - futility pruning
 - internal iterative reduction (slightly unusual form)
+- singular extension
 
 EVAL
 
@@ -45,10 +46,11 @@ EVAL
 - mobility evaluation
 - rooks on open files and 7th rank
 - primitive king safety
-- passed pawns
+- passed pawns (plus control of the blockade square) 
 - isolated pawns
 - doubled pawns
 - supported pawns (phalanx or defended)
+- hanging pieces
 - very primitive evaluation of king's pawn shield
 - very basic evaluation of non-winnable positions
 
