@@ -68,6 +68,9 @@ int Evaluate(Position* pos, EvalData* e) {
                        e->control[Black][Bishop] | e->control[Black][Rook] | 
                        e->control[Black][Queen] | e->control[Black][King];
 
+    EvalPasser(pos, e, White);
+    EvalPasser(pos, e, Black);
+
     EvalPressure(pos, e, White);
     EvalPressure(pos, e, Black);
 
@@ -161,12 +164,6 @@ void EvalPawn(const Position* pos, EvalData* e, Color color) {
         // Isolated pawn
         else if ((Mask.adjacentFiles[FileOf(square)] & pos->Map(color, Pawn)) == 0) {
             e->AddPawn(color, isolPawnMg, isolPawnEg);
-        }
-
-        // Passed pawn
-        if (!(Mask.passed[color][square] & pos->Map(~color, Pawn))) {
-            e->mgPawn[color] += passedBonusMg[color][RankOf(square)];
-            e->egPawn[color] += passedBonusEg[color][RankOf(square)];
         }
     }
 }
@@ -364,6 +361,30 @@ void EvalKing(const Position* pos, EvalData* e, Color color) {
 
     shieldMask = ForwardOf(shieldMask, color);
     e->mgPawn[color] += kingPseudoShield * PopCnt(shieldMask & pos->Map(color, Pawn));
+}
+
+void EvalPasser(const Position* pos, EvalData* e, Color color) {
+
+    Bitboard b, stop;
+    Color oppo = ~color;
+
+    b = pos->Map(color, Pawn);
+
+    while (b) {
+        // Find the next pawn to evaluate
+        Square square = PopFirstBit(&b);
+        stop = ForwardOf(Paint(square), color);
+
+        // Passed pawn
+        if (!(Mask.passed[color][square] & pos->Map(~color, Pawn))) {
+            int mul = 100;
+            if (stop & e->allAtt[color]) mul += 33;
+            if (stop & e->allAtt[oppo]) mul -= 33;
+            if (stop & pos->Occupied()) mul -= 15;
+            e->mg[color] += passedBonusMg[color][RankOf(square)] * mul / 100;
+            e->eg[color] += passedBonusEg[color][RankOf(square)] * mul / 100;
+        }
+    }
 }
 
 void EvalPressure(Position* p, EvalData *e, Color side) {

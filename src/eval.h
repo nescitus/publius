@@ -45,6 +45,7 @@ void EvalRook(const Position* pos, EvalData* e, Color color);
 void EvalQueen(const Position* pos, EvalData* e, Color color);
 void EvalKing(const Position* pos, EvalData* e, Color color);
 void EvalKingAttacks(EvalData* e, Color color);
+void EvalPasser(const Position* pos, EvalData* e, Color color);
 void EvalPressure(Position* p, EvalData* e, Color side);
 int GetDrawMul(Position* pos, const Color strong, const Color weak);
 int Interpolate(EvalData* e);

@@ -297,9 +297,6 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         depth--;
     }
 
-    // Check extension - moved downstream, can be retested here
-    // if (isInCheck && (isPv || depth < 7)) depth++;
-
     // Init moves and variables before entering main loop
     bestScore = -Infinity;
     list.Clear();
@@ -513,7 +510,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
                 // If beta cutoff occurs at the root, 
                 // change the best move and display
-                // the new mainline. (Cutoffs can happen
+                // the new mainline. (cutoffs can happen
                 // in the root node because er are using
                 // the aspiration window).
                 if (isRoot) {
