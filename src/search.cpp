@@ -212,7 +212,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // Instead of letting the opponent search
         // two moves in a row, it simply assumes some
         // loss, increasing with depth. If side to move
-        // can accept that loss, then we prune.
+        // can accept that loss, then we prune (~12 Elo).
 
         if (depth <= 6) {
             score = eval - 125 * depth;
@@ -221,16 +221,18 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         }
 
         // RAZORING - we drop directly to the quiescence
-        // search if eval score is really bad. ~8 Elo gain.
-        if (!ttMove && depth <= 3) {
-            int threshold = beta - 300 + 60 * depth;
-            if (eval < threshold) {
-                score = Quiesce(pos, ply, alpha, beta, 0);
-                if (score < threshold) {
-                    return score;
-                }
-            }
-        }
+        // search if eval score is really bad.
+        // CURRENT IMPLEMENTATION FAILS,~ -20 Elo
+        // 
+        // if (!ttMove && depth <= 3) {
+        //    int threshold = beta - 300 + 60 * depth;
+        //    if (eval < threshold) {
+        //        score = Quiesce(pos, ply, alpha, beta, 0);
+        //        if (score < threshold) {
+        //            return score;
+        //        }
+        //    }
+        //}
 
         // NULL MOVE PRUNING means allowing the opponent
         // to execute two moves in a row, for eample 
@@ -243,10 +245,10 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // above takes care of that. Also, null move is 
         // not used in the endgame because of the risk 
         // of zugzwang - se CanTryNullMove() function 
-        // for details.
+        // for details. (~82 Elo)
 
         if (eval > beta && depth > 1) {
-
+            
             // Set null move reduction
             reduction = 3 + depth / 6 + (eval - beta > 200);
 
@@ -292,7 +294,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // Idea from Prodeo chess engine (from Ed Schroder).
     // Please note that the implementation is non-standard,
     // as normally pv-nodes are not excluded, but this is
-    // what worked for this engine.
+    // what worked for this engine. (~9 Elo)
     if (depth > 5 && !isPv && ttMove == 0 && !isInCheckBeforeMoving) {
         depth--;
     }
@@ -324,7 +326,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             if (move == excludedMove && isExcluded)
                 continue;
 
-            // Are we doing singular textension?
+            // Are we doing singular extension?
             bool doSingularExtension = false;
 
             // Singular extension: tried once per search
@@ -392,7 +394,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // Set new search depth
             newDepth = depth - 1;
 
-            // Apply singular extension
+            // Singular extension
             if (doSingularExtension)
                 newDepth++;
 
@@ -418,6 +420,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // This may lead to an error, but statistically
             // speaking, depth gain is more important
             // and a deeper search will fix the error.
+            // (~70 Elo)
             if (depth <= 3 &&
                !isPv && 
                !isInCheckBeforeMoving &&
@@ -429,14 +432,14 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 continue;
             }
 
-            // Late move reduction (LMR). We assume
+            // LATE MOVE REDUCTION (LMR). We assume
             // that with decent move ordering cutoffs
             // will be caused by the moves tried early on.
             // That's why we search later moves at the 
             // reduced depth. However, if a reduced depth
             // search scores above beta, we need to search
-            // at the normal depth.
-            if (depth > 1 && 
+            // at the normal depth (~125 Elo)
+            if (depth > 1 &&
                 quietMovesTried > 3 && 
                 moveType == moveQuiet && 
                !isInCheckBeforeMoving && 
