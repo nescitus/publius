@@ -399,11 +399,23 @@ void EvalPressure(Position* p, EvalData *e, Color side) {
     oppo = ~side;
     enemyPieces = p->Map(oppo);
 
+    // bishop on knight attacks
+    if (p->Map(oppo, Bishop) & e->control[side][Knight]) {
+        pressureMg += 15;
+        pressureEg += 15;
+    }
+
+    // knight on bishop attacks
+    if (p->Map(oppo, Knight) & e->control[side][Bishop]) {
+        pressureMg += 15;
+        pressureEg += 15;
+    }
+
+    // detect hanging pieces
     ctrl = e->allAtt[side] & ~e->allAtt[oppo];
     hang = (enemyPieces & ctrl) | (enemyPieces & e->control[side][Pawn]);
 
-    // enemy pieces, hanging and attacked
-
+    // evaluate enemy pieces, hanging and attacked
     while (hang) {
         sq = PopFirstBit(&hang);
         pieceType = p->PieceTypeOnSq(sq);

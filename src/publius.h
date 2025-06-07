@@ -19,10 +19,10 @@ typedef struct {
 	int reversibleMoves;
 	Bitboard boardHash;
 	Bitboard pawnHash;
-} UndoStack;
+} UndoData;
 
 static const int stackSize = 2048;
-extern UndoStack undoStack[stackSize];
+extern UndoData undoStack[stackSize];
 
 class Parameters {
 private:

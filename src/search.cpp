@@ -19,7 +19,7 @@ Move dummyMove = CreateMove(A1, B8, 0); // clearly illegal
 Move excludedMove = dummyMove;
 
 // stack to hold information necessary to undo moves
-UndoStack undoStack[stackSize];
+UndoData undoStack[stackSize];
 
 // counter of nodes visited during search
 // (for statistic purposes and enforcing nodes limit)
@@ -264,7 +264,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // NULL MOVE VERIFICATION - at higher depths
             // we perform a normal search to a reduced
             // depth. The idea is to have some safeguard
-            // against zugzwangs.
+            // against zugzwangs (~10 Elo)
             if (depth - reduction > 5 && score >= beta)
                 score = Search(pos, ply, alpha, beta, depth - reduction - 4, true, false);
             
@@ -280,6 +280,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // that if the static evaluation of a node is bad,
     // then quiet moves will lead to no improvement.
     // Score margin is increased with depth.
+    // (~2 Elo, so definately needs tuning)
 
     bool canDoFutility = false;
 
@@ -403,6 +404,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 newDepth++;
 
             // Futility pruning
+            // (~2 Elo, so definately needs tuning)
             if (canDoFutility &&
                 movesTried > 1 &&
                !isPv &&

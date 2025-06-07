@@ -182,8 +182,11 @@ Bitboard MoveGenerator::FileAttacks(const Bitboard occ, const Square sq) {
 
 Bitboard MoveGenerator::RankAttacks(const Bitboard occ, const Square sq) {
     
+    // masked occupancy
+    const Bitboard maskedOccupancy = bbFileA & (occ >> FileOf(sq));
+
     // occupancy index
-    const int occupancyIndex = (((bbFileA & (occ >> FileOf(sq))) * bbB8H2diag) >> 58);
+    const int occupancyIndex = (maskedOccupancy * bbB8H2diag) >> 58;
     
     // fileAttacks[RankOf(sq)][occupancyIndex] contains the same
     // bit pattern for all the files, so that it returns moves
@@ -192,6 +195,9 @@ Bitboard MoveGenerator::RankAttacks(const Bitboard occ, const Square sq) {
     // of a file that we are interested in.
     return (fileAttacks[RankOf(sq)][occupancyIndex] & fileMask[sq]);
 }
+
+//  Bench at depth 15 took 25735 milliseconds, searching 34982198 nodes at 1359323 nodes per second.
+
 
 Bitboard MoveGenerator::DiagAttacks(const Bitboard occ, const Square sq) {
     
@@ -220,18 +226,14 @@ Bitboard MoveGenerator::AntiDiagAttacks(const Bitboard occ, const Square sq) {
 Bitboard MoveGenerator::BishSlow(const Bitboard occ, const Square sq) {
 
     Bitboard b = Paint(sq);
-    return NEOf(FillOcclNE(b, ~occ))
-        | NWOf(FillOcclNW(b, ~occ))
-        | SEOf(FillOcclSE(b, ~occ))
-        | SWOf(FillOcclSW(b, ~occ));
+    return NEOf(FillOcclNE(b, ~occ)) | NWOf(FillOcclNW(b, ~occ)) |
+           SEOf(FillOcclSE(b, ~occ)) | SWOf(FillOcclSW(b, ~occ));
 }
 
 // Legacy function, showing slower, but more readable algorithm
 Bitboard MoveGenerator::RookSlow(const Bitboard occ, const Square sq) {
 
     Bitboard b = Paint(sq);
-    return NorthOf(FillOcclNorth(b, ~occ))
-        | SouthOf(FillOcclSouth(b, ~occ))
-        | EastOf(FillOcclEast(b, ~occ))
-        | WestOf(FillOcclWest(b, ~occ));
+    return NorthOf(FillOcclNorth(b, ~occ)) | SouthOf(FillOcclSouth(b, ~occ)) |
+           EastOf(FillOcclEast(b, ~occ)) | WestOf(FillOcclWest(b, ~occ));
 }
