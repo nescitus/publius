@@ -6,6 +6,7 @@ class HashKeys {
 public:
     void Init();
     Bitboard Random64(void);
+    Bitboard ForPiece(Color color, int pieceType, Square square);
     Bitboard pieceKey[12][64];
     Bitboard castleKey[16];
     Bitboard enPassantKey[8];

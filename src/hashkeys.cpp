@@ -1,4 +1,5 @@
 #include "types.h"
+#include "piece.h"
 #include "square.h"
 #include "limits.h"
 #include "publius.h"
@@ -26,4 +27,8 @@ void HashKeys::Init() {
 
 Bitboard HashKeys::Random64(void) {
     return dist(e2);
+}
+
+Bitboard HashKeys::ForPiece(Color color, int pieceType, Square square) {
+    return pieceKey[CreatePiece(color, pieceType)][square];
 }

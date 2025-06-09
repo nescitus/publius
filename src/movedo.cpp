@@ -34,7 +34,7 @@ void Position::DoMove(const Move move, UndoData *undo) {
     if (prey != noPieceType) {
         TakePiece(~color, prey, toSquare);
         if (prey == Pawn)
-            pawnHash ^= Key.pieceKey[CreatePiece(~color, prey)][toSquare];
+            pawnHash ^= Key.ForPiece(~color, prey, toSquare);
     }
 
     // Update reversible moves counter
@@ -43,8 +43,8 @@ void Position::DoMove(const Move move, UndoData *undo) {
 
     // Update pawn hash
     if (hunter == Pawn || hunter == King)
-        pawnHash ^= Key.pieceKey[CreatePiece(color, hunter)][fromSquare] 
-                  ^ Key.pieceKey[CreatePiece(color, hunter)][toSquare];
+        pawnHash ^= Key.ForPiece(color, hunter, fromSquare) ^
+                    Key.ForPiece(color, hunter, toSquare);
 
 
     // Update castling rights
@@ -74,7 +74,7 @@ void Position::DoMove(const Move move, UndoData *undo) {
     // Remove pawn captured en passant
     if (moveType == tEnPassant) {
         TakePiece(~color, Pawn, toSquare ^ 8);
-        pawnHash ^= Key.pieceKey[CreatePiece(~color, Pawn)][toSquare ^ 8];
+        pawnHash ^= Key.ForPiece(~color, Pawn, toSquare ^ 8);
     }
 
     // Set new en passant square
@@ -85,9 +85,9 @@ void Position::DoMove(const Move move, UndoData *undo) {
     // Promotion
     if (IsMovePromotion(move)) {
         const int promoted = GetPromotedPiece(move);
-        boardHash ^= Key.pieceKey[CreatePiece(color, Pawn)][toSquare]
-                   ^ Key.pieceKey[CreatePiece(color, promoted)][toSquare];
-        pawnHash ^= Key.pieceKey[CreatePiece(color, Pawn)][toSquare];
+        boardHash ^= Key.ForPiece(color, Pawn, toSquare) ^
+                     Key.ForPiece(color, promoted, toSquare);
+        pawnHash ^= Key.ForPiece(color, Pawn, toSquare);
         ChangePieceNoHash(Pawn, promoted, color, toSquare);
     }
 

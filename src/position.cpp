@@ -204,7 +204,7 @@ Bitboard Position::CalculatePawnKey() {
     for (Square square = A1; square < 64; ++square)
         if (pieceLocation[square] != noPiece) {
             if (PieceTypeOnSq(square) == Pawn || PieceTypeOnSq(square) == King)
-            key ^= Key.pieceKey[pieceLocation[square]][square];
+               key ^= Key.pieceKey[pieceLocation[square]][square];
         }
 
     return key;
@@ -228,8 +228,8 @@ void Position::MovePiece(const Color color, const int hunter,
                          const Square fromSquare, const Square toSquare) {
 
     MovePieceNoHash(color, hunter, fromSquare, toSquare);
-    boardHash ^= Key.pieceKey[CreatePiece(color, hunter)][fromSquare]
-              ^ Key.pieceKey[CreatePiece(color, hunter)][toSquare];
+    boardHash ^= Key.ForPiece(color, hunter, fromSquare) ^
+                 Key.ForPiece(color, hunter, toSquare);
 }
 
 void Position::MovePieceNoHash(const Color color, const int hunter, 
@@ -245,7 +245,7 @@ void Position::TakePiece(const Color color,
                          const Square square) {
 
     TakePieceNoHash(color, typeOfPiece, square);
-    boardHash ^= Key.pieceKey[CreatePiece(color, typeOfPiece)][square];
+    boardHash ^= Key.ForPiece(color, typeOfPiece, square);
 }
 
 void Position::TakePieceNoHash(const Color color, 
