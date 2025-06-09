@@ -5,22 +5,22 @@
 #include "move.h"
 #include "piece.h"
 
-void Position::UndoMove(const Move move, const int ply) {
+void Position::UndoMove(const Move move, UndoData* undo) {
 
     // Init variables
     const Color color = ~sideToMove;
     const Square fromSquare = GetFromSquare(move);
     const Square toSquare = GetToSquare(move);
     const int hunter = TypeOfPiece(pieceLocation[toSquare]);
-    const int prey = undoStack[ply].prey;
+    const int prey = undo->prey;
     const int moveType = GetTypeOfMove(move);
 
     // Copy stuff needed to undo the move
-    castleFlags = undoStack[ply].castleFlags;
-    enPassantSq = undoStack[ply].enPassantSq;
-    reversibleMoves = undoStack[ply].reversibleMoves;
-    boardHash = undoStack[ply].boardHash;
-    pawnHash = undoStack[ply].pawnHash;
+    castleFlags = undo->castleFlags;
+    enPassantSq = undo->enPassantSq;
+    reversibleMoves = undo->reversibleMoves;
+    boardHash = undo->boardHash;
+    pawnHash = undo->pawnHash;
     repetitionIndex--;
 
     // Move piece
@@ -61,10 +61,10 @@ void Position::UndoMove(const Move move, const int ply) {
     sideToMove = ~sideToMove;
 }
 
-void Position::UndoNull(const int ply) {
+void Position::UndoNull(UndoData* undo) {
 
-    enPassantSq = undoStack[ply].enPassantSq;
-    boardHash = undoStack[ply].boardHash;
+    enPassantSq = undo->enPassantSq;
+    boardHash = undo->boardHash;
     repetitionIndex--;
     reversibleMoves--;
     sideToMove = ~sideToMove;

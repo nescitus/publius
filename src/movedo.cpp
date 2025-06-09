@@ -8,7 +8,7 @@
 #include "piece.h"
 #include "move.h"
 
-void Position::DoMove(const Move move, const int ply) {
+void Position::DoMove(const Move move, UndoData *undo) {
 
     // Init variables
     const Color color = sideToMove;
@@ -19,13 +19,13 @@ void Position::DoMove(const Move move, const int ply) {
     const int moveType = GetTypeOfMove(move);
 
     // Save data needed for undoing a move
-    undoStack[ply].move = move;
-    undoStack[ply].prey = prey;
-    undoStack[ply].castleFlags = castleFlags;
-    undoStack[ply].enPassantSq = enPassantSq;
-    undoStack[ply].reversibleMoves = reversibleMoves;
-    undoStack[ply].boardHash = boardHash;
-    undoStack[ply].pawnHash = pawnHash;
+    undo->move = move;
+    undo->prey = prey;
+    undo->castleFlags = castleFlags;
+    undo->enPassantSq = enPassantSq;
+    undo->reversibleMoves = reversibleMoves;
+    undo->boardHash = boardHash;
+    undo->pawnHash = pawnHash;
 
     // Update repetition list
     repetitionList[repetitionIndex++] = boardHash;
@@ -96,12 +96,12 @@ void Position::DoMove(const Move move, const int ply) {
 
 }
 
-void Position::DoNull(const int ply) {
+void Position::DoNull(UndoData* undo) {
 
     // Save stuff
-    undoStack[ply].move = 0;
-    undoStack[ply].enPassantSq = enPassantSq;
-    undoStack[ply].boardHash = boardHash;
+    undo->move = 0;
+    undo->enPassantSq = enPassantSq;
+    undo->boardHash = boardHash;
 
     // Update repetition list
     repetitionList[repetitionIndex++] = boardHash;

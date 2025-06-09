@@ -18,9 +18,6 @@ const int singularDepth = 7;
 Move dummyMove = CreateMove(A1, B8, 0); // clearly illegal
 Move excludedMove = dummyMove;
 
-// stack to hold information necessary to undo moves
-UndoData undoStack[stackSize];
-
 // counter of nodes visited during search
 // (for statistic purposes and enforcing nodes limit)
 Bitboard nodeCount;
@@ -36,6 +33,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     int movesTried, quietMovesTried;
     EvalData e;
     MoveList list;
+    UndoData undo;
     Move listOfTriedMoves[256];
     bool singularExtension;
 
@@ -165,18 +163,15 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // for pruning/reduction/extension decisions
     const bool isInCheckBeforeMoving = pos->IsInCheck();
 
-    // Init eval and improving flag.
-    // Nodes where the side to move 
-    // is not improving the eval are
-    // probably less interesting and
-    // warrant more pruning.
+    // Init eval and improving flag. Nodes where the side 
+    // to move  is not improving the eval are probably 
+    // less interesting and warrant more pruning.
 
     // Evaluate position, unless in check
     eval = isInCheckBeforeMoving ? -Infinity : Evaluate(pos, &e);
     
-    // Adjust node eval by using score
-    // from the transposition table.
-    // It modifies a few things, including
+    // Adjust node eval by using score from the trans-
+    // position table. It modifies a few things, including 
     // null move probability.
     if (foundTTrecord) {
         if (hashFlag & (score > eval ? lowerBound : upperBound))
@@ -186,12 +181,9 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // Save eval for the current ply.
     oldEval[ply] = eval;
 
-    // We check whether the eval has
-    // improved from two ples ago.
-    // As of now, it affects late move 
-    // pruning only, but some more uses
-    // will be tested.
-
+    // We check whether the eval has improved from 
+    // two ples ago. As of now, it affects late move 
+    // pruning only, but some more uses will be tested.
     const bool improving = SetImproving(eval, ply);
 
     // NODE-LEVEL PRUNING. We try to avoid searching
@@ -254,9 +246,9 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
             // Do null move search, giving the opponent
             // two moves in a row
-            pos->DoNull(ply);
+            pos->DoNull(&undo);
             score = -Search(pos, ply + 1, -beta, -beta + 1, depth - reduction, true, false);
-            pos->UndoNull(ply);
+            pos->UndoNull(&undo);
 
             if (State.isStopping)
                 return 0;
@@ -377,11 +369,11 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             }
 
             // Make move
-            pos->DoMove(move, ply);
+            pos->DoMove(move, &undo);
 
             // Filter out illegal moves
             if (pos->LeavesKingInCheck()) {
-                pos->UndoMove(move, ply);
+                pos->UndoMove(move, &undo);
                 continue;
             }
 
@@ -412,7 +404,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                !pos->IsInCheck() &&
                 moveType == moveQuiet) 
             {
-                pos->UndoMove(move, ply);
+                pos->UndoMove(move, &undo);
                 continue;
             }
 
@@ -430,7 +422,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 moveType == moveQuiet && 
                 quietMovesTried > (3 + improving) * depth) 
             {
-                pos->UndoMove(move, ply);
+                pos->UndoMove(move, &undo);
                 continue;
             }
 
@@ -467,7 +459,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                     // below alpha, don't bother with
                     // full depth search
                     if (score <= alpha) {
-                        pos->UndoMove(move, ply);
+                        pos->UndoMove(move, &undo);
                         if (State.isStopping) return 0;
                         continue;
                     }
@@ -492,7 +484,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             }
 
             // Undo move
-            pos->UndoMove(move, ply);
+            pos->UndoMove(move, &undo);
             if (State.isStopping) {
                 return 0;
             }

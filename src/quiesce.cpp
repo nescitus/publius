@@ -15,6 +15,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     Move move, bestMove, ttMove;
     EvalData e;
     MoveList list;
+    UndoData undo;
 
     // Init
     bestMove = 0;
@@ -116,9 +117,9 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
             }
 
             // Make move, unless illegal
-            pos->DoMove(move, ply);
+            pos->DoMove(move, &undo);
             if (pos->LeavesKingInCheck()) {
-                pos->UndoMove(move, ply);
+                pos->UndoMove(move, &undo);
                 continue;
             }
 
@@ -126,7 +127,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
             score = -Quiesce(pos, ply + 1, qdepth + 1, -beta, -alpha);
 
             // Unmake move
-            pos->UndoMove(move, ply);
+            pos->UndoMove(move, &undo);
 
             // Exit if needed
             if (State.isStopping) {

@@ -73,10 +73,10 @@ public:
 	Bitboard pawnHash;
 	bool SquareIsAttacked(const Square sq, const Color color) const;
 	void Set(const std::string& str);
-	void DoMove(const Move move, const int ply);
-	void DoNull(const int ply);
-	void UndoMove(const Move move, const int ply);
-	void UndoNull(const int ply);
+	void DoMove(const Move move, UndoData* undo);
+	void DoNull(UndoData * undo);
+	void UndoMove(const Move move, UndoData *undo);
+	void UndoNull(UndoData *undo);
 	bool IsDraw() const;
 	bool CanTryNullMove(void) const;
 	Color GetSideToMove() const;

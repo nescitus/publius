@@ -60,6 +60,7 @@ void OnUciCommand() {
 
 void OnPositionCommand(std::istringstream& stream, Position* pos) {
 
+    UndoData undo;
     std::string token, fen;
     stream >> token;
 
@@ -81,7 +82,7 @@ void OnPositionCommand(std::istringstream& stream, Position* pos) {
 
     for (bool found = true; stream >> token && found;)
     {
-        pos->DoMove(StringToMove(pos, token), 0);
+        pos->DoMove(StringToMove(pos, token), &undo);
         pos->TryMarkingIrreversible();
     }
 }
@@ -89,11 +90,12 @@ void OnPositionCommand(std::istringstream& stream, Position* pos) {
 void OnStepCommand(std::istringstream& stream, Position* pos) {
 
     std::string token;
+    UndoData undo;
 
     for (bool found = true; stream >> token && found;)
     {
         char* moveChar = const_cast<char*>(token.c_str());
-        pos->DoMove(StringToMove(pos, moveChar), 0);
+        pos->DoMove(StringToMove(pos, moveChar), &undo);
         pos->TryMarkingIrreversible();
     }
 }

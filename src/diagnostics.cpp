@@ -96,6 +96,7 @@ Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
     MoveList list;
     Bitboard localCount = 0;
     Bitboard moveCount = 0;
+    UndoData undo;
 
     list.Clear();
     FillCompleteList(pos, &list);
@@ -106,10 +107,10 @@ Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
         for (int i = 0; i < moveListLength; i++) {
 
             move = list.GetMove();
-            pos->DoMove(move, ply);
+            pos->DoMove(move, &undo);
 
             if (pos->LeavesKingInCheck()) {
-                pos->UndoMove(move, ply);
+                pos->UndoMove(move, &undo);
                 continue;
             }
 
@@ -122,7 +123,7 @@ Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
                 moveCount += localCount;
             }
 
-            pos->UndoMove(move, ply);
+            pos->UndoMove(move, &undo);
 
             if (ply == 0 && isNoisy)
                 std::cout << MoveToString(move) << ": " << localCount << std::endl;
