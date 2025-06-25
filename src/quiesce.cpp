@@ -36,7 +36,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     }
 
     // Retrieve score from transposition table
-    // (isPv condition helps)
+    // (in zero window nodes or when we get exact score)
     if (TT.Retrieve(pos->boardHash, &ttMove, &score, &hashFlag, alpha, beta, 0, ply)) {
 
         if (!isPv || (score > alpha && score < beta)) {

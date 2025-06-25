@@ -12,7 +12,7 @@ LmrData::LmrData() {
             if (depth == 0 || moves == 0)
                 r = 0; // log(0) is undefined
             else
-                r = log(depth) * log(moves) / 2;
+                r = 0.38 + log(depth) * log(moves) / 2.17;
 
             table[0][depth][moves] = r + 1; // zero window node
             table[1][depth][moves] = r;     // principal variation node
