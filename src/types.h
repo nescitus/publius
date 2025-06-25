@@ -27,6 +27,9 @@ Color operator++(Color& d); // increment color in a "for" loop
 
 enum eFile { fileA, fileB, fileC, fileD, fileE, fileF, fileG, fileH };
 enum eRank { rank1, rank2, rank3, rank4, rank5, rank6, rank7, rank8 };
+
+// Define Square enum and what can be done with it
+
 enum Square {
 	A1, B1, C1, D1, E1, F1, G1, H1,
 	A2, B2, C2, D2, E2, F2, G2, H2,

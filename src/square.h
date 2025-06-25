@@ -1,15 +1,13 @@
-/*
-Define Color enum and what can be done with it.
-
-Type safety is explained in types.h
-*/
-
 #pragma once
 #include <iostream>
 
 Square MakeSquare(const int rank, const int file);
 int RankOf(const Square square);
 int FileOf(const Square square);
+bool IsSameRank(const Square s1, const Square s2);
+bool IsSameFile(const Square s1, const Square s2);
+bool IsSameUpwardsDiag(const Square s1, const Square s2);
+bool IsSameDownwardsDiag(const Square s1, const Square s2);
 Square InvertSquare(const Square square);
 Square RelativeSq(const Color color, const Square square);
 std::string SquareName(Square sq);
