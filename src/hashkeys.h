@@ -4,7 +4,7 @@ static constexpr auto sideRandom = ~((Bitboard)0);
 
 class HashKeys {
 public:
-    void Init();
+    HashKeys(); // constructor
     Bitboard Random64(void);
     Bitboard ForPiece(Color color, int pieceType, Square square);
     Bitboard pieceKey[12][64];

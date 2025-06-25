@@ -5,7 +5,7 @@
 #include "bitboard.h"
 #include "mask.h"
 
-void MaskData::Init() {
+MaskData::MaskData() {
 
     InitRanks();
     InitPassedMask();

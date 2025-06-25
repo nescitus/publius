@@ -15,7 +15,7 @@ public:
     Bitboard passed[2][64];
     Bitboard strongPawn[2][64];
     Bitboard adjacentFiles[8];
-    void Init();
+    MaskData(); // constructor
 };
 
 extern MaskData Mask;

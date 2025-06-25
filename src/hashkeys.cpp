@@ -9,7 +9,7 @@
 std::mt19937_64 e2(2018);
 std::uniform_int_distribution<Bitboard> dist(std::llround(std::pow(2, 56)), std::llround(std::pow(2, 62)));
 
-void HashKeys::Init() {
+HashKeys::HashKeys() {
 
     for (int piece = 0; piece < 12; piece++)
         for (Square square = A1; square < sqNone; ++square) {

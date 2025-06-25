@@ -26,8 +26,6 @@ PvCollector Pv;
 
 int main()
 {
-    Mask.Init();
-    Key.Init();
     Params.Init();
     GenerateMoves.Init();
     State.Init();

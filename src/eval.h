@@ -46,7 +46,7 @@ void EvalQueen(const Position* pos, EvalData* e, Color color);
 void EvalKing(const Position* pos, EvalData* e, Color color);
 void EvalKingAttacks(EvalData* e, Color color);
 void EvalPasser(const Position* pos, EvalData* e, Color color);
-void EvalPressure(Position* p, EvalData* e, Color side);
+void EvalPressure(Position* pos, EvalData* e, Color side);
 int GetDrawMul(Position* pos, const Color strong, const Color weak);
 int Interpolate(EvalData* e);
 
@@ -108,16 +108,16 @@ const int p_support[64] = {
 };
 
 const int mgPawnPst[64] = {
-    //A1                                H1
-      0,   0,   0,   0,   0,   0,   0,   0,
-     -7, -10, -15, -10, -15,   9,   2, -19,
-     -7, -12, -11,   0,   0,   6,  -1, -15,
-     -3,  -2,   0,   5,  11,   6,  -5, -10,
-      1,   6,   3,  13,  20,  12,   2, -15,
-     12,  17,  28,  21,  31,  39,  17,  -9,
-     31,  41,  41,  25,  27,  37,  10,  11,
-      0,   0,   0,   0,   0,   0,   0,   0,
-      //A8                                H8
+//A1                                H1
+  0,   0,   0,   0,   0,   0,   0,   0,
+ -7, -10, -15, -10, -15,   9,   2, -19,
+ -7, -12, -11,   0,   0,   6,  -1, -15,
+ -3,  -2,   0,   5,  11,   6,  -5, -10,
+  1,   6,   3,  13,  20,  12,   2, -15,
+ 12,  17,  28,  21,  31,  39,  17,  -9,
+ 31,  41,  41,  25,  27,  37,  10,  11,
+  0,   0,   0,   0,   0,   0,   0,   0,
+//A8                                H8
 };
 
 const int egPawnPst[64] = {

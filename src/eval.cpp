@@ -387,7 +387,7 @@ void EvalPasser(const Position* pos, EvalData* e, Color color) {
     }
 }
 
-void EvalPressure(Position* p, EvalData *e, Color side) {
+void EvalPressure(Position* pos, EvalData *e, Color side) {
 
     Color oppo;
     Square sq;
@@ -397,16 +397,16 @@ void EvalPressure(Position* p, EvalData *e, Color side) {
     pressureMg = 0;
     pressureEg = 0;
     oppo = ~side;
-    enemyPieces = p->Map(oppo);
+    enemyPieces = pos->Map(oppo);
 
     // bishop on knight attacks
-    if (p->Map(oppo, Bishop) & e->control[side][Knight]) {
+    if (pos->Map(oppo, Bishop) & e->control[side][Knight]) {
         pressureMg += 15;
         pressureEg += 15;
     }
 
     // knight on bishop attacks
-    if (p->Map(oppo, Knight) & e->control[side][Bishop]) {
+    if (pos->Map(oppo, Knight) & e->control[side][Bishop]) {
         pressureMg += 15;
         pressureEg += 15;
     }
@@ -418,7 +418,7 @@ void EvalPressure(Position* p, EvalData *e, Color side) {
     // evaluate enemy pieces, hanging and attacked
     while (hang) {
         sq = PopFirstBit(&hang);
-        pieceType = p->PieceTypeOnSq(sq);
+        pieceType = pos->PieceTypeOnSq(sq);
         pressureMg += mgPressure[pieceType];
         pressureEg += egPressure[pieceType];
     }

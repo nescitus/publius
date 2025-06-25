@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "types.h"
+#include "piece.h"
 #include "square.h"
 #include "limits.h"
 #include "publius.h"
@@ -315,7 +316,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             moveType = GetMoveType(pos, move, ttMove, ply);
 
             // In singular search we omit the best move
-            // checking ehether there are viable alternatives
+            // checking whether there are viable alternatives
             if (move == excludedMove && isExcluded)
                 continue;
 
@@ -325,7 +326,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // Singular extension: tried once per search
             if (depth > singularDepth &&
                 singularMove &&
-                move == singularMove && // we are about to ssearch the best move from tt
+                move == singularMove && // we are about to search the best move from tt
                 singularExtension &&    // conditions for the singular search are met
                 excludedMove == dummyMove) {
 
@@ -377,6 +378,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 continue;
             }
 
+            bool moveGivesCheck = pos->IsInCheck();
+
             // Update move statistics
             listOfTriedMoves[movesTried] = move;
             movesTried++;
@@ -392,7 +395,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 newDepth++;
 
             // Check extension
-            else if (pos->IsInCheck() && (isPv || depth < 4))
+            else if (moveGivesCheck && (isPv || depth < 4))
                 newDepth++;
 
             // Futility pruning
@@ -401,7 +404,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 movesTried > 1 &&
                !isPv &&
                !isInCheckBeforeMoving &&
-               !pos->IsInCheck() &&
+               !moveGivesCheck &&
                 moveType == moveQuiet) 
             {
                 pos->UndoMove(move, &undo);
@@ -418,7 +421,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             if (depth <= 3 &&
                !isPv && 
                !isInCheckBeforeMoving &&
-               !pos->IsInCheck() &&
+               !moveGivesCheck &&
                 moveType == moveQuiet && 
                 quietMovesTried > (3 + improving) * depth) 
             {
@@ -437,7 +440,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 quietMovesTried > 3 && 
                 moveType == moveQuiet && 
                !isInCheckBeforeMoving && 
-               !pos->IsInCheck())
+               !moveGivesCheck)
             {   
                 reduction = Lmr.table[isPv]
                                      [std::min(depth, 63)]
