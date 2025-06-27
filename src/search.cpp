@@ -13,6 +13,7 @@
 #include "pv.h"
 #include "evaldata.h"
 #include "eval.h"
+#include "uci.h"
 #include "search.h"
 
 const int singularDepth = 7;
@@ -446,6 +447,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                                      [std::min(depth, 63)]
                                      [std::min(movesTried, 63)];
 
+                // TODO: increase reducyion when not improving
                 //if (reduction > 1 && improving) 
                 //    reduction--;
 
@@ -463,7 +465,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                     // full depth search
                     if (score <= alpha) {
                         pos->UndoMove(move, &undo);
-                        if (State.isStopping) return 0;
+                        if (State.isStopping) 
+                            return 0;
                         continue;
                     }
                 }
@@ -622,11 +625,7 @@ void DisplayPv(int score) {
               << " score "
               << scoreType << " " << score << " pv";
 
-    // print the main line
-    for (int j = 0; j < Pv.size[0]; ++j) {
-        std::cout << " " << MoveToString(Pv.line[0][j]);
-    }
-
+    Pv.PrintMainLine();
     std::cout << std::endl;
 }
 
@@ -642,7 +641,7 @@ void TryInterrupting(void)
 
     // Search limited by the nodecount
     // (not entirely precise, see previous comment)
-    if (Timer.GetData(maxNodes) != 0) {
+    if (Timer.GetData(maxNodes) != 0 && !Timer.IsInfiniteMode() ) {
         if (nodeCount >= Timer.GetData(maxNodes))
             State.isStopping = true;
     }
@@ -655,7 +654,7 @@ void TryInterrupting(void)
 
         // user ordered us to stop
         if (!strcmp(command, "stop"))
-            State.isStopping = true;
+            OnStopCommand();
 
         // transition from pondering to normal search
         else if (!strcmp(command, "ponderhit"))

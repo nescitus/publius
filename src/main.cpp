@@ -28,14 +28,15 @@ int main()
 {
     Params.Init();
     GenerateMoves.Init();
-    State.Init();
+    State.Clear();
     UciLoop();
     TT.Exit();
     return 0;
 }
 
-void EngineState::Init()
+void EngineState::Clear()
 {
     isStopping = false;
     isPondering = false;
+    waitingForStop = false;
 }

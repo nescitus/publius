@@ -114,9 +114,10 @@ public:
 
 class EngineState {
 public:
+	bool waitingForStop;
 	bool isStopping;
 	bool isPondering;
-    void Init();
+    void Clear();
 };
 
 extern EngineState State;

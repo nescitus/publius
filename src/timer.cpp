@@ -44,11 +44,14 @@ void UCItimer::SetMoveTiming(void) {
     // Certain settings forbid using tricks to finish earlier
     if (data[maxDepth] < 64 || // depth limit set
         data[maxNodes] > 0 ||  // node limit set
-        data[moveTime]     ||  // time per move set
-        isRepeating)           // repeating time control
+        data[moveTime])    //||  // time per move set
+     //   isRepeating)           // repeating time control
         isStrict = true;
     else
         isStrict = false;
+
+    // TODO: test whether repeating time control
+    // benefits from strict mode (I hope not)
 
     // User-defined time per move
     if (data[moveTime]) {
@@ -71,6 +74,7 @@ void UCItimer::SetMoveTiming(void) {
 
     if (data[engTime] >= 0) {
 
+        // safeguard for the last move of repeating time control
         if (data[movesToGo] == 1) {
             data[engTime] -= std::min(1000, data[engTime] / 10);
         }
@@ -127,16 +131,19 @@ int UCItimer::IsInfiniteMode(void) {
 }
 
 bool UCItimer::TimeHasElapsed(void) {
+
+    if (IsInfiniteMode())
+        return false;
+
     return (Elapsed() >= hardTimeLimit);
 }
 
 bool UCItimer::ShouldFinishIteration(void) {
     
-    // not applicable
+    // faster timeout not applicable
     if (isStrict || IsInfiniteMode() ) 
         return false;
     
-    // applicable
     return (Elapsed() >= softTimeLimit);
 }
 
@@ -149,6 +156,6 @@ void UCItimer::SetData(const int slot, const int val) {
 }
 
 void UCItimer::SetDataForColor(const Color color) {
-    data[engTime] = (bool)(color == White) ? GetData(wTime) : GetData(bTime);
-    data[engInc] =  (bool)(color == White) ? GetData(wIncrement) : GetData(bIncrement);
+    data[engTime] = color == White ? GetData(wTime) : GetData(bTime);
+    data[engInc] =  color == White ? GetData(wIncrement) : GetData(bIncrement);
 }

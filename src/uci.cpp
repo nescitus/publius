@@ -45,13 +45,14 @@ bool ParseCommand(std::istringstream& stream, Position* pos) {
     else if (command == "perft") OnPerftCommand(stream, pos);
     else if (command == "bench") OnBenchCommand(stream, pos);
     else if (command == "step") OnStepCommand(stream, pos);
+    else if (command == "stop") OnStopCommand();
     else if (command == "quit") { return false; }
     return true;
 }
 
 void OnUciCommand() {
 
-    std::cout << "id name Publius 0.065" << std::endl;
+    std::cout << "id name Publius 0.066" << std::endl;
     std::cout << "id author Pawel Koziol" << std::endl;
     std::cout << "option name Hash type spin default 16 min 1 max 4096" << std::endl;
     std::cout << "option name Clear Hash type button" << std::endl;
@@ -105,7 +106,7 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
     std::string param, value;
 
     Timer.Clear();
-    State.isPondering = false;
+    State.Clear();
 
     // Parse command
     stream >> param;
@@ -136,7 +137,7 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
         }
         else if (param == "depth") {
             stream >> value;
-            Timer.SetData(isInfinite, 1);
+            Timer.SetData(moveTime, INT_MAX);
             Timer.SetData(maxDepth, std::stoi(value));
         }
         else if (param == "movetime") {
@@ -145,8 +146,11 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
         }
         else if (param == "nodes") {
             stream >> value;
-            Timer.SetData(isInfinite, 1);
+            Timer.SetData(moveTime, INT_MAX);
             Timer.SetData(maxNodes, std::stoi(value));
+        } 
+        else if (param == "infinite") {
+            Timer.SetData(isInfinite, 1);
         }
 
         param.clear();
@@ -161,21 +165,10 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
     
     // How much time do we want to spend searching?
     Timer.SetMoveTiming();
-
-    Pv.line[0][0] = 0; // clear engine move
-    Pv.line[0][1] = 0; // clear ponder move
+    Pv.Clear(); // to reset bestmove and ponder move
     Think(pos);
-
-    if (Pv.line[0][1]) {
-        // print best move and ponder move
-        std::cout << "bestmove " << MoveToString(Pv.line[0][0])
-                  << " ponder "  << MoveToString(Pv.line[0][1]) 
-                  << std::endl;
-    }
-    else
-        // print just best move
-        std::cout << "bestmove " << MoveToString(Pv.line[0][0]) 
-                  << std::endl;
+    if (!Timer.IsInfiniteMode())
+        Pv.SendBestMove();
 }
 
 void OnSetOptionCommand(std::istringstream& stream) {
@@ -225,4 +218,17 @@ void OnNewGame(void) {
 
     History.Clear();
     TT.Clear();
+}
+
+void OnStopCommand() {
+
+    State.isStopping = true;
+    Timer.SetData(isInfinite, 0);
+
+    // after finishing "go infinite" run
+    // due to reaching ply limit
+    if (State.waitingForStop) {
+        State.waitingForStop = false;
+        Pv.SendBestMove();
+    }
 }

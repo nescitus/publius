@@ -1,7 +1,7 @@
 #include "types.h"
-#include "square.h"
 #include "limits.h"
 #include "publius.h"
+#include "move.h"
 #include "pv.h"
 #include <iostream>
 
@@ -20,4 +20,26 @@ void PvCollector::Refresh(const int ply, const Move move) {
         line[ply][i] = line[ply + 1][i];
 
     size[ply] = size[ply + 1];
+}
+
+void PvCollector::SendBestMove() {
+
+    if (line[0][1]) {
+        // print best move and ponder move
+        std::cout << "bestmove " << MoveToString(line[0][0])
+            << " ponder " << MoveToString(line[0][1])
+            << std::endl;
+    }
+    else {
+        // print just best move
+        std::cout << "bestmove " << MoveToString(line[0][0])
+            << std::endl;
+    }
+}
+
+void PvCollector::PrintMainLine() {
+
+    for (int j = 0; j < size[0]; ++j) {
+        std::cout << " " << MoveToString(line[0][j]);
+    }
 }

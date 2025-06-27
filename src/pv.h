@@ -4,6 +4,8 @@ class PvCollector {
 public:
 	void Clear();
 	void Refresh(int ply, Move move);
+	void SendBestMove();
+	void PrintMainLine();
 
 	// array keeping principal variation, 
 	// used also to retrieve best move and ponder move

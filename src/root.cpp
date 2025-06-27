@@ -45,6 +45,10 @@ void Iterate(Position* pos) {
         }
 
         val = curVal;
+
+        // for go infinite
+        if (rootDepth == 64 && Timer.IsInfiniteMode() )
+            State.waitingForStop = true;
     }
 }
 

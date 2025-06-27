@@ -9,3 +9,4 @@ void OnBenchCommand(std::istringstream& stream, Position* pos);
 void OnPerftCommand(std::istringstream& stream, Position* pos);
 std::string ToLower(const std::string& str);
 bool IsSameOrLowercase(const std::string& str1, const std::string& str2);
+void OnStopCommand();

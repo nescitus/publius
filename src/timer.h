@@ -10,7 +10,7 @@ private:
     int hardTimeLimit;       // basic time allocated for a move
     int softTimeLimit;       // but we won't start the next iteration after exceeding this
     bool isStrict;
-    bool isRepeating;        // repeating TC requires strict mode...
+    bool isRepeating;        // repeating TC uses strict mode (does it help?)...
 public:
     void SetRepeating(void); //...and we won't detect it just by checking movestogo
     void Clear(void);
