@@ -19,6 +19,16 @@ void AddPromotions(MoveList* list, const Square fromSquare,
     list->AddMove( fromSquare, toSquare, tPromN );
 }
 
+void AddPawnMoves(MoveList* list, Bitboard moves, int vector, int flag) {
+    
+    Square toSquare;
+    
+    while (moves) {
+        toSquare = PopFirstBit(&moves);
+        list->AddMove(toSquare + vector, toSquare, flag);
+    }
+}
+
 void FillNoisyList(Position* pos, MoveList* list) {
 
     Bitboard pieces, moves;
@@ -61,18 +71,12 @@ void FillNoisyList(Position* pos, MoveList* list) {
         // White pawn captures (NW)
 
 	    moves = NWOf(pieces) & prey;
-        while (moves) {
-            toSquare = PopFirstBit(&moves);
-	        list->AddMove(toSquare - 7, toSquare, 0);
-        }
+        AddPawnMoves(list, moves, -7, tNormal);
 
         // White pawn captures (NE)
 
 	    moves = NEOf(pieces) & prey;
-        while (moves) {
-            toSquare = PopFirstBit(&moves);
-	        list->AddMove(toSquare - 9, toSquare, 0);
-        }
+        AddPawnMoves(list, moves, -9, tNormal);
 
         // White en passant capture
 
@@ -115,18 +119,12 @@ void FillNoisyList(Position* pos, MoveList* list) {
         // Black pawn captures, excluding promotions (SW)
 
 	    moves = SWOf(pieces) & prey;
-        while (moves) { 
-            toSquare = PopFirstBit(&moves);
-	        list->AddMove(toSquare + 9, toSquare, 0);
-        }
+        AddPawnMoves(list, moves, 9, tNormal);
 
         // Black pawn captures, excluding promotions (SE)
 
 	    moves = SEOf(pieces) & prey;
-        while (moves) {
-            toSquare = PopFirstBit(&moves);
-	        list->AddMove(toSquare + 7, toSquare, 0);
-        }
+        AddPawnMoves(list, moves, 7, tNormal);
 
         // Black en passant capture
 
@@ -199,18 +197,13 @@ void FillQuietList(Position* pos, MoveList* list) {
         // White double pawn moves
 
         moves = (NorthOf(NorthOf(pos->Map(White, Pawn) & Mask.rank[rank2]) & pos->Empty())) & pos->Empty();
-        while (moves) {
-            toSquare = PopFirstBit(&moves);
-	        list->AddMove(toSquare - 16, toSquare, tPawnjump);
-        }
+        AddPawnMoves(list, moves, -16, tPawnjump);
 
         // White normal pawn moves
 
         moves = NorthOf(pos->Map(White, Pawn) & ~Mask.rank[rank7]) & pos->Empty();
-        while (moves) {
-            toSquare = PopFirstBit(&moves);
-	        list->AddMove(toSquare - 8, toSquare, 0);
-        }
+        AddPawnMoves(list, moves, -8, tNormal);
+
     } else {
  
         // Black short castle
@@ -224,18 +217,12 @@ void FillQuietList(Position* pos, MoveList* list) {
         // Black double pawn moves
 
         moves = (SouthOf(SouthOf(pos->Map(Black, Pawn) & Mask.rank[rank7]) & pos->Empty())) & pos->Empty();
-        while (moves) {
-            toSquare = PopFirstBit(&moves);
-	        list->AddMove(toSquare + 16, toSquare, tPawnjump);
-        }
+        AddPawnMoves(list, moves, 16, tPawnjump);
 
         // Black single pawn moves
 
         moves = SouthOf(pos->Map(Black, Pawn) & ~Mask.rank[rank2]) & pos->Empty();
-        while (moves) {
-            toSquare = PopFirstBit(&moves);
-	        list->AddMove(toSquare + 8, toSquare, 0);
-        }
+        AddPawnMoves(list, moves, 8, tNormal);
     }
 
     // Knight moves
@@ -305,19 +292,13 @@ void FillCheckList(Position* pos, MoveList* list) {
 
         moves = (NorthOf(NorthOf(pos->Map(White, Pawn) & Mask.rank[rank2]) & pos->Empty())) & pos->Empty();
         moves &= pawnChecks;
-        while (moves) {
-            toSquare = PopFirstBit(&moves);
-            list->AddMove(toSquare - 16, toSquare, tPawnjump);
-        }
+        AddPawnMoves(list, moves, -16, tPawnjump);
 
         // White single pawn moves
 
         moves = NorthOf(pos->Map(White, Pawn) & ~Mask.rank[rank7]) & pos->Empty();
         moves &= pawnChecks;
-        while (moves) {
-            toSquare = PopFirstBit(&moves);
-            list->AddMove(toSquare - 8, toSquare, 0);
-        }
+        AddPawnMoves(list, moves, -8, tNormal);
     }
     else {
 
@@ -325,19 +306,13 @@ void FillCheckList(Position* pos, MoveList* list) {
 
         moves = (SouthOf(SouthOf(pos->Map(Black, Pawn) & Mask.rank[rank7]) & pos->Empty())) & pos->Empty();
         moves &= pawnChecks;
-        while (moves) {
-            toSquare = PopFirstBit(&moves);
-            list->AddMove(toSquare + 16, toSquare, tPawnjump);
-        }
+        AddPawnMoves(list, moves, 16, tPawnjump);
 
         // Black single pawn moves
 
         moves = SouthOf(pos->Map(Black, Pawn) & ~Mask.rank[rank2]) & pos->Empty();
         moves &= pawnChecks;
-        while (moves) {
-            toSquare = PopFirstBit(&moves);
-            list->AddMove(toSquare + 8, toSquare, 0);
-        }
+        AddPawnMoves(list, moves, 8, tNormal);
     }
 
     // Knight moves

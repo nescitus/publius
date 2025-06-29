@@ -146,6 +146,8 @@ void FillNoisyList(Position* pos, MoveList* list);
 void FillCheckList(Position* pos, MoveList* list);
 void FillCompleteList(Position* pos, MoveList* list);
 void FillChecksAndCaptures(Position* pos, MoveList* list);
+void AddPawnMoves(MoveList* list, Bitboard moves, int vector, int flag);
+void AddPromotions(MoveList* list, const Square fromSquare, const Square toSquare);
 
 bool IsBadCapture(Position* pos, Move move);
 int Swap(const Position* pos, const Square fromSquare, const Square toSquare);
