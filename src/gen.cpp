@@ -8,6 +8,7 @@
 #include "mask.h"
 #include "bitgen.h"
 #include "piece.h"
+#include "legality.h"
 
 void AddPromotions(MoveList* list, const Square fromSquare, 
                                    const Square toSquare) {
@@ -188,22 +189,12 @@ void FillQuietList(Position* pos, MoveList* list) {
     if (color == White) {
 
         // White short castle
-
-        if ((pos->WhiteCanCastleShort()) &&
-           !(pos->Occupied() & Paint(F1, G1))) {
-            if (!pos->SquareIsAttacked(E1, Black) &&
-                !pos->SquareIsAttacked(F1, Black))
-                list->AddMove(E1, G1, tCastle);
-        }
-
+        if (IsWhiteShortCastleLegal(pos))
+            list->AddMove(E1, G1, tCastle);
+        
         // White long castle
-
-        if ((pos->WhiteCanCastleLong()) &&
-           !(pos->Occupied() & Paint(B1, C1, D1))) {
-            if (!pos->SquareIsAttacked(E1, Black) &&
-                !pos->SquareIsAttacked(D1, Black))
-                list->AddMove(E1, C1, tCastle);
-        }
+        if (IsWhiteLongCastleLegal(pos))
+            list->AddMove(E1, C1, tCastle);
 
         // White double pawn moves
 
@@ -221,25 +212,15 @@ void FillQuietList(Position* pos, MoveList* list) {
 	        list->AddMove(toSquare - 8, toSquare, 0);
         }
     } else {
-
+ 
         // Black short castle
-
-        if ((pos->BlackCanCastleShort()) &&
-           !(pos->Occupied() & Paint(F8, G8))) {
-            if (!pos->SquareIsAttacked(E8, White) &&
-                !pos->SquareIsAttacked(F8, White))
-                list->AddMove(E8, G8, tCastle);
-        }
-
+        if (IsBlackShortCastleLegal(pos))
+           list->AddMove(E8, G8, tCastle);
+        
         // Black long castle
-
-        if ((pos->BlackCanCastleLong()) &&
-           !(pos->Occupied() & Paint(B8, C8, D8))) {
-            if (!pos->SquareIsAttacked(E8, White) &&
-                !pos->SquareIsAttacked(D8, White))
-                list->AddMove(E8, C8, tCastle);
-        }
-
+        if (IsBlackLongCastleLegal(pos))
+           list->AddMove(E8, C8, tCastle);
+        
         // Black double pawn moves
 
         moves = (SouthOf(SouthOf(pos->Map(Black, Pawn) & Mask.rank[rank7]) & pos->Empty())) & pos->Empty();

@@ -15,6 +15,7 @@ SRCS= \
 	history.cpp \
 	list.cpp \
 	lmr.cpp \
+	legality.cpp \
 	main.cpp \
 	mask.cpp \
 	move.cpp \
