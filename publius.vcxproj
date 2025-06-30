@@ -132,6 +132,7 @@
     <ClCompile Include="src\gen.cpp" />
     <ClCompile Include="src\hashkeys.cpp" />
     <ClCompile Include="src\history.cpp" />
+    <ClCompile Include="src\legality.cpp" />
     <ClCompile Include="src\list.cpp" />
     <ClCompile Include="src\lmr.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="src\evaldata.h" />
     <ClInclude Include="src\hashkeys.h" />
     <ClInclude Include="src\history.h" />
+    <ClInclude Include="src\legality.h" />
     <ClInclude Include="src\limits.h" />
     <ClInclude Include="src\lmr.h" />
     <ClInclude Include="src\mask.h" />
