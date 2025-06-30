@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <string.h>
 #include "types.h"
-#include "piece.h"
-#include "square.h"
 #include "limits.h"
 #include "publius.h"
 #include "timer.h"
@@ -518,7 +514,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 // the aspiration window).
                 if (isRoot) {
                     Pv.Refresh(ply, move);
-                    DisplayPv(score);
+                    Pv.Display(score);
                 }
 
                 // Stop searching this node. It has already
@@ -541,9 +537,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                     alpha = score;
                     bestMove = move;
                     Pv.Refresh(ply, move);
-                    if (isRoot) {
-                        DisplayPv(score);
-                    }
+                    if (isRoot)
+                        Pv.Display(score);
                 }
             }
         }
@@ -595,40 +590,6 @@ int GetMoveType(Position* pos, Move move, Move ttMove, int ply) {
     return moveQuiet;      // quiet move
 }
 
-void DisplayPv(int score) {
-
-    std::string scoreType;
-    Bitboard nps = 0;
-    int elapsed = Timer.Elapsed();
-
-    // calculate nodes per second
-    if (elapsed) nps = nodeCount * 1000 / elapsed;
-
-    // If we are outside of normal evaluation range,
-    // then the engine either gives a checkmate
-    // or is being mated. In this case, we translate
-    // the score into distance to mate and set
-    // approppriate score type ("mate" instead of
-    // the usual centipawns)
-    scoreType = "mate";
-    if (score < -EvalLimit)     
-        score = (-MateScore - score) / 2;
-    else if (score > EvalLimit) 
-        score = (MateScore - score + 1) / 2;
-    else scoreType = "cp";
-
-    // print statistics
-    std::cout << "info depth " << rootDepth
-              << " time " << elapsed
-              << " nodes " << nodeCount
-              << " nps " << nps
-              << " score "
-              << scoreType << " " << score << " pv";
-
-    Pv.PrintMainLine();
-    std::cout << std::endl;
-}
-
 void TryInterrupting(void) 
 {
     char command[80];
@@ -666,9 +627,8 @@ void TryInterrupting(void)
     }
 
     // the time is out!
-    if (Timeout()) {
+    if (Timeout())
         State.isStopping = true;
-    }
 }
 
 int Timeout() {

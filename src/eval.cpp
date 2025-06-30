@@ -25,12 +25,6 @@ int Evaluate(Position* pos, EvalData* e) {
     e->Clear();
     e->enemyKingZone[White] = GenerateMoves.King(pos->KingSq(Black));
     e->enemyKingZone[Black] = GenerateMoves.King(pos->KingSq(White));
-
-    for (int i = 0; i < 6; i++) {
-        e->control[White][i] = 0;
-        e->control[Black][i] = 0;
-    }
-
     e->control[White][Pawn] = GetWPAttacks(pos->Map(White, Pawn));
     e->control[Black][Pawn] = GetBPAttacks(pos->Map(Black, Pawn));
     e->control[White][King] = GenerateMoves.King(pos->KingSq(White));
@@ -58,13 +52,10 @@ int Evaluate(Position* pos, EvalData* e) {
 
     // Precalculate board control bitboards
 
-    e->allAtt[White] = e->control[White][Pawn] | e->control[White][Knight] | 
-                       e->control[White][Bishop] | e->control[White][Rook] | 
-                       e->control[White][Queen] | e->control[White][King];
-
-    e->allAtt[Black] = e->control[Black][Pawn] | e->control[Black][Knight] | 
-                       e->control[Black][Bishop] | e->control[Black][Rook] | 
-                       e->control[Black][Queen] | e->control[Black][King];
+    for (int piece = Pawn; piece <= King; piece++) {
+        e->allAtt[White] |= e->control[White][piece];
+        e->allAtt[Black] |= e->control[Black][piece];
+    }
 
     EvalPasser(pos, e, White);
     EvalPasser(pos, e, Black);

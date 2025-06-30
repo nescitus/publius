@@ -3,7 +3,6 @@
 #include <iostream>
 #include <sstream>
 #include "types.h"
-#include "square.h"
 #include "limits.h"
 #include "publius.h"
 #include "timer.h"
@@ -11,10 +10,10 @@
 #include "trans.h"
 #include "move.h"
 #include "search.h"
-#include "uci.h"
 #include "evaldata.h"
 #include "eval.h"
 #include "pv.h"
+#include "uci.h"
 
 void UciLoop(void) {
 

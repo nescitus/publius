@@ -1,7 +1,7 @@
 #pragma once
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3887 lines
+// 3848 lines
 
 #include <iostream>
 #include <algorithm>
@@ -9,7 +9,7 @@
 static constexpr auto startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -";
 static constexpr auto kiwipeteFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
 
-// stack
+// data for undoing a move
 
 typedef struct {
 	Move move;
@@ -20,9 +20,6 @@ typedef struct {
 	Bitboard boardHash;
 	Bitboard pawnHash;
 } UndoData;
-
-static const int stackSize = 2048;
-extern UndoData undoStack[stackSize];
 
 class Parameters {
 private:
@@ -154,7 +151,6 @@ bool IsBadCapture(Position* pos, Move move);
 int Swap(const Position* pos, const Square fromSquare, const Square toSquare);
 
 void TryInterrupting(void);
-void DisplayPv(int score);
 
 int InputAvailable(void);
 void OnNewGame(void);

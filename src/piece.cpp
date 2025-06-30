@@ -1,7 +1,4 @@
 #include "types.h"
-#include "square.h"
-#include "limits.h"
-#include "publius.h"
 #include "piece.h"
 
 Color ColorOfPiece(int piece) {

@@ -7,11 +7,9 @@
 #  include <sys/time.h>
 #endif
 #include "types.h"
-#include "square.h"
 #include "limits.h"
 #include "publius.h"
 #include "move.h"
-#include "search.h"
 
 // TODO: model after hakkapeliitta
 

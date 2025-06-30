@@ -1,12 +1,11 @@
 #include "types.h"
-#include "square.h"
-#include "limits.h"
-#include "publius.h"
 #include "evaldata.h"
 
 
 void EvalData::Clear() {
+
     phase = 0;
+    
     for (Color color = White; color < colorNone; ++color) {
         mg[color] = 0;
         eg[color] = 0;
@@ -15,6 +14,11 @@ void EvalData::Clear() {
         minorAttacks[color] = 0;
         rookAttacks[color] = 0;
         queenAttacks[color] = 0;
+        allAtt[color] = 0;
+        
+        for (int piece = 0; piece < 6; piece++) {
+            control[color][piece] = 0;
+        }
     }
 }
 

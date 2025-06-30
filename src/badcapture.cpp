@@ -1,6 +1,5 @@
 #include "types.h"
 #include "piece.h"
-#include "square.h"
 #include "limits.h"
 #include "publius.h"
 #include "move.h"
@@ -28,11 +27,8 @@ bool IsBadCapture(Position* pos, Move move) {
     if (GetTypeOfMove(move) == tEnPassant)
         return false;
 
-    // static exchange evaluator
-    if (Swap(pos, fromSquare, toSquare) < 0)
-        return true;
-    
-    return false;
+    // we must resort to static exchange evaluator
+    return (Swap(pos, fromSquare, toSquare) < 0);
 }
 
 // Static Exchange Evaluator tries to calculate the value

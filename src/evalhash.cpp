@@ -1,8 +1,6 @@
 #include "types.h"
-#include "square.h"
 #include "limits.h"
 #include "publius.h"
-#include "bitboard.h"
 #include "evaldata.h"
 #include "eval.h"
 

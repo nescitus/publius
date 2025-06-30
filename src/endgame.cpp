@@ -1,6 +1,5 @@
 #include "types.h"
 #include "piece.h"
-#include "square.h"
 #include "limits.h"
 #include "publius.h"
 
