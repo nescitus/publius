@@ -8,8 +8,6 @@
 #include "eval.h"
 #include "mask.h"
 #include "piece.h"
-#include <iostream>
-#include <algorithm>
 
 EvalHashTable EvalHash(1024);
 sPawnHashEntry PawnTT[PAWN_HASH_SIZE];
@@ -83,13 +81,11 @@ int Evaluate(Position* pos, EvalData* e) {
 
   // Drawn and drawish endgame evaluation
   int multiplier = 64;
-  if (score > 0) {
+  if (score > 0)
       multiplier = GetDrawMul(pos, White, Black);
-  }
 
-  if (score < 0) {
+  if (score < 0)
       multiplier = GetDrawMul(pos, Black, White);
-  }
 
   score = (score * multiplier) / 64;
 

@@ -40,7 +40,7 @@ Bitboard Position::Map(const Color color, const int piece) const {
 Bitboard Position::Map(const Color color) const {
 
     return Map(color, Pawn) | Map(color, Knight) | Map(color, Bishop)
-        | Map(color, Rook) | Map(color, Queen) | Map(color, King);
+         | Map(color, Rook) | Map(color, Queen) | Map(color, King);
 }
 
 Bitboard Position::Occupied() const {
@@ -77,7 +77,7 @@ bool Position::IsEmpty(const Square sq) const {
 
 Bitboard Position::MapPieceType(const int pieceType) const {
     return pieceBitboard[White][pieceType] |
-        pieceBitboard[Black][pieceType];
+           pieceBitboard[Black][pieceType];
 }
 
 Bitboard Position::AllDiagMovers() const {
@@ -142,7 +142,8 @@ bool Position::IsDrawByInsufficientMaterial() const {
 
     if (!LeavesKingInCheck()) {
         if (CountAllPawns() + CountMajors(White) + CountMajors(Black) == 0 &&
-            CountMinors(White) + CountMinors(Black) <= 1) return true;
+            CountMinors(White) + CountMinors(Black) <= 1) 
+            return true;
     }
 
     return false;
