@@ -105,9 +105,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     if (!isRoot) {
         alpha = std::max(alpha, -MateScore + ply);
         beta = std::min(beta, MateScore - ply + 1);
-        if (alpha >= beta) {
+        if (alpha >= beta)
             return alpha;
-        }
     }
 
     //  READ THE TRANSPOSITION TABLE. If we have 
@@ -205,7 +204,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // can accept that loss, then we prune (~12 Elo).
 
         if (depth <= 6) {
-            score = eval - 125 * depth;
+            score = eval - 135 * depth;
             if (score > beta)
                 return score;
         }
@@ -569,10 +568,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
 bool SetImproving(int eval, int ply) {
 
-    if (ply > 1 && oldEval[ply - 2] > eval)
-       return false;
-    
-    return true;
+    return !(ply > 1 && oldEval[ply - 2] > eval);
 }
 
 // We need to know the move type for the pruning decisions
