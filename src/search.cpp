@@ -201,7 +201,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // Instead of letting the opponent search
         // two moves in a row, it simply assumes some
         // loss, increasing with depth. If side to move
-        // can accept that loss, then we prune (~12 Elo).
+        // can accept that loss, then we prune (~14 Elo).
 
         if (depth <= 6) {
             score = eval - 135 * depth;
@@ -442,7 +442,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                                      [std::min(depth, 63)]
                                      [std::min(movesTried, 63)];
 
-                // TODO: increase reducyion when not improving
+                // TODO: increase reduction when not improving
                 //if (reduction > 1 && improving) 
                 //    reduction--;
 
@@ -467,15 +467,15 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 }
             }
 
-            // PVS (Principal variation search)
-            // we search the first move of a pv-node
-            // with a full window. For each later node
-            // de do a scout search first, testing whether
-            // score is above alpha (and thus above last best score).
-            // Only if it is, we do a full window search
-            // to get the exact value of the current node.
-            // Zero window searches are still conducted
-            // with a zero window.
+            // PVS (Principal variation search). We search 
+            // the first move of a pv-node with a full window. 
+            // For each later move we do a scout search first, 
+            // testing whether score is above alpha (and thus 
+            // above last best score). Only if it is, we do 
+            // a full window search to get the exact value 
+            // of the current node. Zero window searches are 
+            // still conducted with a zero window.
+
             if (bestScore == -Infinity)
                 score = -Search(pos, ply + 1, -beta, -alpha, newDepth, false, false);
             else {
@@ -486,9 +486,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
             // Undo move
             pos->UndoMove(move, &undo);
-            if (State.isStopping) {
+            if (State.isStopping)
                 return 0;
-            }
 
             // Beta cutoff
             if (score >= beta) {
@@ -512,7 +511,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 // in the root node because er are using
                 // the aspiration window).
                 if (isRoot) {
-                    Pv.Refresh(ply, move);
+                    Pv.Update(ply, move);
                     Pv.Display(score);
                 }
 
@@ -535,7 +534,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 if (score > alpha) {
                     alpha = score;
                     bestMove = move;
-                    Pv.Refresh(ply, move);
+                    Pv.Update(ply, move);
                     if (isRoot)
                         Pv.Display(score);
                 }
@@ -554,13 +553,11 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // unwinding the search due to timeout.
     // This is a common source of bugs. If you wish,
     // you can add an explicit test for that.
-    if (!isExcluded)
-    {
-        if (bestMove) {
+    if (!isExcluded) {
+        if (bestMove)
             TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, depth, ply);
-        } else {
+        else
             TT.Store(pos->boardHash, 0, bestScore, lowerBound, depth, ply);
-        }
     }
 
     return bestScore;

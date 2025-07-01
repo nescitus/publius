@@ -47,11 +47,12 @@ void EvalKing(const Position* pos, EvalData* e, Color color);
 void EvalKingAttacks(EvalData* e, Color color);
 void EvalPasser(const Position* pos, EvalData* e, Color color);
 void EvalPressure(Position* pos, EvalData* e, Color side);
+int GetTropism(Square sq1, Square sq2);
 int GetDrawMul(Position* pos, const Color strong, const Color weak);
 int Interpolate(EvalData* e);
 
-const int mgPieceValue[6] = { 93, 402, 407, 595, 1250, 0 };
-const int egPieceValue[6] = { 104, 345, 375, 651, 1240, 0 };
+const int mgPieceValue[6] = { 93, 402, 407, 589, 1250, 0 };
+const int egPieceValue[6] = { 104, 345, 375, 645, 1240, 0 };
 const int mgPressure[7] = { 1, 10, 10, 12, 20, 0, 0 };
 const int egPressure[7] = { 2, 14, 14, 17, 24, 0, 0 };
 
@@ -84,17 +85,16 @@ const int doubledPawnMg = -9;
 const int doubledPawnEg = -9;
 const int isolPawnMg = -10;
 const int isolPawnEg = -18;
-const int rookClosedMg = -6;
-const int rookClosedEg = -6;
-const int rookHalfMg = 6;
-const int rookHalfEg = 6;
-const int rookOpenMg = 12;
-const int rookOpenEg = 12;
+const int rookHalfMg = 12;
+const int rookHalfEg = 12;
+const int rookOpenMg = 18;
+const int rookOpenEg = 18;
 const int rook7thMg = 12;
 const int rook7thEg = 30;
 const int kingPseudoShield = 8;
 const int kingOpenFilePenalty = -8;
 const int kingNearOpenPenalty = -6;
+const int minorOnMinor = 15;
 
 const int p_support[64] = {
   0,   0,   0,   0,   0,   0,   0,   0,

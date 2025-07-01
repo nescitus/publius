@@ -244,15 +244,12 @@ void EvalRook(const Position* pos, EvalData* e, Color color) {
         if (att & e->enemyKingZone[color])
             e->rookAttacks[color]++;
 
-        // Rook's file (closed, semi-open, open)
+        // Rook on a (semi) open file
         file = FillNorth(Paint(square)) | FillSouth(Paint(square));
 
         // rook on a closed file
-        if (file & pos->Map(color, Pawn)) {
-            e->Add(color, rookClosedMg, rookClosedEg);
-        }
-        else
-        {
+        if (!(file & pos->Map(color, Pawn))) {
+
             // rook on a semi-open file
             if (file & pos->Map(~color, Pawn))
                 e->Add(color, rookHalfMg, rookHalfEg);   
@@ -388,14 +385,14 @@ void EvalPressure(Position* pos, EvalData *e, Color side) {
 
     // bishop on knight attacks
     if (pos->Map(oppo, Bishop) & e->control[side][Knight]) {
-        pressureMg += 15;
-        pressureEg += 15;
+        pressureMg += minorOnMinor;
+        pressureEg += minorOnMinor;
     }
 
     // knight on bishop attacks
     if (pos->Map(oppo, Knight) & e->control[side][Bishop]) {
-        pressureMg += 15;
-        pressureEg += 15;
+        pressureMg += minorOnMinor;
+        pressureEg += minorOnMinor;
     }
 
     // detect hanging pieces

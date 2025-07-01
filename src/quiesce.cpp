@@ -30,17 +30,15 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     TryInterrupting();
 
     // Exit to unwind search if it has timed out
-    if (State.isStopping) {
+    if (State.isStopping)
         return 0;
-    }
 
     // Retrieve score from transposition table
     // (in zero window nodes or when we get exact score)
     if (TT.Retrieve(pos->boardHash, &ttMove, &score, &hashFlag, alpha, beta, 0, ply)) {
 
-        if (!isPv || (score > alpha && score < beta)) {
+        if (!isPv || (score > alpha && score < beta))
             return score;
-        }
     }
 
     Pv.size[ply] = ply;
@@ -57,9 +55,8 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     }
 
     // Safeguarding against ply limit overflow
-    if (ply >= PlyLimit - 1) {
+    if (ply >= PlyLimit - 1)
         return Evaluate(pos, &e);
-    }
 
     // Are we in check? Then we must flee
     const bool isInCheck = pos->IsInCheck();
@@ -71,14 +68,12 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     bestScore = isInCheck ? -Infinity : Evaluate(pos, &e);
 
     // Static score cutoff
-    if (bestScore >= beta) {
+    if (bestScore >= beta)
         return bestScore;
-    }
 
     // Guaranteed score if we don't find anything better
-    if (bestScore > alpha) {
+    if (bestScore > alpha)
         alpha = bestScore;
-    }
 
     // Generate and sort move list. We have three cases:
     // 1) when in check, we look for evasions
@@ -128,10 +123,9 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
             // Unmake move
             pos->UndoMove(move, &undo);
 
-            // Exit if needed
-            if (State.isStopping) {
+            // Exit in case of a timeout / stop command
+            if (State.isStopping)
                 return 0;
-            }
 
             // Beta cutoff
             if (score >= beta) {
@@ -145,7 +139,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
                 if (score > alpha) {
                     bestMove = move;
                     alpha = score;
-                    Pv.Refresh(ply, move);
+                    Pv.Update(ply, move);
                 }
             }
         }
@@ -157,12 +151,10 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     }
 
     // Save result in the transpositon table 
-    // (depth 0 for quiescence search)
-    if (bestMove) {
+    if (bestMove)
         TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, 0, ply);
-    } else {
+    else
         TT.Store(pos->boardHash, 0, bestScore, lowerBound, 0, ply);
-    }
 
     return bestScore;
 }

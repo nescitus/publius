@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 #include "types.h"
-#include "square.h"
 #include "limits.h"
 #include "publius.h"
 #include "timer.h"
@@ -31,10 +30,8 @@ void Iterate(Position* pos) {
     for (rootDepth = 1; rootDepth <= Timer.GetData(maxDepth); rootDepth++) {
         
         int elapsed = Timer.Elapsed();
-        
-        if (elapsed) {
+        if (elapsed)
             nps = nodeCount * 1000 / elapsed;
-        }
 
         PrintRootInfo(elapsed, nps);
 
@@ -77,26 +74,21 @@ int Widen(Position* pos, int depth, int lastScore) {
             beta = lastScore + margin;
             currentDepthScore = Search(pos, 0, alpha, beta, depth, false, false);
 
-            if (State.isStopping) {
+            // timeout
+            if (State.isStopping)
                 break;
-            }
 
             // we have finished within the window, break the loop
-
-            if (currentDepthScore > alpha && currentDepthScore < beta) {
+            if (currentDepthScore > alpha && currentDepthScore < beta)
                 return currentDepthScore;
-            }
 
-            // verify checkmate by searching with infinite bounds
-
-            if (currentDepthScore > EvalLimit) {
+            // verify a checkmate by searching with infinite bounds
+            if (currentDepthScore > EvalLimit)
                 break;
-            }
         }
     }
 
     // full window search
-
     return Search(pos, 0, -Infinity, Infinity, depth, false, false);
     
 }

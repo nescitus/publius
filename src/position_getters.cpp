@@ -1,5 +1,4 @@
 #include "types.h"
-#include "square.h"
 #include "limits.h"
 #include "piece.h"
 #include "publius.h"
@@ -105,7 +104,6 @@ bool Position::BlackCanCastleLong() const {
 }
 
 bool Position::CanTryNullMove() const {
-
     return ((CountMinors(sideToMove) + CountMajors(sideToMove)) > 0);
 }
 

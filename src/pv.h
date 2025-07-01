@@ -3,7 +3,7 @@
 class PvCollector {
 public:
 	void Clear();
-	void Refresh(int ply, Move move);
+	void Update(int ply, Move move);
 	void SendBestMove();
 	void Display(int score);
 

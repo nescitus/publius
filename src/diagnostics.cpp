@@ -117,8 +117,7 @@ Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
             if (depth == 1) {
                 moveCount++;
                 localCount = 1;
-            }
-            else {
+            } else {
                 localCount = Perft(pos, ply + 1, depth - 1, isNoisy);
                 moveCount += localCount;
             }

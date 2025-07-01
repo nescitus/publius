@@ -13,7 +13,7 @@ void PvCollector::Clear() {
             line[i][j] = 0;
 }
 
-void PvCollector::Refresh(const int ply, const Move move) {
+void PvCollector::Update(const int ply, const Move move) {
 
     line[ply][ply] = move;
 

@@ -1,12 +1,11 @@
 #include "types.h"
+#include "piece.h"
 #include "square.h"
 #include "limits.h"
 #include "publius.h"
 #include "bitboard.h"
 #include "bitgen.h"
 #include "hashkeys.h"
-#include "piece.h"
-
 
 // For Position class members observe the following 
 // naming convention: if the function to manipulate
