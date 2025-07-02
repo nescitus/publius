@@ -40,6 +40,12 @@ void MaskData::InitRanks() {
         rr[White][i] = rank[i];
         rr[Black][i] = rank[7 - i];
     }
+
+    // outpost masks
+
+    outpost[White] = (rr[White][rank4] | rr[White][rank5] | rr[White][rank6]) & ~file[fileA] & ~file[fileH];
+    outpost[Black] = (rr[Black][rank4] | rr[Black][rank5] | rr[Black][rank6]) & ~file[fileA] & ~file[fileH];
+
 }
 
 void MaskData::InitPassedMask() {

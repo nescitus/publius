@@ -47,7 +47,6 @@ void EvalKing(const Position* pos, EvalData* e, Color color);
 void EvalKingAttacks(EvalData* e, Color color);
 void EvalPasser(const Position* pos, EvalData* e, Color color);
 void EvalPressure(Position* pos, EvalData* e, Color side);
-int GetTropism(Square sq1, Square sq2);
 int GetDrawMul(Position* pos, const Color strong, const Color weak);
 int Interpolate(EvalData* e);
 
@@ -146,11 +145,22 @@ const int egKnightPst[64] = {
 -44, -33,  -8,  -6,  -6,  -8, -33, -44,
 -14,   5,  -2,   6,   6,  -2,   5, -14,
 -22,   7,  11,  29,  29,  11,   7, -22,
- 12,  26,  37,  37,  37,  37,  26,  12,
- 19,  35,  33,  45,  45,  33,  35,  19,
-  0,  21 , 28,  22,  22,  28,  21,   0,
+ 12,  26,  36,  37,  37,  36,  26,  12,
+ 19,  35,  33,  43,  43,  33,  35,  19,
+  0,  21 , 27,  21,  21,  27,  21,   0,
 -16,   1,  -3,  30,  30,  -3,   1, -16,
 -68, -20,  -6,   3,   3,  -6, -20, -68,
+};
+
+const int n_outpost[64] = {
+  0,   0,   0,   0,   0,   0,   0,   0,
+  0,   0,   0,   0,   0,   0,   0,   0,
+  0,   0,   0,   0,   0,   0,   0,   0,
+  0,   0,   2,   3,   3,   2,   0,   0,
+  0,   1,   4,  12,   7,   7,   1,   0,
+  0,   2,   4,  13,  13,   5,   3,   0,
+  0,   0,   0,   0,   0,   0,   0,   0,
+  0,   0,   0,   0,   0,   0,   0,   0,
 };
 
 const int mgBishopPst[64] = {

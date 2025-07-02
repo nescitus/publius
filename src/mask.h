@@ -15,6 +15,7 @@ public:
     Bitboard passed[2][64];
     Bitboard strongPawn[2][64];
     Bitboard adjacentFiles[8];
+    Bitboard outpost[2];
     MaskData(); // constructor
 };
 

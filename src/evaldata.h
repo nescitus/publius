@@ -6,6 +6,7 @@ public:
 	int eg[2];
 	int mgPawn[2];
 	int egPawn[2];
+	Bitboard pawnReach[2];
 	Bitboard enemyKingZone[2];
 	int minorAttacks[2];
 	int rookAttacks[2];

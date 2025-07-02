@@ -30,6 +30,9 @@ int Evaluate(Position* pos, EvalData* e) {
     e->control[White][King] = GenerateMoves.King(pos->KingSq(White));
     e->control[Black][King] = GenerateMoves.King(pos->KingSq(Black));
 
+    e->pawnReach[White] = ForwardOf(e->control[White][Pawn], White);
+    e->pawnReach[Black] = ForwardOf(e->control[Black][Pawn], Black);
+
     // Tempo bonus
     e->Add(pos->GetSideToMove(), tempoMg, tempoEg);
 
@@ -180,6 +183,24 @@ void EvalKnight(const Position* pos, EvalData* e, Color color) {
         // Knight attacks on the enemy king zone
         if (GenerateMoves.Knight(square) & e->enemyKingZone[color])
             e->minorAttacks[color]++;
+
+        // Knight outpost
+        if (Paint(square) & Mask.outpost[color]) {
+
+            int mul = 0;
+
+            // hole of enemy pawn structure
+            if (Paint(square) & ~e->pawnReach[~color])
+                mul += 2;
+
+            // defended by a pawn
+            if (Paint(square) & e->control[color][Pawn]) // defended
+                mul += 1;
+
+            // add bonus
+            int tmp = Params.knightOutpost[color][square] * mul / 2;
+            e->Add(color, tmp, tmp);
+        }
     }
 }
 
@@ -376,7 +397,7 @@ void EvalPressure(Position* pos, EvalData *e, Color side) {
     Color oppo;
     Square sq;
     int pieceType, pressureMg, pressureEg;
-    Bitboard enemyPieces, ctrl, hang, behind;
+    Bitboard enemyPieces, enemyMinors, ctrl, hang, behind;
 
     pressureMg = 0;
     pressureEg = 0;

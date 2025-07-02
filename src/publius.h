@@ -1,7 +1,7 @@
 #pragma once
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3823 lines
+// 3849 lines
 
 #include <iostream>
 #include <algorithm>
@@ -27,6 +27,7 @@ private:
 public:
 	void Init();
 	int pawnSupport[2][64];
+	int knightOutpost[2][64];
 	int mgPst[2][6][64];
 	int egPst[2][6][64];
 };
