@@ -106,6 +106,7 @@ public:
 	Bitboard AllDiagMovers() const;
 	Bitboard MapPieceType(const int pieceType) const;
 	bool IsOnSq(const Color color, const int piece, const Square square) const;
+	Bitboard AttacksFrom(const Square sq) const;
 };
 
 // state
