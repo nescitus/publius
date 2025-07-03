@@ -15,6 +15,16 @@ void MoveList::SwapMoves(const int i, const int j) {
     values[j] = tmpVal;
 }
 
+bool MoveList::Contains(Move move) {
+
+    for (int i = 0; i < ind; i++) {
+        if (moves[i] == move)
+            return true;
+    }
+
+    return false;
+}
+
 void MoveList::AddMove(Square fromSquare, Square toSquare, int flag) {
 
     moves[ind] = CreateMove(fromSquare, toSquare, flag);

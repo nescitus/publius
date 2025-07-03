@@ -293,18 +293,19 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // Init moves and variables before entering main loop
     bestScore = -Infinity;
 
+
     // Calculate moves' scores to sort them. Normally
     // we are going to search the transposition table
     // move first; in root node we start searching
     // from the best move from the previous iteration.
     if (isRoot)
-        movePicker.Init(Pv.line[0][0]);
+        movePicker.InitAllMoves(Pv.line[0][0]);
     else
-        movePicker.Init(ttMove);
+        movePicker.InitAllMoves(ttMove);
 
     // Main loop
 
-    while ((move = movePicker.Next(pos, ply)) != 0) {
+    while ((move = movePicker.NextMove(pos, ply)) != 0) {
 
             moveType = GetMoveType(pos, move, ttMove, ply);
 

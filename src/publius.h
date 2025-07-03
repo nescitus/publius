@@ -136,6 +136,7 @@ public:
 	int GetInd();
 	Move GetMove();
 	void ScoreMoves(Position* pos, int ply, Move ttMove);
+	bool Contains(Move move);
 };
 
 // move generation
