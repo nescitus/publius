@@ -29,7 +29,7 @@ void MoveList::AddMove(Square fromSquare, Square toSquare, int flag) {
 
     moves[ind] = CreateMove(fromSquare, toSquare, flag);
     values[ind] = 0;
-	ind++;
+    ind++;
 }
 
 void MoveList::Clear() { 

@@ -20,41 +20,44 @@
 // the moves are served as {tt}, {m1, m2}."
 
 void MovePicker::InitAllMoves(Move ttMove) {
-	
-	ttMove = ttMove;
-	list.Clear();
+    
+    moveFromTT = ttMove;
+    list.Clear();
     stage = stageTT;
 }
 
 Move MovePicker::NextMove(Position* pos, int ply) {
-	Move move;
 
-	while (true) {
-		switch (stage) {
+    Move move;
 
-		case stageTT:
-			stage = stageGen;
-			if (IsPseudoLegal(pos, ttMove))
-				return ttMove;
-			break;
+    while (true) {
+        switch (stage) {
+        case stageTT:
+            stage = stageGen;
+            if (IsPseudoLegal(pos, moveFromTT))
+                return moveFromTT;
+            break;
 
-		case stageGen:
-			FillCompleteList(pos, &list);
-			list.ScoreMoves(pos, ply, ttMove);
-			listLength = list.GetInd();
-			cnt = 0;
-			stage = stageReturn;
-			break;
+        case stageGen:
+            FillCompleteList(pos, &list);
+            list.ScoreMoves(pos, ply, moveFromTT);
+            listLength = list.GetInd();
+            cnt = 0;
+            stage = stageReturn;
+            break;
 
-		case stageReturn:
-			while (cnt < listLength) {
-				move = list.GetMove();
-				cnt++;
-				if (move == ttMove)
-					continue;  // Avoid returning ttMove again
-				return move;
-			}
-			return 0;
-		}
-	}
+        case stageReturn:
+            while (cnt < listLength) {
+                move = list.GetMove();
+                cnt++;
+                if (move == moveFromTT)
+                    continue;  // Avoid returning moveFromTT again
+                return move;
+            }
+
+            return 0;
+        }
+    }
 }
+
+// Bench at depth 15 took 25437 milliseconds, searching 34483645 nodes at 1355649 nodes per second.
