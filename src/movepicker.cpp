@@ -1,4 +1,4 @@
-#include "types.h"
+﻿#include "types.h"
 #include "limits.h"
 #include "publius.h"
 #include "legality.h"
@@ -22,7 +22,7 @@
 void MovePicker::InitAllMoves(Move ttMove) {
     
     moveFromTT = ttMove;
-    list.Clear();
+    allCaptureList.Clear();
     stage = stageTT;
 }
 
@@ -32,32 +32,92 @@ Move MovePicker::NextMove(Position* pos, int ply) {
 
     while (true) {
         switch (stage) {
-        case stageTT:
-            stage = stageGen;
-            if (IsPseudoLegal(pos, moveFromTT))
-                return moveFromTT;
-            break;
-
-        case stageGen:
-            FillCompleteList(pos, &list);
-            list.ScoreMoves(pos, ply, moveFromTT);
-            listLength = list.GetInd();
-            cnt = 0;
-            stage = stageReturn;
-            break;
-
-        case stageReturn:
-            while (cnt < listLength) {
-                move = list.GetMove();
-                cnt++;
-                if (move == moveFromTT)
-                    continue;  // Avoid returning moveFromTT again
-                return move;
+            case stageTT:
+            {
+                stage = stageGenCapt;
+                if (IsPseudoLegal(pos, moveFromTT))
+                    return moveFromTT;
+                break;
             }
 
-            return 0;
+           case stageGenCapt:
+            {
+                FillNoisyList(pos, &allCaptureList);
+                allCaptLength = allCaptureList.GetInd();
+                allCaptCnt = 0;
+                goodCaptureList.Clear();
+                badCaptureList.Clear();
+
+                while (allCaptCnt < allCaptLength) {
+                    move = allCaptureList.GetMove();
+                    if (IsBadCapture(pos, move))
+                        badCaptureList.AddMove(move);
+                    else
+                        goodCaptureList.AddMove(move);
+                    allCaptCnt++;
+                }
+
+                goodCaptureList.ScoreMoves(pos, ply, moveFromTT);
+                goodCaptureLength = goodCaptureList.GetInd();
+                goodCaptureCnt = 0;
+                stage = stageReturnGoodCapt;
+                break;
+            }
+
+            case stageReturnGoodCapt:
+                {
+                    while (goodCaptureCnt < goodCaptureLength) {
+                        move = goodCaptureList.GetMove();
+                        goodCaptureCnt++;
+                        if (move == moveFromTT)
+                            continue;  // Avoid returning moveFromTT again
+                        return move;
+                    }
+                    stage = stageGenQuiet;
+                    break;
+                }
+
+            case stageGenQuiet:
+            {
+                quietList.Clear();
+                FillQuietList(pos, &quietList);
+                quietList.ScoreQuiet(pos, ply, moveFromTT);
+                quietLength = quietList.GetInd();
+                quietCnt = 0;
+                stage = stageReturnQuiet;
+                break;
+            }
+
+            case stageReturnQuiet:
+            {
+                while (quietCnt < quietLength) {
+                    move = quietList.GetMove();
+                    quietCnt++;
+                    if (move == moveFromTT)
+                        continue;  // Avoid returning moveFromTT again
+                    return move;
+                }
+
+                stage = stageReturnBad;
+                badCaptureList.ScoreMoves(pos, ply, moveFromTT);
+                badCaptureLength = badCaptureList.GetInd();
+                badCaptureCnt = 0;
+                break;
+            }
+
+            case stageReturnBad:
+            {
+                while (badCaptureCnt < badCaptureLength) {
+                    move = badCaptureList.GetMove();
+                    badCaptureCnt++;
+                    if (move == moveFromTT)
+                        continue;
+                    return move;
+                }
+                return 0;
+            }
         }
     }
 }
 
-// Bench at depth 15 took 25437 milliseconds, searching 34483645 nodes at 1355649 nodes per second.
+// Bench at depth 15 took 23250 milliseconds, searching 32951946 nodes at 1417288 nodes per second.

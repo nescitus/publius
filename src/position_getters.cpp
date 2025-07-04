@@ -46,6 +46,10 @@ Bitboard Position::Occupied() const {
     return Map(White) | Map(Black);
 }
 
+bool Position::IsOccupied(const Square sq) const { 
+    return pieceLocation[sq] != noPiece; 
+};
+
 Bitboard Position::Empty() const {
     return ~Occupied();
 }

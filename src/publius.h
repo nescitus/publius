@@ -1,7 +1,7 @@
 #pragma once
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 4023 lines
+// 4106 lines
 
 #include <iostream>
 #include <algorithm>
@@ -85,6 +85,7 @@ public:
     int CountMajors(const Color color) const;
     Bitboard Map(const Color color, const int piece) const;
     Bitboard Map(const Color color) const;
+    bool IsOccupied(const Square sq) const;
     Bitboard Occupied() const;
     Bitboard Empty() const;
     Bitboard MapDiagonalMovers(const Color color) const;
@@ -133,9 +134,11 @@ private:
 public:
     void Clear();
     void AddMove(Square fromSquare, Square toSquare, int flag);
+    void AddMove(Move move);
     int GetInd();
     Move GetMove();
     void ScoreMoves(Position* pos, int ply, Move ttMove);
+    void ScoreQuiet(Position* pos, int ply, Move ttMove);
     bool Contains(Move move);
 };
 

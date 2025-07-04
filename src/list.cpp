@@ -25,6 +25,13 @@ bool MoveList::Contains(Move move) {
     return false;
 }
 
+void MoveList::AddMove(Move move) {
+
+    moves[ind] = move;
+    values[ind] = 0;
+    ind++;
+}
+
 void MoveList::AddMove(Square fromSquare, Square toSquare, int flag) {
 
     moves[ind] = CreateMove(fromSquare, toSquare, flag);
@@ -137,5 +144,27 @@ void MoveList::ScoreMoves(Position* pos,
                 if (moveType == tPromB) values[i] = BishopPromValue;
             }
         }
+    }
+}
+
+void MoveList::ScoreQuiet(Position* pos,
+    const int ply,
+    const Move ttMove) {
+
+    for (int i = 0; i < ind; i++) {
+        // hash move
+        if (moves[i] == ttMove)
+            values[i] = IntLimit;
+        else {
+            // first killer move
+            if (moves[i] == History.GetKiller1(ply))
+                values[i] = Killer1Value;
+            // second killer move
+            else if (moves[i] == History.GetKiller2(ply))
+                values[i] = Killer2Value;
+            // normal move
+            else
+                values[i] = History.GetScore(pos, moves[i]);
+            }
     }
 }
