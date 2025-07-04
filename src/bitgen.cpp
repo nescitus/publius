@@ -149,11 +149,11 @@ void MoveGenerator::InitLineMasks(Square sq) {
 }
 
 Bitboard MoveGenerator::Pawn(const Color color, const Square sq) { 
-	return pawnAttacks[color][sq]; 
+    return pawnAttacks[color][sq]; 
 };
 
 Bitboard MoveGenerator::Knight(const Square sq) { 
-	return knightAttacks[sq]; 
+    return knightAttacks[sq]; 
 };
 
 Bitboard MoveGenerator::Bish(const Bitboard occ, const Square sq) {
@@ -169,7 +169,7 @@ Bitboard MoveGenerator::Queen(const Bitboard occ, const Square sq) {
 }
 
 Bitboard MoveGenerator::King(const Square sq) {
-	return kingAttacks[sq]; 
+    return kingAttacks[sq]; 
 };
 
 Bitboard MoveGenerator::FileAttacks(const Bitboard occ, const Square sq) {

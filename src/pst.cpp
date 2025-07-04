@@ -12,8 +12,8 @@ void Parameters::Init() {
 
 void Parameters::InitPst(void) {
 
-	for (Color color = White; color < colorNone; ++color) {
-		for (Square square = A1; square < sqNone; ++square) {
+    for (Color color = White; color < colorNone; ++color) {
+        for (Square square = A1; square < sqNone; ++square) {
 
             pawnSupport[color][RelativeSq(color, square)] = p_support[square];
             mgPst[color][Pawn][RelativeSq(color, square)] = mgPawnPst[square] + mgPieceValue[Pawn];
@@ -34,6 +34,6 @@ void Parameters::InitPst(void) {
 
             mgPst[color][King][RelativeSq(color, square)] = mgKingPst[square];
             egPst[color][King][RelativeSq(color, square)] = egKingPst[square];
-		}
-	}
+        }
+    }
 }

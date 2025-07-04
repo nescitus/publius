@@ -16,164 +16,164 @@
 
 void Position::Clear() {
 
-	for (Color color = White; color < colorNone; ++color) {
-		
+    for (Color color = White; color < colorNone; ++color) {
+        
         kingSq[color] = sqNone;
-	
+    
         for (int type = 0; type < 6; type++) {
-			pieceBitboard[color][type] = 0ULL;
-			pieceCount[color][type] = 0;
-		}
-	}
+            pieceBitboard[color][type] = 0ULL;
+            pieceCount[color][type] = 0;
+        }
+    }
 
     for (Square square = A1; square < 64; ++square) {
         pieceLocation[square] = noPiece;
     }
 
-	castleFlags = 0;
-	reversibleMoves = 0;
-	repetitionIndex = 0;
-	enPassantSq = sqNone;
-	sideToMove = White;
+    castleFlags = 0;
+    reversibleMoves = 0;
+    repetitionIndex = 0;
+    enPassantSq = sqNone;
+    sideToMove = White;
 }
 
 void Position::Set(const std::string& str) {
 
-	Clear();
-	
-	int length = str.length();
-	Square square = A1;
+    Clear();
+    
+    int length = str.length();
+    Square square = A1;
 
-	for (int i = 0; i < length; i++) {
-		char letter = str.at(i);
+    for (int i = 0; i < length; i++) {
+        char letter = str.at(i);
 
-		if (square < 64) {
-			switch (letter) {
-				case '/': break;
-				case '1': 
+        if (square < 64) {
+            switch (letter) {
+                case '/': break;
+                case '1': 
                     square = square + 1; 
                     break;
-				case '2': 
+                case '2': 
                     square = square + 2; 
                     break;
-				case '3': 
+                case '3': 
                     square = square + 3; 
                     break;
-				case '4': 
+                case '4': 
                     square = square + 4; 
                     break;
-				case '5': 
+                case '5': 
                     square = square + 5; 
                     break;
-				case '6': 
+                case '6': 
                     square = square + 6; 
                     break;
-				case '7': 
+                case '7': 
                     square = square + 7; 
                     break;
-				case '8': 
+                case '8': 
                     square = square + 8; 
                     break;
-				case 'p': 
+                case 'p': 
                     AddPieceNoHash(Black, Pawn, InvertSquare(square)); 
                     ++square; 
                     break;
-				case 'b': 
+                case 'b': 
                     AddPieceNoHash(Black, Bishop, InvertSquare(square)); 
                     ++square; 
                     break;
-				case 'n': 
+                case 'n': 
                     AddPieceNoHash(Black, Knight, InvertSquare(square)); 
                     ++square; 
                     break;
-				case 'r': 
+                case 'r': 
                     AddPieceNoHash(Black, Rook, InvertSquare(square)); 
                     ++square; 
                     break;
-				case 'q': 
+                case 'q': 
                     AddPieceNoHash(Black, Queen, InvertSquare(square)); 
                     ++square; 
                     break;
-				case 'k': 
+                case 'k': 
                     AddPieceNoHash(Black, King, InvertSquare(square)); 
                     kingSq[Black] = InvertSquare(square); 
                     ++square; 
                     break;
-				case 'P': 
+                case 'P': 
                     AddPieceNoHash(White, Pawn, InvertSquare(square)); 
                     ++square; 
                     break;
-				case 'B': 
+                case 'B': 
                     AddPieceNoHash(White, Bishop, InvertSquare(square)); 
                     ++square; 
                     break;
-				case 'N': 
+                case 'N': 
                     AddPieceNoHash(White, Knight, InvertSquare(square)); 
                     ++square; 
                     break;
-				case 'R': 
+                case 'R': 
                     AddPieceNoHash(White, Rook, InvertSquare(square)); 
                     ++square; 
                     break;
-				case 'Q': 
+                case 'Q': 
                     AddPieceNoHash(White, Queen, InvertSquare(square)); 
                     ++square; 
                     break;
-				case 'K': 
+                case 'K': 
                     AddPieceNoHash(White, King, InvertSquare(square)); 
                     kingSq[White] = InvertSquare(square); 
                     ++square; 
                     break;
-			}
-		} else { // all pieces are in place, now deal with the other data
+            }
+        } else { // all pieces are in place, now deal with the other data
 
-			switch (letter) {
-				case 'w':
-					sideToMove = White;
-					break;
-				case 'b':
-					if (str.at(i+1) == '3') enPassantSq = B3;
-					else if (str.at(i+1) == '6') enPassantSq = B6;
-					else sideToMove = Black;
-					break;
-				case 'k':
-					castleFlags |= bShortCastle;
-					break;
-				case 'K':
-					castleFlags |= wShortCastle;
-					break;
-				case 'q':
-					castleFlags |= bLongCastle;
-					break;
-				case 'Q':
-					castleFlags |= wLongCastle;
-					break;
-				case 'a':
-					str.at(i+1) == '3' ? enPassantSq = A3 : enPassantSq = A6;
-					break;
-				case 'c':
-					str.at(i+1) == '3' ? enPassantSq = C3 : enPassantSq = C6;
-					break;
-				case 'd':
-					str.at(i+1) == '3' ? enPassantSq = D3 : enPassantSq = D6;
-					break;
-				case 'e':
-					str.at(i+1) == '3' ? enPassantSq = E3 : enPassantSq = E6;
-					break;
-				case 'f':
-					str.at(i+1) == '3' ? enPassantSq = F3 : enPassantSq = F6;
-					break;
-				case 'g':
-					str.at(i+1) == '3' ? enPassantSq = G3 : enPassantSq = G6;
-					break;
-				case 'h':
-					str.at(i+1) == '3' ? enPassantSq = H3 : enPassantSq = H6;
-					break;
-			}
-		}
-	}
-	
-	boardHash = CalculateHashKey();
+            switch (letter) {
+                case 'w':
+                    sideToMove = White;
+                    break;
+                case 'b':
+                    if (str.at(i+1) == '3') enPassantSq = B3;
+                    else if (str.at(i+1) == '6') enPassantSq = B6;
+                    else sideToMove = Black;
+                    break;
+                case 'k':
+                    castleFlags |= bShortCastle;
+                    break;
+                case 'K':
+                    castleFlags |= wShortCastle;
+                    break;
+                case 'q':
+                    castleFlags |= bLongCastle;
+                    break;
+                case 'Q':
+                    castleFlags |= wLongCastle;
+                    break;
+                case 'a':
+                    str.at(i+1) == '3' ? enPassantSq = A3 : enPassantSq = A6;
+                    break;
+                case 'c':
+                    str.at(i+1) == '3' ? enPassantSq = C3 : enPassantSq = C6;
+                    break;
+                case 'd':
+                    str.at(i+1) == '3' ? enPassantSq = D3 : enPassantSq = D6;
+                    break;
+                case 'e':
+                    str.at(i+1) == '3' ? enPassantSq = E3 : enPassantSq = E6;
+                    break;
+                case 'f':
+                    str.at(i+1) == '3' ? enPassantSq = F3 : enPassantSq = F6;
+                    break;
+                case 'g':
+                    str.at(i+1) == '3' ? enPassantSq = G3 : enPassantSq = G6;
+                    break;
+                case 'h':
+                    str.at(i+1) == '3' ? enPassantSq = H3 : enPassantSq = H6;
+                    break;
+            }
+        }
+    }
+    
+    boardHash = CalculateHashKey();
     pawnHash = CalculatePawnKey();
 }
 

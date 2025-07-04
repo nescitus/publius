@@ -81,24 +81,24 @@ void MoveList::ScoreMoves(Position* pos,
                           const int ply, 
                           const Move ttMove) {
 
-	Square fromSquare, toSquare;
-	int moveType, hunter, prey;
+    Square fromSquare, toSquare;
+    int moveType, hunter, prey;
 
-	for (int i = 0; i < ind; i++) {
+    for (int i = 0; i < ind; i++) {
         // hash move
-		if (moves[i] == ttMove) 
-			values[i] = IntLimit;
-		else {
-			values[i] = 0; // default, shouldn't be used
+        if (moves[i] == ttMove) 
+            values[i] = IntLimit;
+        else {
+            values[i] = 0; // default, shouldn't be used
 
-			moveType = GetTypeOfMove(moves[i]);
+            moveType = GetTypeOfMove(moves[i]);
 
-			if (moveType == tNormal || moveType == tPawnjump || moveType == tCastle) {
+            if (moveType == tNormal || moveType == tPawnjump || moveType == tCastle) {
 
-				fromSquare = GetFromSquare(moves[i]);
-				toSquare = GetToSquare(moves[i]);
-				hunter = pos->PieceTypeOnSq(fromSquare);
-				prey = pos->PieceTypeOnSq(toSquare);
+                fromSquare = GetFromSquare(moves[i]);
+                toSquare = GetToSquare(moves[i]);
+                hunter = pos->PieceTypeOnSq(fromSquare);
+                prey = pos->PieceTypeOnSq(toSquare);
 
                 // capture
                 if (prey != noPieceType) {
@@ -123,19 +123,19 @@ void MoveList::ScoreMoves(Position* pos,
                     else
                         values[i] = History.GetScore(pos, moves[i]);
                 }
-			}
+            }
 
             // en passant capture
-			if (moveType == tEnPassant) 
+            if (moveType == tEnPassant) 
                 values[i] = HighValue + 106;
 
             // promotions
-			if (IsMovePromotion(moves[i])) {
-				if (moveType == tPromQ) values[i] = QueenPromValue;
-				if (moveType == tPromN) values[i] = KnightPromValue;
-				if (moveType == tPromR) values[i] = RookPromValue;
-				if (moveType == tPromB) values[i] = BishopPromValue;
-			}
-		}
-	}
+            if (IsMovePromotion(moves[i])) {
+                if (moveType == tPromQ) values[i] = QueenPromValue;
+                if (moveType == tPromN) values[i] = KnightPromValue;
+                if (moveType == tPromR) values[i] = RookPromValue;
+                if (moveType == tPromB) values[i] = BishopPromValue;
+            }
+        }
+    }
 }

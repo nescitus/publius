@@ -23,8 +23,8 @@ void EvalData::Clear() {
 }
 
 void EvalData::Add(Color color, int mgVal, int egVal) {
-	mg[color] += mgVal;
-	eg[color] += egVal;
+    mg[color] += mgVal;
+    eg[color] += egVal;
 }
 
 void EvalData::AddPawn(Color color, int mgVal, int egVal) {

@@ -35,7 +35,7 @@ void Iterate(Position* pos) {
 
         PrintRootInfo(elapsed, nps);
 
-	    curVal = Widen(pos, rootDepth, curVal);
+        curVal = Widen(pos, rootDepth, curVal);
 
         if (State.isStopping || Timer.ShouldFinishIteration()) {
             break;

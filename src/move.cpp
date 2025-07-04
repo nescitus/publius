@@ -18,7 +18,7 @@ Square GetToSquare(const Move move) {
 }
 
 int GetPromotedPiece(const Move move) {
-	return (move >> 12) - 3;
+    return (move >> 12) - 3;
 }
 
 Move CreateMove(const Square fromSquare, 
@@ -28,7 +28,7 @@ Move CreateMove(const Square fromSquare,
 }
 
 bool IsMovePromotion(const Move move) {
-	return move & 0x4000;
+    return move & 0x4000;
 }
 
 // does this move change material balance?

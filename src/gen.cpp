@@ -73,30 +73,30 @@ void FillNoisyList(Position* pos, MoveList* list) {
         SerializePromotions(list, moves, -7);
 
         // White pawn promotions with capture (NE)
-	    moves = NEOf(pieces) & prey;
+        moves = NEOf(pieces) & prey;
         SerializePromotions(list, moves, -9);
 
         // White pawn promotions without capture
-	    moves = NorthOf(pieces) & pos->Empty();
+        moves = NorthOf(pieces) & pos->Empty();
         SerializePromotions(list, moves, -8);
 
-	    // Map white pawns that cannot promote
-	    pieces = pos->Map(White, Pawn) & ~Mask.rank[rank7];
+        // Map white pawns that cannot promote
+        pieces = pos->Map(White, Pawn) & ~Mask.rank[rank7];
 
         // White pawn captures (NW)
-	    moves = NWOf(pieces) & prey;
+        moves = NWOf(pieces) & prey;
         SerializePawnMoves(list, moves, -7, tNormal);
 
         // White pawn captures (NE)
-	    moves = NEOf(pieces) & prey;
+        moves = NEOf(pieces) & prey;
         SerializePawnMoves(list, moves, -9, tNormal);
 
         // White en passant capture
         if ((toSquare = pos->EnPassantSq() ) != sqNone) {
             if (NWOf(pieces) & Paint(toSquare))
-		    list->AddMove(toSquare - 7, toSquare, tEnPassant);
+            list->AddMove(toSquare - 7, toSquare, tEnPassant);
             if (NEOf(pieces) & Paint(toSquare))
-		    list->AddMove(toSquare - 9, toSquare, tEnPassant);
+            list->AddMove(toSquare - 9, toSquare, tEnPassant);
         }
     } else {
 
@@ -106,31 +106,31 @@ void FillNoisyList(Position* pos, MoveList* list) {
         moves = SWOf(pieces) & prey;
         SerializePromotions(list, moves, 9);
 
-	    // Black pawn promotions with capture (SE)
-	    moves = SEOf(pieces) & prey;
+        // Black pawn promotions with capture (SE)
+        moves = SEOf(pieces) & prey;
         SerializePromotions(list, moves, 7);
 
         // Black pawn promotions
-	    moves = SouthOf(pieces) & pos->Empty();
+        moves = SouthOf(pieces) & pos->Empty();
         SerializePromotions(list, moves, 8);
 
         // Map black pawns that cannot promote
-	    pieces = pos->Map(Black, Pawn) & ~Mask.rank[rank2];
+        pieces = pos->Map(Black, Pawn) & ~Mask.rank[rank2];
 
         // Black pawn captures, excluding promotions (SW)
-	    moves = SWOf(pieces) & prey;
+        moves = SWOf(pieces) & prey;
         SerializePawnMoves(list, moves, 9, tNormal);
 
         // Black pawn captures, excluding promotions (SE)
-	    moves = SEOf(pieces) & prey;
+        moves = SEOf(pieces) & prey;
         SerializePawnMoves(list, moves, 7, tNormal);
 
         // Black en passant capture
         if ((toSquare = pos->EnPassantSq() ) != sqNone) {
             if (SWOf(pieces) & Paint(toSquare))
-		        list->AddMove(toSquare + 9, toSquare, tEnPassant);
+                list->AddMove(toSquare + 9, toSquare, tEnPassant);
             if (SEOf(pieces) & Paint(toSquare))
-		        list->AddMove(toSquare + 7, toSquare, tEnPassant);
+                list->AddMove(toSquare + 7, toSquare, tEnPassant);
         }
     }
 

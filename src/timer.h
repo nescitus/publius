@@ -1,7 +1,7 @@
 #pragma once
 
 enum eTimeData { wTime, bTime, wIncrement, bIncrement, engTime, engInc, movesToGo, moveTime, 
-	             maxDepth, maxNodes, isInfinite, timerDataSize };
+                 maxDepth, maxNodes, isInfinite, timerDataSize };
 
 struct UCItimer {
 private:
@@ -16,7 +16,7 @@ public:
     void Clear(void);
     void SetStartTime();
     void SetMoveTiming(void);
-	int Now(void);
+    int Now(void);
     int Elapsed(void);
     int IsInfiniteMode(void);
     bool ShouldFinishIteration(void);

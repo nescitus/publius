@@ -14,24 +14,24 @@
 void TransTable::Allocate(int mbsize) {
 
     // Cap the size to a maximum of 1024 MB
-	mbsize = std::min(mbsize, 1024);
+    mbsize = std::min(mbsize, 1024);
 
     // Find the largest power of two less than or equal to mbsize
-	for (tableSize = 2; tableSize <= mbsize; tableSize *= 2)
-		;
+    for (tableSize = 2; tableSize <= mbsize; tableSize *= 2)
+        ;
 
     // Calculate the number of hash records that can fit 
     // in the allocated memory
-	tableSize = ((tableSize/2) * 1024 * 1024) / sizeof(hashRecord);
+    tableSize = ((tableSize/2) * 1024 * 1024) / sizeof(hashRecord);
 
     // Free any previously allocated memory
-	free(table);
+    free(table);
 
     // Allocate memory for the transposition table
-	table = (hashRecord*) malloc(tableSize * sizeof(hashRecord));
+    table = (hashRecord*) malloc(tableSize * sizeof(hashRecord));
 
     // Init empty transposition table
-	Clear();
+    Clear();
 }
 
 void TransTable::Exit(void) {
@@ -44,7 +44,7 @@ void TransTable::Clear(void) {
 
 bool TransTable::Retrieve(Bitboard key, Move* move, int* score, int* flag, int alpha, int beta, int depth, int ply) {
 
-	hashRecord *slot;
+    hashRecord *slot;
 
     // Find slot
     slot = FindSlot(key);
@@ -54,26 +54,26 @@ bool TransTable::Retrieve(Bitboard key, Move* move, int* score, int* flag, int a
 
         // We don't know yet if score can be reused,
         // but move can come handy for sorting purposes
-		*move = slot->move;
-		*flag = slot->flags;
+        *move = slot->move;
+        *flag = slot->flags;
 
-		if (slot->depth >= depth) {
+        if (slot->depth >= depth) {
 
             // Return score, adjusting it for checkmate
-			*score = ScoreFromTT(slot->score, ply);
+            *score = ScoreFromTT(slot->score, ply);
 
             // Score from the transposition table can be used in search
-			if ((slot->flags & lowerBound && *score <= alpha) ||
-			    (slot->flags & upperBound && *score >= beta))
-				return true;
-		}
-	}
-	return false;
+            if ((slot->flags & lowerBound && *score <= alpha) ||
+                (slot->flags & upperBound && *score >= beta))
+                return true;
+        }
+    }
+    return false;
 }
 
 void TransTable::Store(Bitboard key, Move move, int score, int flags, int depth, int ply) {
 
-	hashRecord *slot;
+    hashRecord *slot;
 
     // Adjust checkmate score for root distance
     score = ScoreToTT(score, ply);
