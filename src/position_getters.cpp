@@ -177,3 +177,22 @@ Bitboard Position::AttacksTo(const Square sq) const {
         ((AllStraightMovers()) & GenerateMoves.Rook(Occupied(), sq)) |
         (MapPieceType(King) & GenerateMoves.King(sq));
 }
+
+Bitboard Position::AttacksFrom(const Square sq) const {
+
+    switch (PieceTypeOnSq(sq)) {
+    case Pawn:
+        return GenerateMoves.Pawn(ColorOfPiece(pieceLocation[sq]), sq);
+    case Knight:
+        return GenerateMoves.Knight(sq);
+    case Bishop:
+        return GenerateMoves.Bish(Occupied(), sq);
+    case Rook:
+        return GenerateMoves.Rook(Occupied(), sq);
+    case Queen:
+        return GenerateMoves.Queen(Occupied(), sq);
+    case King:
+        return GenerateMoves.King(sq);
+    }
+    return 0;
+}

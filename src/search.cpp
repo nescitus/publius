@@ -10,6 +10,7 @@
 #include "evaldata.h"
 #include "eval.h"
 #include "uci.h"
+#include "movepicker.h"
 #include "search.h"
 
 const int singularDepth = 7;
@@ -30,8 +31,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     Move move, ttMove, bestMove, singularMove; 
     int movesTried, quietMovesTried;
     EvalData e;
-    MoveList list;
     UndoData undo;
+    MovePicker movePicker;
     Move listOfTriedMoves[256];
     bool singularExtension;
 
@@ -291,24 +292,21 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
     // Init moves and variables before entering main loop
     bestScore = -Infinity;
-    list.Clear();
-    FillCompleteList(pos, &list);
-    moveListLength = list.GetInd();
+
 
     // Calculate moves' scores to sort them. Normally
     // we are going to search the transposition table
     // move first; in root node we start searching
     // from the best move from the previous iteration.
-    if (isRoot) 
-        list.ScoreMoves(pos, ply, Pv.line[0][0]);
-    else      
-        list.ScoreMoves(pos, ply, ttMove);
+    if (isRoot)
+        movePicker.InitAllMoves(Pv.line[0][0]);
+    else
+        movePicker.InitAllMoves(ttMove);
 
     // Main loop
-    if (moveListLength) {
-        for (int i = 0; i < moveListLength; i++) {
 
-            move = list.GetMove();
+    while ((move = movePicker.NextMove(pos, ply)) != 0) {
+
             moveType = GetMoveType(pos, move, ttMove, ply);
 
             // In singular search we omit the best move
@@ -539,7 +537,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                         Pv.Display(score);
                 }
             }
-        }
+        
     } // end of the main loop
 
     // Return correct checkmate/stalemate score
