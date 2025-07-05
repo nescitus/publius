@@ -1,12 +1,37 @@
 #pragma once
 
-enum {stageTT, stageGenCapt, stageReturnGoodCapt, stageGenQuiet, stageReturnQuiet, stageReturnBad};
+// MovePicker class is a framework for staged
+// move generation. The idea is to delay generating
+// all the moves as much as possible.
+
+// Please note that even something as simple 
+// as separating a stage that returns a move
+// from the transposition table changes node counts.
+// Colin Jenkins, author of Lozza, explained it
+// as follows: "consider a position with 3 moves 
+// (m1,2), (m2,2), (tt,100). in a non-staged context 
+// the moves are served as {tt, m2, m1} because m1 
+// is swapped with tt (assuming > condition). 
+// in a staged move context tt is not there and 
+// the moves are served as {tt}, {m1, m2}."
+
+// Staged move generator goes through the following
+// stages, from top to bottom:
+
+enum {stageTT,             // return move from transposition table 
+      stageGenCapt,        // generate noisy moves, split them to good and bad
+      stagePrepareGood,    // score good noisies
+      stageReturnGoodCapt, // return good noisies
+      stageGenQuiet,       // generate and score quiet moves
+      stageReturnQuiet,    // return quiet moves
+      stagePrepareBad,     // score bad noisies
+      stageReturnBad};     // return bad noisies
 
 class MovePicker {
 private:
-    int allCaptLength, goodCaptureLength, badCaptureLength, quietLength;
-    int allCaptCnt, goodCaptureCnt, badCaptureCnt, quietCnt;
-    MoveList allCaptureList, goodCaptureList, badCaptureList, quietList;
+    int goodNoisyLength, badNoisyLength, quietLength;
+    int goodNoisyCnt, badNoisyCnt, quietCnt;
+    MoveList allNoisyList, goodNoisyList, badNoisyList, quietList;
 public:
     Move moveFromTT;
     int stage;

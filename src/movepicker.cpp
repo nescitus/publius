@@ -4,25 +4,9 @@
 #include "legality.h"
 #include "movepicker.h"
 
-// MovePicker class is a framework for staged
-// move generation. The idea is to delay generating
-// all the moves as much as possible.
-
-// Please note that even something as simple 
-// as separating a stage that returns a move
-// from the transposition table changes node counts.
-// Colin Jenkins, author of Lozza, explained it
-// as follows: "consider a position with 3 moves 
-// (m1,2), (m2,2), (tt,100). in a non-staged context 
-// the moves are served as {tt, m2, m1} because m1 
-// is swapped with tt (assuming > condition). 
-// in a staged move context tt is not there and 
-// the moves are served as {tt}, {m1, m2}."
-
 void MovePicker::InitAllMoves(Move ttMove) {
     
     moveFromTT = ttMove;
-    allCaptureList.Clear();
     stage = stageTT;
 }
 
@@ -42,33 +26,41 @@ Move MovePicker::NextMove(Position* pos, int ply) {
 
            case stageGenCapt:
             {
-                FillNoisyList(pos, &allCaptureList);
-                allCaptLength = allCaptureList.GetInd();
-                allCaptCnt = 0;
-                goodCaptureList.Clear();
-                badCaptureList.Clear();
+                allNoisyList.Clear();
+                FillNoisyList(pos, &allNoisyList);
+                goodNoisyList.Clear();
+                badNoisyList.Clear();
 
-                while (allCaptCnt < allCaptLength) {
-                    move = allCaptureList.GetMove();
+                // split noisy moves into "good"
+                // (good or equal captures) and "bad"
+                // (presumably losing material)
+                while (true) {
+                    move = allNoisyList.GetNextRawMove();
+                    if (move == 0) 
+                        break;
                     if (IsBadCapture(pos, move))
-                        badCaptureList.AddMove(move);
+                        badNoisyList.AddMove(move);
                     else
-                        goodCaptureList.AddMove(move);
-                    allCaptCnt++;
+                        goodNoisyList.AddMove(move);
                 }
+                stage = stagePrepareGood;
+                break;
+            }
 
-                goodCaptureList.ScoreMoves(pos, ply, moveFromTT);
-                goodCaptureLength = goodCaptureList.GetInd();
-                goodCaptureCnt = 0;
+            case stagePrepareGood:
+            {
+                goodNoisyList.ScoreNoisy(pos, ply, moveFromTT);
+                goodNoisyLength = goodNoisyList.GetInd();
+                goodNoisyCnt = 0;
                 stage = stageReturnGoodCapt;
                 break;
             }
 
             case stageReturnGoodCapt:
                 {
-                    while (goodCaptureCnt < goodCaptureLength) {
-                        move = goodCaptureList.GetMove();
-                        goodCaptureCnt++;
+                    while (goodNoisyCnt < goodNoisyLength) {
+                        move = goodNoisyList.GetMove();
+                        goodNoisyCnt++;
                         if (move == moveFromTT)
                             continue;  // Avoid returning moveFromTT again
                         return move;
@@ -98,18 +90,24 @@ Move MovePicker::NextMove(Position* pos, int ply) {
                     return move;
                 }
 
+                stage = stagePrepareBad;
+                break;
+            }
+
+            case stagePrepareBad:
+            {
                 stage = stageReturnBad;
-                badCaptureList.ScoreMoves(pos, ply, moveFromTT);
-                badCaptureLength = badCaptureList.GetInd();
-                badCaptureCnt = 0;
+                badNoisyList.ScoreNoisy(pos, ply, moveFromTT);
+                badNoisyLength = badNoisyList.GetInd();
+                badNoisyCnt = 0;
                 break;
             }
 
             case stageReturnBad:
             {
-                while (badCaptureCnt < badCaptureLength) {
-                    move = badCaptureList.GetMove();
-                    badCaptureCnt++;
+                while (badNoisyCnt < badNoisyLength) {
+                    move = badNoisyList.GetMove();
+                    badNoisyCnt++;
                     if (move == moveFromTT)
                         continue;
                     return move;
@@ -120,4 +118,4 @@ Move MovePicker::NextMove(Position* pos, int ply) {
     }
 }
 
-// Bench at depth 15 took 23250 milliseconds, searching 32951946 nodes at 1417288 nodes per second.
+// Bench at depth 15 took 25828 milliseconds, searching 36730234 nodes at 1422109 nodes per second.

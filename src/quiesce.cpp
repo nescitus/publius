@@ -90,7 +90,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
 
     // Score moves to sort them well
     int length = list.GetInd();
-    list.ScoreMoves(pos, ply, ttMove);
+    list.ScoreAllMoves(pos, ply, ttMove);
 
     // Main loop
     if (length) {

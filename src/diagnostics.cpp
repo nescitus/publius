@@ -100,7 +100,7 @@ Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
 
     list.Clear();
     FillCompleteList(pos, &list);
-    list.ScoreMoves(pos, ply, 0);
+    list.ScoreAllMoves(pos, ply, 0);
     int moveListLength = list.GetInd();
 
     if (moveListLength) {
