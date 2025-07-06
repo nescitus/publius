@@ -68,7 +68,9 @@ void PvCollector::Display(int score) {
         << " score "
         << scoreType << " " << score << " pv";
 
-    for (int j = 0; j < size[0]; ++j) {
+    int lineLength = std::min(size[0], 2);
+
+    for (int j = 0; j < lineLength; ++j) {
         std::cout << " " << MoveToString(line[0][j]);
     }
     std::cout << std::endl;

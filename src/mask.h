@@ -7,6 +7,7 @@ private:
     void InitRanks();
     void InitPassedMask();
     void InitAdjacentMask();
+    void InitSupportMask();
     void InitStrongPawn();
 public:
     Bitboard rank[8];
@@ -14,6 +15,7 @@ public:
     Bitboard rr[2][8]; // relative rank
     Bitboard passed[2][64];
     Bitboard strongPawn[2][64];
+    Bitboard support[2][64];
     Bitboard adjacentFiles[8];
     Bitboard outpost[2];
     MaskData(); // constructor

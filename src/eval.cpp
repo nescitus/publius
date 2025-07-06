@@ -431,6 +431,11 @@ void EvalPressure(Position* pos, EvalData *e, Color side) {
     e->Add(side, pressureMg, pressureEg);
 }
 
+int GetTropism(Square sq1, Square sq2) {
+    return 7 - (std::abs(RankOf(sq1) - RankOf(sq2))
+        + std::abs(FileOf(sq1) - FileOf(sq2)));
+}
+
 // Operations repeated while evaluating any piece:
 // adding material value, piece/square tables score
 // and calculating the game phase.

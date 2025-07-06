@@ -11,6 +11,7 @@ MaskData::MaskData() {
     InitPassedMask();
     InitAdjacentMask();
     InitStrongPawn();
+    InitSupportMask();
 }
 
 void MaskData::InitRanks() {
@@ -62,6 +63,17 @@ void MaskData::InitAdjacentMask() {
 
     for (int f = 0; f < 8; f++)
         adjacentFiles[f] = WestOf(file[f]) | EastOf(file[f]);
+}
+
+void MaskData::InitSupportMask() {
+
+    for (Square sq = A1; sq < 64; ++sq) {
+        support[White][sq] = SidesOf(Paint(sq));
+        support[White][sq] |= FillSouth(support[White][sq]);
+
+        support[Black][sq] = SidesOf(Paint(sq));
+        support[Black][sq] |= FillNorth(support[Black][sq]);
+    }
 }
 
 void MaskData::InitStrongPawn() {
