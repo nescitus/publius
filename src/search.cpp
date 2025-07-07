@@ -180,7 +180,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     oldEval[ply] = eval;
 
     // We check whether the eval has improved from 
-    // two ples ago. As of now, it affects late move 
+    // two plies ago. As of now, it affects late move 
     // pruning only, but some more uses will be tested.
     const bool improving = SetImproving(eval, ply);
 
@@ -211,18 +211,13 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         }
 
         // RAZORING - we drop directly to the quiescence
-        // search if eval score is really bad.
-        // CURRENT IMPLEMENTATION FAILS,~ -20 Elo
-        // 
-        // if (!ttMove && depth <= 3) {
-        //    int threshold = beta - 300 + 60 * depth;
-        //    if (eval < threshold) {
-        //        score = Quiesce(pos, ply, alpha, beta, 0);
-        //        if (score < threshold) {
-        //            return score;
-        //        }
-        //    }
-        //}
+        // search if static eval is really bad. (~15 Elo)
+
+        if (depth <= 3 && eval + 200 * depth < beta) {
+        score = Quiesce(pos, ply, 0, alpha, beta);
+        if (score < beta)
+            return score;
+        }
 
         // NULL MOVE PRUNING means allowing the opponent
         // to execute two moves in a row, for eample 

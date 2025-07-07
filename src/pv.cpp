@@ -62,13 +62,13 @@ void PvCollector::Display(int score) {
 
     // print statistics
     std::cout << "info depth " << rootDepth
-        << " time " << elapsed
-        << " nodes " << nodeCount
-        << " nps " << nps
-        << " score "
-        << scoreType << " " << score << " pv";
+              << " time " << elapsed
+              << " nodes " << nodeCount
+              << " nps " << nps
+              << " score "
+              << scoreType << " " << score << " pv";
 
-    int lineLength = std::min(size[0], 2);
+    int lineLength = size[0]; // std::min(size[0], 1);
 
     for (int j = 0; j < lineLength; ++j) {
         std::cout << " " << MoveToString(line[0][j]);
