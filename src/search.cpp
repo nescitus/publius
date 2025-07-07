@@ -58,17 +58,14 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // an exact score.
     const bool isPv = (beta > alpha + 1);
 
-    // QUIESCENCE SEARCH entry point. Ideally
-    // we want to evaluate a quiet position
-    // (i.e. a position where there are no
-    // favourable captures, so that we may
-    // consider its evaluation stable). That's
-    // why at leaf nodes we initiate 
-    // a capture-only search instead of
-    // returning the evaluation score here. 
-    if (depth <= 0) {
+    // QUIESCENCE SEARCH entry point. Ideally we want
+    // to evaluate a quiet position (i.e. a position 
+    // where there are no favourable captures, so that 
+    // we may consider its evaluation stable). That's
+    // why at leaf nodes we initiate a capture-only 
+    // search instead of returning the evaluation score. 
+    if (depth <= 0)
         return Quiesce(pos, ply, 0, alpha, beta);
-    }
 
     // Some bookkeeping
     nodeCount++;
@@ -79,9 +76,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     TryInterrupting();
 
     // Exit to unwind search if it has timed out
-    if (State.isStopping) {
+    if (State.isStopping)
         return 0;
-    }
 
     // Quick exit on on a statically detected draw, 
     // unless we are at root, where we need to have
@@ -149,12 +145,12 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         
          if (TT.Retrieve(pos->boardHash, &singularMove, &singularScore, &hashFlag, alpha, beta, depth - 4, ply)) {
 
-            if ((hashFlag & lowerBound) &&  // we have found lower bound hash entry 
-                 singularScore < EvalLimit) // and it is not a checkmate score
-            {
-                singularExtension = true;   // we can try the singular extension
-            }
-        }
+             if ((hashFlag & lowerBound) &&  // we have found lower bound hash entry 
+                 singularScore < EvalLimit)  // and it is not a checkmate score
+             {
+                 singularExtension = true;   // we can try the singular extension
+             }
+         }
     }
 
     // Are we in check? Knowing that is useful 
@@ -189,7 +185,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // are speculative, but statistically they work.
     //
     // We skip node level pruning after a null move,
-    // in check, in pv-nodes and in the late endgame.
+    // in check, in pv-nodes, in the late endgame
+    // and in singular search.
     if (!wasNullMove &&
        !isInCheckBeforeMoving &&
        !isPv &&
@@ -215,7 +212,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
         if (depth <= 3 && eval + 200 * depth < beta) {
         score = Quiesce(pos, ply, 0, alpha, beta);
-        if (score < beta)
+        if (score < beta) // no fail high!
             return score;
         }
 
@@ -287,7 +284,6 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
     // Init moves and variables before entering main loop
     bestScore = -Infinity;
-
 
     // Calculate moves' scores to sort them. Normally
     // we are going to search the transposition table

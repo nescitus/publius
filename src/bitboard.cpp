@@ -111,17 +111,17 @@ Bitboard SidesOf(const Bitboard b) {
 }
 
 // color-dependent forward shift
-Bitboard ForwardOf(const Bitboard b, const Color c) {
+Bitboard ForwardOf(const Bitboard b, const Color color) {
 
-    if (c == White) return NorthOf(b);
-    else return SouthOf(b);
+    if (color == White) return NorthOf(b);
+    else                return SouthOf(b);
 }
 
 // color-dependent forward fill
-Bitboard FrontSpan(const Bitboard b, const Color c)
-{
-    if (c == White) return FillNorth(NorthOf(b));
-    else            return FillSouth(SouthOf(b));
+Bitboard FrontSpan(const Bitboard b, const Color color) {
+
+    if (color == White) return FillNorth(NorthOf(b));
+    else                return FillSouth(SouthOf(b));
 }
 
 // Basic fill function (north and south only,
@@ -143,9 +143,13 @@ Bitboard FillSouth(Bitboard b) {
 
 // Occluded fill algorithms are taken from
 // https://www.chessprogramming.org/Kogge-Stone_Algorithm#Occluded_Fill
-// they do multiple shifts, shifting both
-// the bitboard and the "shadow" cast
-// by the blocking pieces.
+// they do multiple shifts, shifting both the bitboard
+// the bitboard and the "shadow" cast by the blocking 
+// pieces. You would be able to generate rook moves
+// by combining orthogonal fill functions and bishop
+// moves by combining diagonal fill functions, but
+// bitgen.cpp implements faster solution - namely 
+// kindergarten bitboards.
 
 Bitboard FillOcclSouth(Bitboard b, Bitboard o) {
 

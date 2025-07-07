@@ -37,9 +37,9 @@ void Iterate(Position* pos) {
 
         curVal = Widen(pos, rootDepth, curVal);
 
-        if (State.isStopping || Timer.ShouldFinishIteration()) {
+        // stop searching
+        if (State.isStopping || Timer.ShouldFinishIteration())
             break;
-        }
 
         val = curVal;
 

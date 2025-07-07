@@ -1,7 +1,7 @@
 #pragma once
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 4152 lines
+// 4132 lines
 
 #include <iostream>
 #include <algorithm>
@@ -22,8 +22,6 @@ typedef struct {
 } UndoData;
 
 class Parameters {
-private:
-    void InitPst();
 public:
     void Init();
     int pawnSupport[2][64];

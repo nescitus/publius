@@ -21,8 +21,8 @@ Bitboard SEOf(const Bitboard b);
 Bitboard SWOf(const Bitboard b);
 
 Bitboard SidesOf(const Bitboard b);
-Bitboard ForwardOf(const Bitboard b, const Color c);
-Bitboard FrontSpan(const Bitboard b, const Color c);
+Bitboard ForwardOf(const Bitboard b, const Color color);
+Bitboard FrontSpan(const Bitboard b, const Color color);
 
 Bitboard FillNorth(Bitboard b);
 Bitboard FillSouth(Bitboard b);

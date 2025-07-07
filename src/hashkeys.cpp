@@ -8,18 +8,19 @@ std::uniform_int_distribution<Bitboard> dist(std::llround(std::pow(2, 56)), std:
 
 HashKeys::HashKeys() {
 
+    // init piece.square keys
     for (int piece = 0; piece < 12; piece++)
         for (Square square = A1; square < sqNone; ++square) {
             pieceKey[piece][square] = Random64();
         }
 
-    for (int i = 0; i < 16; i++) {
+    // init castle keys
+    for (int i = 0; i < 16; i++)
         castleKey[i] = Random64();
-    }
 
-    for (int i = 0; i < 8; i++) {
+    // init en passant keys
+    for (int i = 0; i < 8; i++)
         enPassantKey[i] = Random64();
-    }
 }
 
 Bitboard HashKeys::Random64(void) {

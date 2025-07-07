@@ -45,9 +45,8 @@ std::string MoveToString(const Move move) {
     std::string move_str = SquareName(GetFromSquare(move))
                          + SquareName(GetToSquare(move));
 
-    if (IsMovePromotion(move)) {
+    if (IsMovePromotion(move))
         move_str += prom_char[(move >> 12) & 3];
-    }
 
     return move_str;
 }

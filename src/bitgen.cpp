@@ -221,19 +221,3 @@ Bitboard MoveGenerator::AntiDiagAttacks(const Bitboard occ, const Square sq) {
     const int occupancyIndex = (maskedOccupancy * bbFileB) >> 58;
     return (rankAttacks[FileOf(sq)][occupancyIndex] & antiDiagMask[sq]);
 }
-
-// Legacy function, showing slower, but more readable algorithm
-Bitboard MoveGenerator::BishSlow(const Bitboard occ, const Square sq) {
-
-    Bitboard b = Paint(sq);
-    return NEOf(FillOcclNE(b, ~occ)) | NWOf(FillOcclNW(b, ~occ)) |
-           SEOf(FillOcclSE(b, ~occ)) | SWOf(FillOcclSW(b, ~occ));
-}
-
-// Legacy function, showing slower, but more readable algorithm
-Bitboard MoveGenerator::RookSlow(const Bitboard occ, const Square sq) {
-
-    Bitboard b = Paint(sq);
-    return NorthOf(FillOcclNorth(b, ~occ)) | SouthOf(FillOcclSouth(b, ~occ)) |
-           EastOf(FillOcclEast(b, ~occ)) | WestOf(FillOcclWest(b, ~occ));
-}

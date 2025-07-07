@@ -24,7 +24,7 @@ Move MovePicker::NextMove(Position* pos, int ply) {
                 break;
             }
 
-           case stageGenCapt:
+            case stageGenCapt:
             {
                 allNoisyList.Clear();
                 FillNoisyList(pos, &allNoisyList);
@@ -117,5 +117,3 @@ Move MovePicker::NextMove(Position* pos, int ply) {
         }
     }
 }
-
-// Bench at depth 15 took 25828 milliseconds, searching 36730234 nodes at 1422109 nodes per second.

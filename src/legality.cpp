@@ -27,39 +27,34 @@ bool IsPseudoLegal(Position* pos, int move) {
 
     // castling
     if (GetTypeOfMove(move) == tCastle) {
-        if (side == White) {
-            if (fromSquare != E1)
-                return false;
+        if (side == White && fromSquare == E1) {
 
             if (toSquare == G1) {
                 if (IsWhiteShortCastleLegal(pos))
                     return true;
-            }
-            else if (toSquare == C1) {
+            } else if (toSquare == C1) {
                 if (IsWhiteLongCastleLegal(pos))
                     return true;
             }
-        }
-        else {
-            if (fromSquare != E8)
-                return false;
+        } 
+        
+        if (side == Black && fromSquare == E8) {
+
             if (toSquare == G8) {
                 if (IsBlackShortCastleLegal(pos))
                     return true;
-            }
-            else if (toSquare == C8) {
+            } else if (toSquare == C8) {
                 if (IsBlackLongCastleLegal(pos))
                     return true;
             }
         }
+
         return false;
     }
 
     // en passant capture
     if (GetTypeOfMove(move) == tEnPassant) {
-        if (hunter == Pawn && toSquare == pos->EnPassantSq())
-            return true;
-        return false;
+        return (hunter == Pawn && toSquare == pos->EnPassantSq());
     }
 
     // double pawn move

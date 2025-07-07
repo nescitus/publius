@@ -10,8 +10,8 @@ HistoryData::HistoryData() {
 }
 
 // clear all values
-void HistoryData::Clear(void) 
-{
+void HistoryData::Clear(void) {
+
     for (int piece = 0; piece < 12; piece++)
         for (Square square = A1; square < sqNone; ++square) {
             cutoffHistory[piece][square] = 0;
@@ -25,8 +25,8 @@ void HistoryData::Clear(void)
 }
 
 // halve history values (used when they grow too high)
-void HistoryData::Trim(void) 
-{
+void HistoryData::Trim(void) {
+
     for (int piece = 0; piece < 12; piece++)
         for (Square square = A1; square < sqNone; ++square) {
             cutoffHistory[piece][square] /= 2;
@@ -56,13 +56,12 @@ void HistoryData::Update(Position* pos, const Move move, const int depth, const 
     cutoffHistory[piece][toSquare] += Inc(depth);
  
     // Keep history scores within range
-    if (cutoffHistory[piece][toSquare] > HistLimit) {
+    if (cutoffHistory[piece][toSquare] > HistLimit)
         Trim();
-    }
 }
 
-void HistoryData::UpdateTries(Position* pos, const Move move, const int depth)
-{
+void HistoryData::UpdateTries(Position* pos, const Move move, const int depth) {
+
     // History is updated only for quiet moves
     if (IsMoveNoisy(pos, move)) 
         return;
@@ -80,23 +79,20 @@ void HistoryData::UpdateTries(Position* pos, const Move move, const int depth)
         Trim();
 }
 
-bool HistoryData::IsKiller(const Move move, const int ply) 
-{
+bool HistoryData::IsKiller(const Move move, const int ply) {
     return (move == killer1[ply] || move == killer2[ply]);
 }
 
-Move HistoryData::GetKiller1(const int ply) 
-{
+Move HistoryData::GetKiller1(const int ply) {
     return killer1[ply];
 }
 
-Move HistoryData::GetKiller2(const int ply)
-{
+Move HistoryData::GetKiller2(const int ply) {
     return killer2[ply];
 }
 
-int HistoryData::GetScore(Position* pos, const Move move) 
-{
+int HistoryData::GetScore(Position* pos, const Move move) {
+
     // Init square variables
     Square fromSquare = GetFromSquare(move);
     Square toSquare = GetToSquare(move);

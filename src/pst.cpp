@@ -6,11 +6,7 @@
 #include "eval.h"
 #include "piece.h"
 
-void Parameters::Init() {
-    InitPst();
-}
-
-void Parameters::InitPst(void) {
+void Parameters::Init(void) {
 
     for (Color color = White; color < colorNone; ++color) {
         for (Square square = A1; square < sqNone; ++square) {

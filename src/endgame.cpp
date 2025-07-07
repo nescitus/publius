@@ -4,19 +4,18 @@
 #include "publius.h"
 
 // In the endgames with reduced material, normal
-// evaluation odten does not apply. Therefore
-// we have some heuristics to detect when to divide
-// evaluation score to reflect increased drawing
-// chances. We cater for the most obvious piece vs piece
-// or two pieces vs piece combinations. Additionally,
-// we pull the score closer to draw in positions
-// with low and almost equal material, so that
-// the engine will not go for an illusory advantage
-// in, say, rook vs rook endgame.
+// evaluation often does not apply. Therefore we use
+// some heuristics to detect when to divide score 
+// to reflect increased drawing chances. We cater for 
+// the most obvious 1 vs 1 or 2 vs 1 piece combos.
+// Additionally, we pull the score closer to draw 
+// in positions with low and almost equal material, 
+// so that the engine will not go for an illusory 
+// advantage in, say, rook vs rook endgame.
 //
 // Fully realized draw detector would recognize
-// at least some rook endgames and bishop of wrong color
-// with an edge pawn.
+// at least some rook endgames and bishop of wrong 
+// color with an edge pawn.
 
 const int certainDrawMultiplier = 0;
 const int drawishMultiplier = 16;

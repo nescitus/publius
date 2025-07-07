@@ -16,9 +16,8 @@
 
 void SerializeMoves(MoveList* list, const Square fromSquare, Bitboard moves) {
     
-    while (moves) {
+    while (moves)
         list->AddMove(fromSquare, PopFirstBit(&moves), 0);
-    }
 }
 
 // Pawn move generation is done in bulk: we generate 

@@ -17,8 +17,6 @@ private:
     void InitKnightAttacks(const Square sq, const Bitboard b);
     void InitKingAttacks(const Square sq, const Bitboard b);
     void InitLineMasks(const Square sq);
-    Bitboard BishSlow(const Bitboard occ, const Square sq);
-    Bitboard RookSlow(const Bitboard occ, const Square sq);
     Bitboard FileAttacks(const Bitboard occ, const Square sq);
     Bitboard RankAttacks(const Bitboard occ, const Square sq);
     Bitboard DiagAttacks(const Bitboard occ, const Square sq);
