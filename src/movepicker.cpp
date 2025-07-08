@@ -47,7 +47,7 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
 
             case stagePrepareGood:
             {
-                goodNoisyList.ScoreNoisy(pos, ply, moveFromTT);
+                goodNoisyList.ScoreNoisy(pos);
                 goodNoisyLength = goodNoisyList.GetInd();
                 goodNoisyCnt = 0;
                 stage = stageReturnGoodCapt;
@@ -104,7 +104,7 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
             case stagePrepareBad:
             {
                 stage = stageReturnBad;
-                badNoisyList.ScoreNoisy(pos, ply, moveFromTT);
+                badNoisyList.ScoreNoisy(pos);
                 badNoisyLength = badNoisyList.GetInd();
                 badNoisyCnt = 0;
                 break;

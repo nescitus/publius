@@ -69,49 +69,22 @@ Move MoveList::GetMove() {
 // Functions below rely on being called in correct places
 // of a staged move generator
 
-void MoveList::ScoreNoisy(Position* pos,
-    const int ply,
-    const Move ttMove) {
-
-    Square fromSquare, toSquare;
-    int moveType, hunter, prey;
+void MoveList::ScoreNoisy(Position* pos) {
 
     for (int i = 0; i < ind; i++) {
 
-        values[i] = 0; // default, shouldn't be used
+        values[i] = 5; // default, shouldn't be used
 
-        moveType = GetTypeOfMove(moves[i]);
+        if (pos->IsOccupied(GetToSquare(moves[i])))
+            values[i] = 6 * pos->PieceTypeOnSq(GetToSquare(moves[i]))
+                      + 5 - pos->PieceTypeOnSq(GetFromSquare(moves[i]));
 
-        if (moveType == tNormal) {
-
-            fromSquare = GetFromSquare(moves[i]);
-            toSquare = GetToSquare(moves[i]);
-            hunter = pos->PieceTypeOnSq(fromSquare);
-            prey = pos->PieceTypeOnSq(toSquare);
-
-            // capture (guaranteed to be good)
-            if (prey != noPieceType) {
-               values[i] = CaptureValue + 10 * prey - hunter;
-            }
-        }
-
-        // en passant capture
-        if (moveType == tEnPassant)
-            values[i] = HighValue + 106;
-
-        // promotions
-        if (IsMovePromotion(moves[i])) {
-            if (moveType == tPromQ) values[i] = QueenPromValue;
-            if (moveType == tPromN) values[i] = KnightPromValue;
-            if (moveType == tPromR) values[i] = RookPromValue;
-            if (moveType == tPromB) values[i] = BishopPromValue;
-        }    
+        if (IsMovePromotion(moves[i]))
+            values[i] = GetPromotedPiece(moves[i]) - 5;
     }
 }
 
-void MoveList::ScoreQuiet(Position* pos,
-    const int ply,
-    const Move ttMove) {
+void MoveList::ScoreQuiet(Position* pos, const int ply, const Move ttMove) {
 
     for (int i = 0; i < ind; i++) {
 
