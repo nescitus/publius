@@ -63,8 +63,14 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
                             continue;  // Avoid returning moveFromTT again
                         return move;
                     }
-                    stage = (mode != modeAll) ? stageEnd 
-                                              : stageGenQuiet;
+
+                    // "modeCaptures" is used in the late stage 
+                    // of quiescence search. In this case we try
+                    // only good or equal captures, not bothering
+                    // with the later stages of move generation.
+
+                    stage = (mode == modeCaptures) ? stageEnd 
+                                                   : stageGenQuiet;
                     break;
                 }
 
@@ -90,7 +96,8 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
                     return move;
                 }
 
-                stage = stagePrepareBad;
+                stage = (mode == modeChecks) ? stageEnd
+                                             : stagePrepareBad;
                 break;
             }
 

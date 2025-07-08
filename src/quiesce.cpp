@@ -76,21 +76,17 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     if (bestScore > alpha)
         alpha = bestScore;
 
-    // Generate and sort move list. We have three cases:
-    // 1) when in check, we look for evasions
-    // 2) when we have just started quiescence search,
-    //    we generate captures and (some) checks
-    // 3) otherwise it's just captures
+    // Generate and sort move list, depending
+    // on the current mode.
 
     Mode movegenMode;
 
-    //list.Clear();
     if (isInCheck)
-        movegenMode = modeAll;  // case 1
-    else if (qdepth == 0) 
-        movegenMode = modeChecks; // case 2)
+        movegenMode = modeAll;
+   // else if (qdepth == 0) 
+   //     movegenMode = modeChecks;
     else
-        movegenMode = modeCaptures; // case 3)
+        movegenMode = modeCaptures;
 
     movePicker.Init(ttMove);
 
