@@ -4,13 +4,13 @@
 #include "legality.h"
 #include "movepicker.h"
 
-void MovePicker::InitAllMoves(Move ttMove) {
+void MovePicker::Init(Move ttMove) {
     
     moveFromTT = ttMove;
     stage = stageTT;
 }
 
-Move MovePicker::NextMove(Position* pos, int ply) {
+Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
 
     Move move;
 
@@ -38,10 +38,8 @@ Move MovePicker::NextMove(Position* pos, int ply) {
                     move = allNoisyList.GetNextRawMove();
                     if (move == 0) 
                         break;
-                    if (IsBadCapture(pos, move))
-                        badNoisyList.AddMove(move);
-                    else
-                        goodNoisyList.AddMove(move);
+                    IsBadCapture(pos, move) ? badNoisyList.AddMove(move)
+                                            : goodNoisyList.AddMove(move);
                 }
                 stage = stagePrepareGood;
                 break;
@@ -65,14 +63,16 @@ Move MovePicker::NextMove(Position* pos, int ply) {
                             continue;  // Avoid returning moveFromTT again
                         return move;
                     }
-                    stage = stageGenQuiet;
+                    stage = (mode != modeAll) ? stageEnd 
+                                              : stageGenQuiet;
                     break;
                 }
 
             case stageGenQuiet:
             {
                 quietList.Clear();
-                FillQuietList(pos, &quietList);
+                (mode == modeChecks) ? FillCheckList(pos, &quietList) 
+                                     : FillQuietList(pos, &quietList);
                 quietList.ScoreQuiet(pos, ply, moveFromTT);
                 quietLength = quietList.GetInd();
                 quietCnt = 0;
@@ -112,6 +112,12 @@ Move MovePicker::NextMove(Position* pos, int ply) {
                         continue;
                     return move;
                 }
+                stage = stageEnd;
+                break;
+            }
+
+            case stageEnd: 
+            {
                 return 0;
             }
         }

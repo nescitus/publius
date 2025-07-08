@@ -5,6 +5,7 @@
 #include "bitboard.h"
 #include "move.h"
 #include "timer.h"
+#include "movepicker.h"
 #include "search.h"
 
 std::string test[] = {
@@ -93,42 +94,32 @@ void PrintBoard(Position* pos) {
 Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
 
     Move move = 0;
-    MoveList list;
     Bitboard localCount = 0;
     Bitboard moveCount = 0;
     UndoData undo;
+    MovePicker movePicker;
 
-    list.Clear();
-    FillCompleteList(pos, &list);
-    list.ScoreAllMoves(pos, ply, 0);
-    int moveListLength = list.GetInd();
+    movePicker.Init(0);
 
-    if (moveListLength) {
-        for (int i = 0; i < moveListLength; i++) {
+    while ((move = movePicker.NextMove(pos, ply, modeAll)) != 0) {
 
-            move = list.GetMove();
-            pos->DoMove(move, &undo);
+        pos->DoMove(move, &undo);
 
-            if (pos->LeavesKingInCheck()) {
-                pos->UndoMove(move, &undo);
-                continue;
-            }
-
-            if (depth == 1) {
-                moveCount++;
-                localCount = 1;
-            } else {
-                localCount = Perft(pos, ply + 1, depth - 1, isNoisy);
-                moveCount += localCount;
-            }
-
+        if (pos->LeavesKingInCheck()) {
             pos->UndoMove(move, &undo);
-
-            if (ply == 0 && isNoisy)
-                std::cout << MoveToString(move) << ": " << localCount << std::endl;
+            continue;
         }
-    }
 
+        localCount = (depth == 1) ? 1 
+                                  : Perft(pos, ply + 1, depth - 1, isNoisy);
+        moveCount += localCount;
+
+        pos->UndoMove(move, &undo);
+
+        if (ply == 0 && isNoisy)
+            std::cout << MoveToString(move) << ": " << localCount << std::endl;
+        }
+    
     return moveCount;
 }
 

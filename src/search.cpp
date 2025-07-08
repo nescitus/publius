@@ -289,14 +289,11 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // we are going to search the transposition table
     // move first; in root node we start searching
     // from the best move from the previous iteration.
-    if (isRoot)
-        movePicker.InitAllMoves(Pv.line[0][0]);
-    else
-        movePicker.InitAllMoves(ttMove);
+    movePicker.Init(isRoot ? Pv.line[0][0] : ttMove);
 
     // Main loop
 
-    while ((move = movePicker.NextMove(pos, ply)) != 0) {
+    while ((move = movePicker.NextMove(pos, ply, modeAll)) != 0) {
 
             moveType = GetMoveType(pos, move, ttMove, ply);
 

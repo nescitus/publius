@@ -112,16 +112,14 @@ Bitboard SidesOf(const Bitboard b) {
 
 // color-dependent forward shift
 Bitboard ForwardOf(const Bitboard b, const Color color) {
-
-    if (color == White) return NorthOf(b);
-    else                return SouthOf(b);
+    return (color == White) ? NorthOf(b) : SouthOf(b);
 }
 
 // color-dependent forward fill
 Bitboard FrontSpan(const Bitboard b, const Color color) {
 
-    if (color == White) return FillNorth(NorthOf(b));
-    else                return FillSouth(SouthOf(b));
+    return (color == White) ? FillNorth(NorthOf(b)) 
+                            : FillSouth(SouthOf(b));
 }
 
 // Basic fill function (north and south only,

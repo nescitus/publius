@@ -56,9 +56,8 @@ void Position::DoMove(const Move move, UndoData *undo) {
     MovePiece(color, hunter, fromSquare, toSquare);
 
     // Update king location
-    if (hunter == King) {
+    if (hunter == King)
         kingSq[color] = toSquare;
-    }
 
     // Make complementary rook move in case of castling
     if (moveType == tCastle) {
@@ -77,9 +76,8 @@ void Position::DoMove(const Move move, UndoData *undo) {
     }
 
     // Set new en passant square
-    if (moveType == tPawnjump) {
+    if (moveType == tPawnjump)
         SetEnPassantSquare(color, toSquare);
-    }
 
     // Promotion
     if (IsMovePromotion(move)) {

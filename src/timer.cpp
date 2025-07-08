@@ -59,8 +59,7 @@ void UCItimer::SetMoveTiming(void) {
         return;
     }
 
-    // We are operating within some time limit. 
-    // We set two limits: hardTimeLimit (break
+    // We set two time limits: hardTimeLimit (break
     // the search no matter what) and softTimeLimit
     // (don't start the next iteration). There is
     // some scope for smarter tricks taking into

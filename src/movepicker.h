@@ -18,14 +18,22 @@
 // Staged move generator goes through the following
 // stages, from top to bottom:
 
-enum {stageTT,             // return move from transposition table 
-      stageGenCapt,        // generate noisy moves, split them to good and bad
-      stagePrepareGood,    // score good noisies
-      stageReturnGoodCapt, // return good noisies
-      stageGenQuiet,       // generate and score quiet moves
-      stageReturnQuiet,    // return quiet moves
-      stagePrepareBad,     // score bad noisies
-      stageReturnBad};     // return bad noisies
+enum {
+    stageTT,              // return move from transposition table 
+    stageGenCapt,         // generate noisy moves, split them to good and bad
+    stagePrepareGood,     // score good noisies
+    stageReturnGoodCapt,  // return good noisies
+    stageGenQuiet,        // generate and score quiet moves
+    stageReturnQuiet,     // return quiet moves
+    stagePrepareBad,      // score bad noisies
+    stageReturnBad,       // return bad noisies
+    stageEnd };           // no more moves
+
+// MovePicker can be run in a few different modes:
+
+enum Mode { modeAll,        // main search or check evasion in qs
+            modeChecks,     // check-aware quiescence search
+            modeCaptures }; // basic (late) quiescence search
 
 class MovePicker {
 private:
@@ -35,6 +43,6 @@ private:
 public:
     Move moveFromTT;
     int stage;
-    void InitAllMoves(Move ttMove);
-    Move NextMove(Position* pos, int ply);
+    void Init(Move ttMove);
+    Move NextMove(Position* pos, int ply, Mode mode);
 };

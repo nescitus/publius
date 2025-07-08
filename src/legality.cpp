@@ -53,19 +53,16 @@ bool IsPseudoLegal(Position* pos, int move) {
     }
 
     // en passant capture
-    if (GetTypeOfMove(move) == tEnPassant) {
+    if (GetTypeOfMove(move) == tEnPassant)
         return (hunter == Pawn && toSquare == pos->EnPassantSq());
-    }
 
     // double pawn move
-    if (GetTypeOfMove(move) == tPawnjump) {
+    if (GetTypeOfMove(move) == tPawnjump)
         return IsPawnJumpLegal(pos, side, hunter, prey, fromSquare, toSquare);
-    }
 
     // single pawn move, including promotion
-    if (hunter == Pawn) {
+    if (hunter == Pawn)
         return IsPawnMoveLegal(side, fromSquare, toSquare, move, hunter, prey);
-    }
 
     // real promotion would be accepted earlier
     if (IsMovePromotion(move))
@@ -73,7 +70,6 @@ bool IsPseudoLegal(Position* pos, int move) {
 
     // normal move - check square accessibility
     return (pos->AttacksFrom(fromSquare) & Paint(toSquare)) != 0;
-
 }
 
 bool IsWhiteShortCastleLegal(Position* pos) {
@@ -128,7 +124,7 @@ bool IsBlackLongCastleLegal(Position* pos) {
 }
 
 bool IsPawnJumpLegal(Position* pos, Color side, int hunter, int prey,
-    Square fromSquare, Square toSquare) {
+                     Square fromSquare, Square toSquare) {
     if (hunter == Pawn &&
         prey == noPieceType &&
         pos->GetPiece(toSquare ^ 8) == noPiece) {
@@ -142,22 +138,33 @@ bool IsPawnJumpLegal(Position* pos, Color side, int hunter, int prey,
 bool IsPawnMoveLegal(Color side, Square fromSquare, Square toSquare, Move move, int hunter, int prey) {
 
     if (side == White) {
+
+        // missing promotion flag
         if (RankOf(fromSquare) == rank7 && !IsMovePromotion(move))
             return false;
+
+        // non-capture
         if (toSquare - fromSquare == 8)
             if (prey == noPieceType)
                 return true;
+        
+        // capture
         if ((toSquare - fromSquare == 7 && FileOf(fromSquare) != fileA) ||
             (toSquare - fromSquare == 9 && FileOf(fromSquare) != fileH))
             if (prey != noPieceType)
                 return true;
-    }
-    else {
+    } else {
+
+        // missing promotion flag
         if (RankOf(fromSquare) == rank2 && !IsMovePromotion(move))
             return false;
+        
+        // non-capture
         if (toSquare - fromSquare == -8)
             if (prey == noPieceType)
                 return true;
+        
+        // capture
         if ((toSquare - fromSquare == -9 && FileOf(fromSquare) != fileA) ||
             (toSquare - fromSquare == -7 && FileOf(fromSquare) != fileH))
             if (prey != noPieceType)

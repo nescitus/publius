@@ -1,7 +1,7 @@
 #pragma once
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 4132 lines
+// 4049 lines
 
 #include <iostream>
 #include <algorithm>
@@ -136,10 +136,8 @@ public:
     int GetInd();
     Move GetNextRawMove();
     Move GetMove();
-    void ScoreAllMoves(Position* pos, int ply, Move ttMove);
     void ScoreNoisy(Position* pos, int ply, Move ttMove);
     void ScoreQuiet(Position* pos, int ply, Move ttMove);
-    bool Contains(Move move);
 };
 
 // move generation
@@ -150,8 +148,6 @@ void SerializePromotions(MoveList* list, Bitboard moves, int vector);
 void FillQuietList(Position* pos, MoveList* list);
 void FillNoisyList(Position* pos, MoveList* list);
 void FillCheckList(Position* pos, MoveList* list);
-void FillCompleteList(Position* pos, MoveList* list);
-void FillChecksAndCaptures(Position* pos, MoveList* list);
 
 bool IsBadCapture(Position* pos, Move move);
 int Swap(const Position* pos, const Square fromSquare, const Square toSquare);

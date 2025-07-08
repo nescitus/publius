@@ -314,15 +314,3 @@ void FillCheckList(Position* pos, MoveList* list) {
     }
     */
 }
-
-void FillCompleteList(Position* pos, MoveList* list) {
-
-    FillNoisyList(pos, list);
-    FillQuietList(pos, list);
-}
-
-void FillChecksAndCaptures(Position* pos, MoveList* list) {
-
-    FillNoisyList(pos, list);
-    FillCheckList(pos, list);
-}

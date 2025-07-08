@@ -7,14 +7,15 @@
 #include "eval.h"
 #include "search.h"
 #include "trans.h"
+#include "movepicker.h"
 
 int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
 
     int bestScore, hashFlag, score;
     Move move, bestMove, ttMove;
     EvalData e;
-    MoveList list;
     UndoData undo;
+    MovePicker movePicker;
 
     // Init
     bestMove = 0;
@@ -80,71 +81,55 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     // 2) when we have just started quiescence search,
     //    we generate captures and (some) checks
     // 3) otherwise it's just captures
-    list.Clear();
+
+    Mode movegenMode;
+
+    //list.Clear();
     if (isInCheck)
-        FillCompleteList(pos, &list); // case 1)
-    else if (qdepth == 0) // <= 1 failed 2025-03-16
-        FillChecksAndCaptures(pos, &list); // case 2)
+        movegenMode = modeAll;  // case 1
+    else if (qdepth == 0) 
+        movegenMode = modeChecks; // case 2)
     else
-        FillNoisyList(pos, &list); // case 3)
+        movegenMode = modeCaptures; // case 3)
 
-    // Score moves to sort them well
-    int length = list.GetInd();
-    list.ScoreAllMoves(pos, ply, ttMove);
+    movePicker.Init(ttMove);
 
-    // Main loop
-    if (length) {
+    while ((move = movePicker.NextMove(pos, ply, movegenMode)) != 0) {
 
-        for (int i = 0; i < length; i++) {
-
-            move = list.GetMove();
-
-            // Bad capture pruning. If the capture
-            // is expected to lose material, we aren't
-            // trying it in the quiescence search.
-            // We don't do it while in check, because
-            // all the moves defending against the check
-            // need to be tried.
-            if (!isInCheck && !pos->IsEmpty(GetToSquare(move))) {
-                if (IsBadCapture(pos, move))
-                    continue;
-            }
-
-            // Make move, unless illegal
-            pos->DoMove(move, &undo);
-            if (pos->LeavesKingInCheck()) {
-                pos->UndoMove(move, &undo);
-                continue;
-            }
-
-            // Recursion
-            score = -Quiesce(pos, ply + 1, qdepth + 1, -beta, -alpha);
-
-            // Unmake move
+        // Make move, unless illegal
+        pos->DoMove(move, &undo);
+        if (pos->LeavesKingInCheck()) {
             pos->UndoMove(move, &undo);
+                continue;
+        }
 
-            // Exit in case of a timeout / stop command
-            if (State.isStopping)
-                return 0;
+        // Recursion
+        score = -Quiesce(pos, ply + 1, qdepth + 1, -beta, -alpha);
 
-            // Beta cutoff
-            if (score >= beta) {
-                TT.Store(pos->boardHash, move, score, upperBound, 0, ply);
-                return score;
-            }
+        // Unmake move
+        pos->UndoMove(move, &undo);
 
-            // Adjust alpha and score
-            if (score > bestScore) {
-                bestScore = score;
-                if (score > alpha) {
-                    bestMove = move;
-                    alpha = score;
-                    Pv.Update(ply, move);
-                }
+        // Exit in case of a timeout / stop command
+        if (State.isStopping)
+            return 0;
+
+        // Beta cutoff
+        if (score >= beta) {
+            TT.Store(pos->boardHash, move, score, upperBound, 0, ply);
+            return score;
+        }
+
+        // Adjust alpha and score
+        if (score > bestScore) {
+            bestScore = score;
+            if (score > alpha) {
+                bestMove = move;
+                alpha = score;
+                Pv.Update(ply, move);
             }
         }
     }
-
+    
     // Return correct checkmate/stalemate score
     if (bestScore == -Infinity) {
         return pos->IsInCheck() ? -MateScore + ply : 0;
