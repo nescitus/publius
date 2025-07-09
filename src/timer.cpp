@@ -15,6 +15,9 @@
 
 void UCItimer::Clear(void) {
 
+    isStopping = false;
+    isPondering = false;
+    waitingForStop = false;
     SetData(maxDepth, 64);
     hardTimeLimit = -1;
     softTimeLimit = -1;
@@ -120,12 +123,13 @@ int UCItimer::Now(void) {
 #endif
 }
 
-int UCItimer::Elapsed(void) {
-    return (Now() - startTime);
+void UCItimer::TryStopping() {
+    if (IsTimeout())
+        isStopping = true;
 }
 
-int UCItimer::IsInfiniteMode(void) {
-    return(data[isInfinite]);
+bool UCItimer::IsTimeout() {
+    return (!isPondering && !IsInfiniteMode() && TimeHasElapsed());
 }
 
 bool UCItimer::TimeHasElapsed(void) {
@@ -134,6 +138,14 @@ bool UCItimer::TimeHasElapsed(void) {
         return false;
 
     return (Elapsed() >= hardTimeLimit);
+}
+
+int UCItimer::Elapsed(void) {
+    return (Now() - startTime);
+}
+
+int UCItimer::IsInfiniteMode(void) {
+    return(data[isInfinite]);
 }
 
 bool UCItimer::ShouldFinishIteration(void) {

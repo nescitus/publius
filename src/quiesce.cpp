@@ -7,6 +7,7 @@
 #include "eval.h"
 #include "search.h"
 #include "trans.h"
+#include "timer.h"
 #include "movepicker.h"
 
 int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
@@ -31,7 +32,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     TryInterrupting();
 
     // Exit to unwind search if it has timed out
-    if (State.isStopping)
+    if (Timer.isStopping)
         return 0;
 
     // Retrieve score from transposition table
@@ -49,8 +50,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
 
         // Too many early exits in a row 
         // might cause a timeout, so we safeguard
-        if (Timeout())
-            State.isStopping = true;
+        Timer.TryStopping();
 
         return ScoreDraw;
     }
@@ -106,7 +106,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
         pos->UndoMove(move, &undo);
 
         // Exit in case of a timeout / stop command
-        if (State.isStopping)
+        if (Timer.isStopping)
             return 0;
 
         // Beta cutoff

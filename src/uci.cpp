@@ -105,7 +105,6 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
     std::string param, value;
 
     Timer.Clear();
-    State.Clear();
 
     // Parse command
     stream >> param;
@@ -132,7 +131,7 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
             Timer.SetData(movesToGo, std::stoi(value));
         }
         else if (param == "ponder") {
-            State.isPondering = true;
+            Timer.isPondering = true;
         }
         else if (param == "depth") {
             stream >> value;
@@ -220,13 +219,13 @@ void OnNewGame(void) {
 
 void OnStopCommand() {
 
-    State.isStopping = true;
+    Timer.isStopping = true;
     Timer.SetData(isInfinite, 0);
 
     // after finishing "go infinite" run
     // due to reaching ply limit
-    if (State.waitingForStop) {
-        State.waitingForStop = false;
+    if (Timer.waitingForStop) {
+        Timer.waitingForStop = false;
         Pv.SendBestMove();
     }
 }

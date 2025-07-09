@@ -12,6 +12,9 @@ private:
     bool isStrict;
     bool isRepeating;        // repeating TC uses strict mode (does it help?)...
 public:
+    bool waitingForStop;
+    bool isStopping;
+    bool isPondering;
     void SetRepeating(void); //...and we won't detect it just by checking movestogo
     void Clear(void);
     void SetStartTime();
@@ -24,6 +27,8 @@ public:
     int GetData(const int slot);
     void SetData(const int slot, const int val);
     void SetDataForColor(const Color color);
+    bool IsTimeout(void);
+    void TryStopping(void);
 };
 
 extern UCItimer Timer;

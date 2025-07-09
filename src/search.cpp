@@ -75,7 +75,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     TryInterrupting();
 
     // Exit to unwind search if it has timed out
-    if (State.isStopping)
+    if (Timer.isStopping)
         return 0;
 
     // Quick exit on on a statically detected draw, 
@@ -85,8 +85,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
         // Too many early exits in a row 
         // might cause a timeout, so we safeguard
-        if (Timeout())
-            State.isStopping = true;
+        Timer.TryStopping();
 
         return ScoreDraw;
     }
@@ -239,7 +238,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             score = -Search(pos, ply + 1, -beta, -beta + 1, depth - reduction, true, false);
             pos->UndoNull(&undo);
 
-            if (State.isStopping)
+            if (Timer.isStopping)
                 return 0;
 
             // NULL MOVE VERIFICATION - at higher depths
@@ -249,7 +248,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             if (depth - reduction > 5 && score >= beta)
                 score = Search(pos, ply, alpha, beta, depth - reduction - 4, true, false);
             
-            if (State.isStopping) 
+            if (Timer.isStopping) 
                 return 0;
 
             if (score >= beta)
@@ -277,9 +276,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // Please note that the implementation is non-standard,
     // as normally pv-nodes are not excluded, but this is
     // what worked for this engine. (~9 Elo)
-    if (depth > 5 && !isPv && ttMove == 0 && !isInCheckBeforeMoving) {
+    if (depth > 5 && !isPv && ttMove == 0 && !isInCheckBeforeMoving)
         depth--;
-    }
 
     // Init moves and variables before entering main loop
     bestScore = -Infinity;
@@ -337,7 +335,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 int sc = Search(pos, ply + 1, newAlpha, newAlpha + 1, (depth - 1) / 2, false, true);
                 excludedMove = dummyMove;
 
-                if (State.isStopping)
+                if (Timer.isStopping)
                     return 0;
 
                 // No move scores close to the singular
@@ -442,7 +440,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                     // full depth search
                     if (score <= alpha) {
                         pos->UndoMove(move, &undo);
-                        if (State.isStopping) 
+                        if (Timer.isStopping) 
                             return 0;
                         continue;
                     }
@@ -462,14 +460,14 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 score = -Search(pos, ply + 1, -beta, -alpha, newDepth, false, false);
             else {
                 score = -Search(pos, ply + 1, -alpha - 1, -alpha, newDepth, false, false);
-                if (!State.isStopping && score > alpha)
+                if (!Timer.isStopping && score > alpha)
                     score = -Search(pos, ply + 1, -beta, -alpha, newDepth, false, false);
             }
 
             // Undo move
             pos->UndoMove(move, &undo);
 
-            if (State.isStopping)
+            if (Timer.isStopping)
                 return 0;
 
             // Beta cutoff
@@ -577,7 +575,7 @@ void TryInterrupting(void)
     // (not entirely precise, see previous comment)
     if (Timer.GetData(maxNodes) != 0 && !Timer.IsInfiniteMode() ) {
         if (nodeCount >= Timer.GetData(maxNodes))
-            State.isStopping = true;
+            Timer.isStopping = true;
     }
 
     // There are some commands
@@ -592,21 +590,13 @@ void TryInterrupting(void)
 
         // transition from pondering to normal search
         else if (!strcmp(command, "ponderhit"))
-            State.isPondering = false;
+            Timer.isPondering = false;
 
         // ping equivalent in the UCI protocol
         else if (!strcmp(command, "isready"))
             std::cout << "readyok" << std::endl;
     }
 
-    // the time is out!
-    if (Timeout())
-        State.isStopping = true;
-}
-
-int Timeout() {
-
-    return (!State.isPondering && 
-            !Timer.IsInfiniteMode() && 
-            Timer.TimeHasElapsed());
+    // check if the time is out
+    Timer.TryStopping();
 }

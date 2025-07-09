@@ -17,7 +17,6 @@ UCItimer Timer;
 MaskData Mask;
 HashKeys Key;
 Parameters Params;
-EngineState State;
 MoveGenerator GenerateMoves;
 HistoryData History;
 TransTable TT;
@@ -28,15 +27,8 @@ int main()
 {
     Params.Init();
     GenerateMoves.Init();
-    State.Clear();
+    Timer.Clear(); // clears also search statis flags
     UciLoop();
     TT.Exit();
     return 0;
-}
-
-void EngineState::Clear()
-{
-    isStopping = false;
-    isPondering = false;
-    waitingForStop = false;
 }

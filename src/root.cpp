@@ -13,7 +13,7 @@ int rootDepth;
 
 void Think(Position* pos) {
 
-    State.isStopping = false;
+    Timer.isStopping = false;
     History.Clear();
     nodeCount = 0;
     Timer.SetStartTime();
@@ -38,14 +38,14 @@ void Iterate(Position* pos) {
         curVal = Widen(pos, rootDepth, curVal);
 
         // stop searching
-        if (State.isStopping || Timer.ShouldFinishIteration())
+        if (Timer.isStopping || Timer.ShouldFinishIteration())
             break;
 
         val = curVal;
 
         // for go infinite
         if (rootDepth == 64 && Timer.IsInfiniteMode() )
-            State.waitingForStop = true;
+            Timer.waitingForStop = true;
     }
 }
 
@@ -75,7 +75,7 @@ int Widen(Position* pos, int depth, int lastScore) {
             currentDepthScore = Search(pos, 0, alpha, beta, depth, false, false);
 
             // timeout
-            if (State.isStopping)
+            if (Timer.isStopping)
                 break;
 
             // we have finished within the window, break the loop

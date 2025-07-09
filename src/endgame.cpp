@@ -92,9 +92,8 @@ int GetDrawMul(Position* pos, const Color strong, const Color weak) {
                     // Two minors vs one is generally a draw,
                     // but two bishops may win against a knight
                     if (pos->CountMinors(weak) == 1) {
-                        if (pos->Count(weak, Bishop) == 1)
-                            return drawishMultiplier;
-                        if (pos->Count(strong, Knight) > 0)
+                        if (pos->Count(weak, Bishop) == 1 ||
+                            pos->Count(strong, Knight) > 0)
                             return drawishMultiplier;
                     }
                 } // stronger side has two minors
