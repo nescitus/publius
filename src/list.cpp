@@ -38,11 +38,15 @@ int MoveList::GetInd() {
     return ind;
 }
 
+// Get next move from an unsorted list
+
 Move MoveList::GetNextRawMove() {
     if (get < ind)
         return moves[get++];
     return 0; // 0 means "no more moves"
 }
+
+// Get the best remaining move from a sorted list
 
 Move MoveList::GetMove() { 
 
@@ -66,23 +70,33 @@ Move MoveList::GetMove() {
     return move; 
 };
 
-// Functions below rely on being called in correct places
-// of a staged move generator
+// Score moves that change material balance (captures,
+// including en passant, and promotions). Function
+// relies on being used within staged move generation
+// framework, so that it does not have to compare
+// tactical ("noisy") moves with quiet moves.
 
 void MoveList::ScoreNoisy(Position* pos) {
 
     for (int i = 0; i < ind; i++) {
 
-        values[i] = 5; // default, shouldn't be used
+        values[i] = 5; // default, handles en passant
 
-        if (pos->IsOccupied(GetToSquare(moves[i])))
-            values[i] = 6 * pos->PieceTypeOnSq(GetToSquare(moves[i]))
-                      + 5 - pos->PieceTypeOnSq(GetFromSquare(moves[i]));
-
+        // Promotion
         if (IsMovePromotion(moves[i]))
             values[i] = GetPromotedPiece(moves[i]) - 5;
+
+        // Most valuable victim/least valuable attacker
+        else if (pos->IsOccupied(GetToSquare(moves[i])))
+            values[i] = 6 * pos->PieceTypeOnSq(GetToSquare(moves[i]))
+                      + 5 - pos->PieceTypeOnSq(GetFromSquare(moves[i]));
     }
 }
+
+// Score quiet moves. Function relies on being called
+// within staged move generation framework, so it
+// does not have to compare quiet moves with tactical
+// ("noisy") moves.
 
 void MoveList::ScoreQuiet(Position* pos, const int ply, const Move ttMove) {
 

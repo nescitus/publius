@@ -26,10 +26,9 @@ int oldEval[PlyLimit];
 
 int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded) {
 
-    int bestScore, newDepth, eval, moveListLength;
+    int bestScore, newDepth, eval, moveListLength, movesTried, quietMovesTried;
     int hashFlag, reduction, score, moveType, singularScore;
     Move move, ttMove, bestMove, singularMove; 
-    int movesTried, quietMovesTried;
     EvalData e;
     UndoData undo;
     MovePicker movePicker;
@@ -346,9 +345,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 // relies on a single move - it would be
                 // a shame if a deeper search revealed
                 // a refutation.
-                if (sc <= newAlpha) {
+                if (sc <= newAlpha)
                     doSingularExtension = true;
-                }
             }
 
             // Make move
@@ -365,9 +363,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // Update move statistics
             listOfTriedMoves[movesTried] = move;
             movesTried++;
-            if (moveType == moveQuiet) {
+            if (moveType == moveQuiet)
                 quietMovesTried++;
-            }
 
             // Set new search depth
             newDepth = depth - 1;
@@ -432,9 +429,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 //if (reduction > 1 && improving) 
                 //    reduction--;
 
-                // for now it is redundant
-                // but as you add more conditions,
-                // it will come handy
+                // for now it is redundant, but as you add
+                // add more conditions, it will come handy
                 reduction = std::min(reduction, newDepth - 1);
 
                 // do a reduced depth search
@@ -472,6 +468,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
             // Undo move
             pos->UndoMove(move, &undo);
+
             if (State.isStopping)
                 return 0;
 
@@ -529,9 +526,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     } // end of the main loop
 
     // Return correct checkmate/stalemate score
-    if (bestScore == -Infinity) {
+    if (bestScore == -Infinity)
         return pos->IsInCheck() ? -MateScore + ply : 0;
-    }
 
     // Save score in the transposition table.
     // Please note that the search structure
@@ -575,9 +571,8 @@ void TryInterrupting(void)
 
     // We don't check for timeout in every node,
     // but only every so often, to improve speed
-    if (nodeCount & 4095 || rootDepth == 1) {
+    if (nodeCount & 4095 || rootDepth == 1)
         return;
-    }
 
     // Search limited by the nodecount
     // (not entirely precise, see previous comment)

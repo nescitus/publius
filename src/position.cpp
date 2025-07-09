@@ -18,18 +18,21 @@ void Position::Clear() {
 
     for (Color color = White; color < colorNone; ++color) {
         
+        // Clear king square
         kingSq[color] = sqNone;
     
+        // Clear bitboards and piece counts
         for (int type = 0; type < 6; type++) {
             pieceBitboard[color][type] = 0ULL;
             pieceCount[color][type] = 0;
         }
     }
 
-    for (Square square = A1; square < 64; ++square) {
+    // Clear piece locations
+    for (Square square = A1; square < 64; ++square)
         pieceLocation[square] = noPiece;
-    }
 
+    // Clear single variables
     castleFlags = 0;
     reversibleMoves = 0;
     repetitionIndex = 0;

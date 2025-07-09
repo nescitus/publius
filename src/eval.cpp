@@ -17,9 +17,8 @@ int Evaluate(Position* pos, EvalData* e) {
     int score = 0;
 
     // Try to retrieve the score from the evaluation hashtable
-    if (EvalHash.Retrieve(pos->boardHash, &score)) {
+    if (EvalHash.Retrieve(pos->boardHash, &score))
         return score;
-    }
 
     // Init eval data
     e->Clear();
@@ -42,9 +41,8 @@ int Evaluate(Position* pos, EvalData* e) {
     for (Color color = White; color < colorNone; ++color) {
 
         // Bishops pair
-        if (pos->Count(color, Bishop) == 2) {
+        if (pos->Count(color, Bishop) == 2)
             e->Add(color, bishPairMg, bishPairEg);
-        }
 
         // Piece eval
         EvalKnight(pos, e, color);
@@ -138,23 +136,20 @@ void EvalPawn(const Position* pos, EvalData* e, Color color) {
 
         // Pawn material and piece/square table value
         e->AddPawn(color, Params.mgPst[color][Pawn][square],
-            Params.egPst[color][Pawn][square]);
+                          Params.egPst[color][Pawn][square]);
 
         // Doubled pawn
         span = FrontSpan(Paint(square), color);
-        if (span & pos->Map(color, Pawn)) {
+        if (span & pos->Map(color, Pawn)) 
             e->AddPawn(color, doubledPawnMg, doubledPawnEg);
-        }
 
         // Strong pawn (phalanx or defended)
-        if (Mask.strongPawn[color][square] & pos->Map(color, Pawn)) {
+        if (Mask.strongPawn[color][square] & pos->Map(color, Pawn)) 
             e->AddPawn(color, Params.pawnSupport[color][square], 0);
-        }
 
         // Isolated pawn
-        else if ((Mask.adjacentFiles[FileOf(square)] & pos->Map(color, Pawn)) == 0) {
+        else if ((Mask.adjacentFiles[FileOf(square)] & pos->Map(color, Pawn)) == 0)
             e->AddPawn(color, isolPawnMg, isolPawnEg);
-        }
     }
 }
 
