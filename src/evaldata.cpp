@@ -1,7 +1,6 @@
 #include "types.h"
 #include "evaldata.h"
 
-
 void EvalData::Clear() {
 
     phase = 0;

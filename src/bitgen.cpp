@@ -2,7 +2,6 @@
 
 #include "types.h"
 #include "square.h"
-#include "limits.h"
 #include "publius.h"
 #include "bitboard.h"
 #include "bitgen.h"
@@ -67,16 +66,15 @@ void MoveGenerator::InitKingAttacks(const Square sq, const Bitboard b) {
     kingAttacks[sq] ^= Paint(sq);
 }
 
-// rankAttacks[][] will contain bitboards 
-// with exactly the same composition of bits 
-// for each rank. If you print such a bitboard,
-// you will see entire files filled. In other
-// words, you can intersect it with the occupancy
-// of any file, and the mask will work the same
-// way. Furthermore, if you intersect it with
-// a diagonal and ignore bits tthat are unused
-// because the diagonal may be too short, 
-// the result will also be identical.
+// rankAttacks[][] will contain bitboards with
+// exactly the same composition of bits for each
+// rank. If you print such a bitboard, you will
+// see entire files filled. In other words, you 
+// can intersect it with the occupancy of any file, 
+// and the mask will work the same way. Furthermore, 
+// if you intersect it with a diagonal and ignore 
+// bits that are unused because the diagonal may be 
+// too short, the result will also be identical.
 
 void MoveGenerator::InitRankAttacks() {
 
@@ -195,9 +193,6 @@ Bitboard MoveGenerator::RankAttacks(const Bitboard occ, const Square sq) {
     // of a file that we are interested in.
     return (fileAttacks[RankOf(sq)][occupancyIndex] & fileMask[sq]);
 }
-
-//  Bench at depth 15 took 25735 milliseconds, searching 34982198 nodes at 1359323 nodes per second.
-
 
 Bitboard MoveGenerator::DiagAttacks(const Bitboard occ, const Square sq) {
     

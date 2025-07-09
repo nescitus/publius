@@ -1,7 +1,7 @@
 #pragma once
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 4016 lines
+// 3993 lines
 
 #include <iostream>
 #include <algorithm>
@@ -121,6 +121,8 @@ public:
 extern EngineState State;
 
 // list
+
+constexpr int MovesLimit = 256;
 
 class MoveList {
 private:

@@ -2,7 +2,6 @@
 #include "piece.h"
 #include "square.h"
 #include "bitboard.h"
-#include "limits.h"
 #include "publius.h"
 #include "move.h"
 #include "legality.h"

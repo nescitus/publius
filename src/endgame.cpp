@@ -1,6 +1,5 @@
 #include "types.h"
 #include "piece.h"
-#include "limits.h"
 #include "publius.h"
 
 // In the endgames with reduced material, normal

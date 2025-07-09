@@ -80,8 +80,6 @@ void MoveList::ScoreNoisy(Position* pos) {
 
     for (int i = 0; i < ind; i++) {
 
-        values[i] = 5; // default, handles en passant
-
         // Promotion
         if (IsMovePromotion(moves[i]))
             values[i] = GetPromotedPiece(moves[i]) - 5;
@@ -90,6 +88,9 @@ void MoveList::ScoreNoisy(Position* pos) {
         else if (pos->IsOccupied(GetToSquare(moves[i])))
             values[i] = 6 * pos->PieceTypeOnSq(GetToSquare(moves[i]))
                       + 5 - pos->PieceTypeOnSq(GetFromSquare(moves[i]));
+        
+        // Default, handles en passant
+        else values [i] = 5;
     }
 }
 

@@ -1,10 +1,10 @@
+#include <iostream>
 #include "types.h"
 #include "limits.h"
 #include "publius.h"
 #include "move.h"
 #include "pv.h"
 #include "timer.h"
-#include <iostream>
 
 void PvCollector::Clear() {
 

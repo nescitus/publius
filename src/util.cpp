@@ -7,7 +7,6 @@
 #  include <sys/time.h>
 #endif
 #include "types.h"
-#include "limits.h"
 #include "publius.h"
 #include "move.h"
 

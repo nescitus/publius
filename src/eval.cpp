@@ -136,15 +136,15 @@ void EvalPawn(const Position* pos, EvalData* e, Color color) {
 
         // Pawn material and piece/square table value
         e->AddPawn(color, Params.mgPst[color][Pawn][square],
-                          Params.egPst[color][Pawn][square]);
+            Params.egPst[color][Pawn][square]);
 
         // Doubled pawn
         span = FrontSpan(Paint(square), color);
-        if (span & pos->Map(color, Pawn)) 
+        if (span & pos->Map(color, Pawn))
             e->AddPawn(color, doubledPawnMg, doubledPawnEg);
 
         // Strong pawn (phalanx or defended)
-        if (Mask.strongPawn[color][square] & pos->Map(color, Pawn)) 
+        if (Mask.strongPawn[color][square] & pos->Map(color, Pawn))
             e->AddPawn(color, Params.pawnSupport[color][square], 0);
 
         // Isolated pawn
