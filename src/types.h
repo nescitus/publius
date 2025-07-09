@@ -25,6 +25,8 @@ enum Color { White, Black, colorNone };
 Color operator~(Color c);   // switch color
 Color operator++(Color& d); // increment color in a "for" loop
 
+enum PieceType { Pawn, Knight, Bishop, Rook, Queen, King, noPieceType };
+
 enum eFile { fileA, fileB, fileC, fileD, fileE, fileF, fileG, fileH };
 enum eRank { rank1, rank2, rank3, rank4, rank5, rank6, rank7, rank8 };
 

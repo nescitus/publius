@@ -1,7 +1,7 @@
 #pragma once
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3995 lines
+// 3970 lines
 
 #include <iostream>
 #include <algorithm>
@@ -25,7 +25,6 @@ class Parameters {
 public:
     void Init();
     int pawnSupport[2][64];
-    int knightOutpost[2][64];
     int mgPst[2][6][64];
     int egPst[2][6][64];
 };
@@ -141,15 +140,6 @@ public:
     void ScoreNoisy(Position* pos);
     void ScoreQuiet(Position* pos, int ply, Move ttMove);
 };
-
-// move generation
-
-void SerializeMoves(MoveList* list, const Square fromSquare, Bitboard moves);
-void SerializePawnMoves(MoveList* list, Bitboard moves, int vector, int flag);
-void SerializePromotions(MoveList* list, Bitboard moves, int vector);
-void FillQuietList(Position* pos, MoveList* list);
-void FillNoisyList(Position* pos, MoveList* list);
-void FillCheckList(Position* pos, MoveList* list);
 
 bool IsBadCapture(Position* pos, Move move);
 int Swap(const Position* pos, const Square fromSquare, const Square toSquare);

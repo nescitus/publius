@@ -3,7 +3,6 @@
 #include "publius.h"
 #include "evaldata.h"
 #include "eval.h"
-#include "piece.h"
 
 void Parameters::Init(void) {
 
@@ -14,7 +13,6 @@ void Parameters::Init(void) {
             mgPst[color][Pawn][RelativeSq(color, square)] = mgPawnPst[square] + mgPieceValue[Pawn];
             egPst[color][Pawn][RelativeSq(color, square)] = egPawnPst[square] + egPieceValue[Pawn];
 
-            knightOutpost[color][RelativeSq(color, square)] = n_outpost[square];
             mgPst[color][Knight][RelativeSq(color, square)] = mgKnightPst[square] + mgPieceValue[Knight];
             egPst[color][Knight][RelativeSq(color, square)] = egKnightPst[square] + egPieceValue[Knight];
 

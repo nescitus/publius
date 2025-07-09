@@ -1,5 +1,4 @@
 #include "types.h"
-#include "piece.h"
 #include "limits.h"
 #include "publius.h"
 #include "move.h"

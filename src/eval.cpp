@@ -7,7 +7,6 @@
 #include "evaldata.h"
 #include "eval.h"
 #include "mask.h"
-#include "piece.h"
 
 EvalHashTable EvalHash(1024);
 sPawnHashEntry PawnTT[PAWN_HASH_SIZE];
@@ -186,24 +185,6 @@ void EvalKnight(const Position* pos, EvalData* e, Color color) {
         // Knight attacks on the enemy king zone
         if (GenerateMoves.Knight(square) & e->enemyKingZone[color])
             e->minorAttacks[color]++;
-
-        // Knight outpost
-        if (Paint(square) & Mask.outpost[color]) {
-
-            int mul = 0;
-
-            // hole of enemy pawn structure
-            if (Paint(square) & ~e->pawnReach[~color])
-                mul += 2;
-
-            // defended by a pawn
-            if (Paint(square) & e->control[color][Pawn]) // defended
-                mul += 1;
-
-            // add bonus
-            int tmp = Params.knightOutpost[color][square] * mul / 2;
-            e->Add(color, tmp, tmp);
-        }
     }
 }
 

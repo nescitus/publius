@@ -3,7 +3,6 @@
 #include "publius.h"
 #include "history.h"
 #include "move.h"
-#include "piece.h"
 
 void MoveList::SwapMoves(const int i, const int j) {
 

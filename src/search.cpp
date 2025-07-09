@@ -480,9 +480,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 // so that the move will be sorted higher
                 // next time we encounter it.
                 History.Update(pos, move, depth, ply);
-                for (int i = 0; i < movesTried; i++) {
+                for (int i = 0; i < movesTried; i++)
                     History.UpdateTries(pos, listOfTriedMoves[i], depth);
-                }
 
                 // Store move in the transposition table
                 if (!isExcluded)

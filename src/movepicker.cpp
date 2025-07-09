@@ -1,6 +1,7 @@
 ﻿#include "types.h"
 #include "publius.h"
 #include "legality.h"
+#include "gen.h"
 #include "movepicker.h"
 
 void MovePicker::Init(Move ttMove) {

@@ -5,8 +5,8 @@
 #include "bitboard.h"
 #include "mask.h"
 #include "bitgen.h"
-#include "piece.h"
 #include "legality.h"
+#include "gen.h"
 
 // Non-pawn moves are generated on a per-piece basis.
 // Knowing piece location (fromSquare) and bitboard
