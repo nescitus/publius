@@ -155,7 +155,7 @@ bool Position::IsInCheck() const {
 }
 
 bool Position::LeavesKingInCheck() const {
-    return (SquareIsAttacked(KingSq(~(sideToMove)), sideToMove) != 0);
+    return (SquareIsAttacked(KingSq(~sideToMove), sideToMove) != 0);
 }
 
 bool Position::IsOnSq(const Color color, const int piece, const Square square) const {

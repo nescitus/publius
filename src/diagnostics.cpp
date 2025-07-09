@@ -125,10 +125,13 @@ Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
 void PrintBitboard(Bitboard b) {
    
     for (Square square = A1; square < 64; ++square) {
+        
         if (b & RelSqBb(Black, square)) std::cout << "+ ";
-        else                        std::cout << ". ";
+        else                            std::cout << ". ";
+
         if ((square + 1) % 8 == 0) 
             std::cout << 9 - ((square + 1) / 8) << std:: endl;
     }
+
     std::cout  << "\na b c d e f g h" << std::endl;
 }

@@ -126,7 +126,8 @@ void EvalPawnStructure(const Position* pos, EvalData* e) {
 
 void EvalPawn(const Position* pos, EvalData* e, Color color) {
 
-    Bitboard b, span;
+    Bitboard b, frontSpan;
+    bool isOpen;
 
     b = pos->Map(color, Pawn);
 
@@ -138,9 +139,12 @@ void EvalPawn(const Position* pos, EvalData* e, Color color) {
         e->AddPawn(color, Params.mgPst[color][Pawn][square],
             Params.egPst[color][Pawn][square]);
 
+        // Asess situation in front of the pawn
+        frontSpan = FrontSpan(Paint(square), color);
+        isOpen = ((frontSpan & pos->Map(~color, Pawn)) == 0);
+
         // Doubled pawn
-        span = FrontSpan(Paint(square), color);
-        if (span & pos->Map(color, Pawn))
+        if (frontSpan & pos->Map(color, Pawn))
             e->AddPawn(color, doubledPawnMg, doubledPawnEg);
 
         // Strong pawn (phalanx or defended)
@@ -149,7 +153,11 @@ void EvalPawn(const Position* pos, EvalData* e, Color color) {
 
         // Isolated pawn
         else if ((Mask.adjacentFiles[FileOf(square)] & pos->Map(color, Pawn)) == 0)
-            e->AddPawn(color, isolPawnMg, isolPawnEg);
+            e->AddPawn(color, isolPawnMg - 9 * isOpen, isolPawnEg);
+
+        // Backward pawn
+        else if ((Mask.support[color][square] & pos->Map(color, Pawn)) == 0)
+            e->AddPawn(color, -2 - 6 * isOpen, -1);
     }
 }
 
