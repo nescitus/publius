@@ -76,22 +76,19 @@ void UCItimer::SetMoveTiming(void) {
     if (data[engTime] >= 0) {
 
         // safeguard for the last move of repeating time control
-        if (data[movesToGo] == 1) {
+        if (data[movesToGo] == 1)
             data[engTime] -= std::min(1000, data[engTime] / 10);
-        }
 
         // calculate move time
         hardTimeLimit = (data[engTime] + data[engInc] * (data[movesToGo] - 1)) / data[movesToGo];
 
         // while in time trouble, try to save a bit on increment
-        if (hardTimeLimit < data[engInc]) {
+        if (hardTimeLimit < data[engInc])
             hardTimeLimit -= ((data[engInc] * 4) / 5);
-        }
 
         // ensure that our limit does not exceed total time available
-        if (hardTimeLimit > data[engTime]) {
+        if (hardTimeLimit > data[engTime])
             hardTimeLimit = data[engTime];
-        }
 
         // safeguard against a lag
         hardTimeLimit -= 10;

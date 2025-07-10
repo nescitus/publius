@@ -28,9 +28,6 @@ int Evaluate(Position* pos, EvalData* e) {
     e->control[White][King] = GenerateMoves.King(pos->KingSq(White));
     e->control[Black][King] = GenerateMoves.King(pos->KingSq(Black));
 
-    e->pawnReach[White] = ForwardOf(e->control[White][Pawn], White);
-    e->pawnReach[Black] = ForwardOf(e->control[Black][Pawn], Black);
-
     // Tempo bonus
     e->Add(pos->GetSideToMove(), tempoMg, tempoEg);
 
