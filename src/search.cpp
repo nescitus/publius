@@ -1,4 +1,6 @@
 #include "types.h"
+#include "bitboard.h"
+#include "bitgen.h"
 #include "limits.h"
 #include "publius.h"
 #include "timer.h"
@@ -28,7 +30,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
     int bestScore, newDepth, eval, moveListLength, movesTried, quietMovesTried;
     int hashFlag, reduction, score, moveType, singularScore;
-    Move move, ttMove, bestMove, singularMove; 
+    Move move, ttMove, bestMove, singularMove;
     EvalData e;
     UndoData undo;
     MovePicker movePicker;
@@ -111,7 +113,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     //  was lower, we still expect the move from 
     //  the previous search to be good and we will
     //  try it first.
-    
+
     bool foundTTrecord = false;
 
     if (TT.Retrieve(pos->boardHash, &ttMove, &score, &hashFlag, alpha, beta, depth, ply)) {
@@ -126,7 +128,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // shallow and less precise search.
         if (!isPv || (score > alpha && score < beta)) {
             if (!isExcluded)
-               return score;
+                return score;
         }
     }
 
@@ -137,18 +139,18 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
     // Prepare for singular extension
     if (!isRoot &&                  // we are not at the root
-         depth > singularDepth &&   // sufficient remaining depth
-         excludedMove == dummyMove) // we are not in the singular search
+        depth > singularDepth &&   // sufficient remaining depth
+        excludedMove == dummyMove) // we are not in the singular search
     {
-        
-         if (TT.Retrieve(pos->boardHash, &singularMove, &singularScore, &hashFlag, alpha, beta, depth - 4, ply)) {
 
-             if ((hashFlag & lowerBound) &&  // we have found lower bound hash entry 
-                 singularScore < EvalLimit)  // and it is not a checkmate score
-             {
-                 singularExtension = true;   // we can try the singular extension
-             }
-         }
+        if (TT.Retrieve(pos->boardHash, &singularMove, &singularScore, &hashFlag, alpha, beta, depth - 4, ply)) {
+
+            if ((hashFlag & lowerBound) &&  // we have found lower bound hash entry 
+                singularScore < EvalLimit)  // and it is not a checkmate score
+            {
+                singularExtension = true;   // we can try the singular extension
+            }
+        }
     }
 
     // Are we in check? Knowing that is useful 
@@ -161,7 +163,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
     // Evaluate position, unless in check
     eval = isInCheckBeforeMoving ? -Infinity : Evaluate(pos, &e);
-    
+
     // Adjust node eval by using score from the trans-
     // position table. It modifies a few things, including 
     // null move probability.
@@ -186,10 +188,10 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // in check, in pv-nodes, in the late endgame
     // and in singular search.
     if (!wasNullMove &&
-       !isInCheckBeforeMoving &&
-       !isPv &&
-       !isExcluded &&
-        pos->CanTryNullMove()) 
+        !isInCheckBeforeMoving &&
+        !isPv &&
+        !isExcluded &&
+        pos->CanTryNullMove())
     {
 
         // STATIC NULL MOVE (or Reverse Futility Pruning 
@@ -209,9 +211,9 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // search if static eval is really bad. (~15 Elo)
 
         if (depth <= 3 && eval + 200 * depth < beta) {
-        score = Quiesce(pos, ply, 0, alpha, beta);
-        if (score < beta) // no fail high!
-            return score;
+            score = Quiesce(pos, ply, 0, alpha, beta);
+            if (score < beta) // no fail high!
+                return score;
         }
 
         // NULL MOVE PRUNING means allowing the opponent
@@ -228,7 +230,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // for details. (~82 Elo)
 
         if (eval > beta && depth > 1) {
-            
+
             // Set null move reduction
             reduction = 3 + depth / 6 + (eval - beta > 200);
 
@@ -247,8 +249,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // against zugzwangs (~10 Elo)
             if (depth - reduction > 5 && score >= beta)
                 score = Search(pos, ply, alpha, beta, depth - reduction - 4, true, false);
-            
-            if (Timer.isStopping) 
+
+            if (Timer.isStopping)
                 return 0;
 
             if (score >= beta)
@@ -259,18 +261,23 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // SET FUTILITY PRUNING FLAG. We are going to bet
     // that if the static evaluation of a node is bad,
     // then quiet moves will lead to no improvement.
-    // Score margin is increased with depth.
-    // (~2 Elo, so definately needs tuning)
+    // Score margin is increased with depth. Please
+    // note that our implementation is both unusual
+    // and sub-optimal, because it avoids pruning
+    // moves that give check and - unfortunately -
+    // requires making and unmaking a move just to 
+    // check that. (~2 Elo, so definately needs tuning)
 
     bool canDoFutility = false;
 
     if (depth <= 6 &&
-       !isInCheckBeforeMoving &&
-       !isPv &&
+        !isInCheckBeforeMoving &&
+        !isPv &&
         eval + 75 * depth < beta) {
         canDoFutility = true;
     }
 
+    // INTERNAL ITERATIVE REDUCTION (non-standard).
     // Reduce when position is not on transposition table.
     // Idea from Prodeo chess engine (from Ed Schroder).
     // Please note that the implementation is non-standard,
@@ -292,234 +299,247 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
     while ((move = movePicker.NextMove(pos, ply, modeAll)) != 0) {
 
-            moveType = GetMoveType(pos, move, ttMove, ply);
+        moveType = GetMoveType(pos, move, ttMove, ply);
 
-            // In singular search we omit the best move
-            // checking whether there are viable alternatives
-            if (move == excludedMove && isExcluded)
-                continue;
+        // In singular search we omit the best move
+        // checking whether there are viable alternatives
+        if (move == excludedMove && isExcluded)
+            continue;
 
-            // Are we doing singular extension?
-            bool doSingularExtension = false;
+        // Are we doing singular extension?
+        bool doSingularExtension = false;
 
-            // Singular extension: tried once per search
-            if (depth > singularDepth &&
-                singularMove &&
-                move == singularMove && // we are about to search the best move from tt
-                singularExtension &&    // conditions for the singular search are met
-                excludedMove == dummyMove) {
+        // Singular extension: tried once per search
+        if (depth > singularDepth &&
+            singularMove &&
+            move == singularMove && // we are about to search the best move from tt
+            singularExtension &&    // conditions for the singular search are met
+            excludedMove == dummyMove) {
 
-                // Move from the transposition table
-                // is a candidate for the singular
-                // move. We are checking whether any 
-                // move comes close to it. If not,
-                // we will extend.
-                int newAlpha = -singularScore - 50;
-                
-                // We are checking for decent alternatives,
-                // so we do not test the singular move
-                // candidate.
-                excludedMove = move;
+            // Move from the transposition table
+            // is a candidate for the singular
+            // move. We are checking whether any 
+            // move comes close to it. If not,
+            // we will extend.
+            int newAlpha = -singularScore - 50;
 
-                // The only instance when we search
-                // with isExcluded flag set to "true".
-                // The flag switches off all the node-level
-                // pruning techniques, including reading
-                // score from the transposition table.
-                // After all, to test alternatives
-                // to the singular move, we need to
-                // search them. We will also refrain
-                // from saving the result of this search
-                // in the transposition table, because
-                // it actively avoids searching the best move.
-                int sc = Search(pos, ply + 1, newAlpha, newAlpha + 1, (depth - 1) / 2, false, true);
-                excludedMove = dummyMove;
+            // We are checking for decent alternatives,
+            // so we do not test the singular move
+            // candidate.
+            excludedMove = move;
 
-                if (Timer.isStopping)
-                    return 0;
-
-                // No move scores close to the singular
-                // move, so we extend. The search result
-                // relies on a single move - it would be
-                // a shame if a deeper search revealed
-                // a refutation.
-                if (sc <= newAlpha)
-                    doSingularExtension = true;
-            }
-
-            // Make move
-            pos->DoMove(move, &undo);
-
-            // Filter out illegal moves
-            if (pos->LeavesKingInCheck()) {
-                pos->UndoMove(move, &undo);
-                continue;
-            }
-
-            bool moveGivesCheck = pos->IsInCheck();
-
-            // Update move statistics
-            listOfTriedMoves[movesTried] = move;
-            movesTried++;
-            if (moveType == moveQuiet)
-                quietMovesTried++;
-
-            // Set new search depth
-            newDepth = depth - 1;
-
-            // Singular extension
-            if (doSingularExtension)
-                newDepth++;
-
-            // Check extension
-            else if (moveGivesCheck && (isPv || depth < 4))
-                newDepth++;
-
-            // Futility pruning
-            // (~2 Elo, so definately needs tuning)
-            if (canDoFutility &&
-                movesTried > 1 &&
-               !isPv &&
-               !isInCheckBeforeMoving &&
-               !moveGivesCheck &&
-                moveType == moveQuiet) 
-            {
-                pos->UndoMove(move, &undo);
-                continue;
-            }
-
-            // Late move pruning. Near the leaf nodes
-            // quiet moves that are ordered way back
-            // are unlikely to succeed, so we prune them.
-            // This may lead to an error, but statistically
-            // speaking, depth gain is more important
-            // and a deeper search will fix the error.
-            // (~70 Elo)
-            if (depth <= 3 &&
-               !isPv && 
-               !isInCheckBeforeMoving &&
-               !moveGivesCheck &&
-                moveType == moveQuiet && 
-                quietMovesTried > (3 + improving) * depth) 
-            {
-                pos->UndoMove(move, &undo);
-                continue;
-            }
-
-            // LATE MOVE REDUCTION (LMR). We assume
-            // that with decent move ordering cutoffs
-            // will be caused by the moves tried early on.
-            // That's why we search later moves at the 
-            // reduced depth. However, if a reduced depth
-            // search scores above beta, we need to search
-            // at the normal depth (~125 Elo)
-            if (depth > 1 &&
-                quietMovesTried > 3 && 
-                moveType == moveQuiet && 
-               !isInCheckBeforeMoving && 
-               !moveGivesCheck)
-            {   
-                reduction = Lmr.table[isPv]
-                                     [std::min(depth, 63)]
-                                     [std::min(movesTried, 63)];
-
-                // TODO: increase reduction when not improving
-                //if (reduction > 1 && improving) 
-                //    reduction--;
-
-                // for now it is redundant, but as you add
-                // add more conditions, it will come handy
-                reduction = std::min(reduction, newDepth - 1);
-
-                // do a reduced depth search
-                if (reduction > 0) {
-                    score = -Search(pos, ply + 1, -alpha - 1, -alpha, newDepth - reduction, false, false);
-                    
-                    // if the reduced search score falls
-                    // below alpha, don't bother with
-                    // full depth search
-                    if (score <= alpha) {
-                        pos->UndoMove(move, &undo);
-                        if (Timer.isStopping) 
-                            return 0;
-                        continue;
-                    }
-                }
-            }
-
-            // PVS (Principal variation search). We search 
-            // the first move of a pv-node with a full window. 
-            // For each later move we do a scout search first, 
-            // testing whether score is above alpha (and thus 
-            // above last best score). Only if it is, we do 
-            // a full window search to get the exact value 
-            // of the current node. Zero window searches are 
-            // still conducted with a zero window.
-
-            if (bestScore == -Infinity)
-                score = -Search(pos, ply + 1, -beta, -alpha, newDepth, false, false);
-            else {
-                score = -Search(pos, ply + 1, -alpha - 1, -alpha, newDepth, false, false);
-                if (!Timer.isStopping && score > alpha)
-                    score = -Search(pos, ply + 1, -beta, -alpha, newDepth, false, false);
-            }
-
-            // Undo move
-            pos->UndoMove(move, &undo);
+            // The only instance when we search
+            // with isExcluded flag set to "true".
+            // The flag switches off all the node-level
+            // pruning techniques, including reading
+            // score from the transposition table.
+            // After all, to test alternatives
+            // to the singular move, we need to
+            // search them. We will also refrain
+            // from saving the result of this search
+            // in the transposition table, because
+            // it actively avoids searching the best move.
+            int sc = Search(pos, ply + 1, newAlpha, newAlpha + 1, (depth - 1) / 2, false, true);
+            excludedMove = dummyMove;
 
             if (Timer.isStopping)
                 return 0;
 
-            // Beta cutoff
-            if (score >= beta) {
-                
-                // Beta cutoff means that a move is good.
-                // Update history table and killer moves
-                // so that the move will be sorted higher
-                // next time we encounter it.
-                History.Update(pos, move, depth, ply);
-                for (int i = 0; i < movesTried; i++)
-                    History.UpdateTries(pos, listOfTriedMoves[i], depth);
+            // No move scores close to the singular
+            // move, so we extend. The search result
+            // relies on a single move - it would be
+            // a shame if a deeper search revealed
+            // a refutation.
+            if (sc <= newAlpha)
+                doSingularExtension = true;
+        }
 
-                // Store move in the transposition table
-                if (!isExcluded)
-                    TT.Store(pos->boardHash, move, score, upperBound, depth, ply);
+        // - it works (no errors on bench)
+        // - it is slower by 500 milliseconds out of 19 seconds at bench 15
+        // - moving up futility pruning and late move pruning, so that
+        // - they do not rely on make/unmake move messes with nodecount
+        // - it happens because of movesTried/quietMovesTried
+        //bool expectsCheck = MoveGivesCheck(pos, move);
 
-                // If beta cutoff occurs at the root, 
-                // change the best move and display
-                // the new mainline. (cutoffs can happen
-                // in the root node because er are using
-                // the aspiration window).
-                if (isRoot) {
-                    Pv.Update(ply, move);
+        // Make move
+        pos->DoMove(move, &undo);
+
+        // Filter out illegal moves
+        if (pos->LeavesKingInCheck()) {
+            pos->UndoMove(move, &undo);
+            continue;
+        }
+
+        // See whether the move we have tried gives check
+        bool moveGivesCheck = pos->IsInCheck();
+
+        // Update move statistics
+        listOfTriedMoves[movesTried] = move;
+        movesTried++;
+        if (moveType == moveQuiet)
+            quietMovesTried++;
+
+        // Set new search depth
+        newDepth = depth - 1;
+
+        // Singular extension
+        if (doSingularExtension)
+            newDepth++;
+
+        // Check extension
+        else if (moveGivesCheck && (isPv || depth < 4))
+            newDepth++;
+
+        // Futility pruning
+        // (~2 Elo, so definately needs tuning)
+        if (canDoFutility &&
+            movesTried > 1 &&
+            !isPv &&
+            !isInCheckBeforeMoving &&
+            !moveGivesCheck &&
+            moveType == moveQuiet)
+        {
+            pos->UndoMove(move, &undo);
+            continue;
+        }
+
+        // LATE MOVE PRUNING. Near the leaf nodes
+        // quiet moves that are ordered way back
+        // are unlikely to succeed, so we prune them.
+        // This may lead to an error, but statistically
+        // speaking, depth gain is more important
+        // and a deeper search will fix the error.
+        // Please note that our implementation is
+        // both unusual and sub-optimal, because
+        // it avoids pruning moves that give check
+        // and requires making and unmaking a move
+        // just to test that.
+        // (~70 Elo)
+        if (depth <= 3 &&
+            !isPv &&
+            !isInCheckBeforeMoving &&
+            !moveGivesCheck &&
+            moveType == moveQuiet &&
+            quietMovesTried > (3 + improving) * depth)
+        {
+            pos->UndoMove(move, &undo);
+            continue;
+        }
+
+        // LATE MOVE REDUCTION (LMR). We assume
+        // that with decent move ordering cutoffs
+        // will be caused by the moves tried early on.
+        // That's why we search later moves at the 
+        // reduced depth. However, if a reduced depth
+        // search scores above beta, we need to search
+        // at the normal depth (~125 Elo)
+        if (depth > 1 &&
+            quietMovesTried > 3 &&
+            moveType == moveQuiet &&
+            !isInCheckBeforeMoving &&
+            !moveGivesCheck)
+        {
+            reduction = Lmr.table[isPv]
+                [std::min(depth, 63)]
+            [std::min(movesTried, 63)];
+
+            // TODO: increase reduction when not improving
+            //if (reduction > 1 && improving) 
+            //    reduction--;
+
+            // for now it is redundant, but as you add
+            // add more conditions, it will come handy
+            reduction = std::min(reduction, newDepth - 1);
+
+            // do a reduced depth search
+            if (reduction > 0) {
+                score = -Search(pos, ply + 1, -alpha - 1, -alpha, newDepth - reduction, false, false);
+
+                // if the reduced search score falls
+                // below alpha, don't bother with
+                // full depth search
+                if (score <= alpha) {
+                    pos->UndoMove(move, &undo);
+                    if (Timer.isStopping)
+                        return 0;
+                    continue;
+                }
+            }
+        }
+
+        // PVS (Principal variation search). We search 
+        // the first move of a pv-node with a full window. 
+        // For each later move we do a scout search first, 
+        // testing whether score is above alpha (and thus 
+        // above last best score). Only if it is, we do 
+        // a full window search to get the exact value 
+        // of the current node. Zero window searches are 
+        // still conducted with a zero window.
+
+        if (bestScore == -Infinity)
+            score = -Search(pos, ply + 1, -beta, -alpha, newDepth, false, false);
+        else {
+            score = -Search(pos, ply + 1, -alpha - 1, -alpha, newDepth, false, false);
+            if (!Timer.isStopping && score > alpha)
+                score = -Search(pos, ply + 1, -beta, -alpha, newDepth, false, false);
+        }
+
+        // Undo move
+        pos->UndoMove(move, &undo);
+
+        if (Timer.isStopping)
+            return 0;
+
+        // Beta cutoff
+        if (score >= beta) {
+
+            // Beta cutoff means that a move is good.
+            // Update history table and killer moves
+            // so that the move will be sorted higher
+            // next time we encounter it.
+            History.Update(pos, move, depth, ply);
+            for (int i = 0; i < movesTried; i++)
+                History.UpdateTries(pos, listOfTriedMoves[i], depth);
+
+            // Store move in the transposition table
+            if (!isExcluded)
+                TT.Store(pos->boardHash, move, score, upperBound, depth, ply);
+
+            // If beta cutoff occurs at the root, 
+            // change the best move and display
+            // the new mainline. (cutoffs can happen
+            // in the root node because er are using
+            // the aspiration window).
+            if (isRoot) {
+                Pv.Update(ply, move);
+                Pv.Display(score);
+            }
+
+            // Stop searching this node. It has already
+            // refuted opponent's previous move and looking
+            // for a better refutation would only waste time.
+            return score;
+        }
+
+        // Updating score and alpha
+        if (score > bestScore) {
+            bestScore = score;
+
+            // The current move is better than whatever
+            // we have calculated so far. The lack of beta
+            // cutoff implies that we are in the pv-node
+            // with some distance between alpha and beta
+            // and we are looking for the best move 
+            // and its exact value.
+            if (score > alpha) {
+                alpha = score;
+                bestMove = move;
+                Pv.Update(ply, move);
+                if (isRoot)
                     Pv.Display(score);
-                }
-
-                // Stop searching this node. It has already
-                // refuted opponent's previous move and looking
-                // for a better refutation would only waste time.
-                return score;
             }
+        }
 
-            // Updating score and alpha
-            if (score > bestScore) {
-                bestScore = score;
-
-                // The current move is better than whatever
-                // we have calculated so far. The lack of beta
-                // cutoff implies that we are in the pv-node
-                // with some distance between alpha and beta
-                // and we are looking for the best move 
-                // and its exact value.
-                if (score > alpha) {
-                    alpha = score;
-                    bestMove = move;
-                    Pv.Update(ply, move);
-                    if (isRoot)
-                        Pv.Display(score);
-                }
-            }
-        
     } // end of the main loop
 
     // Return correct checkmate/stalemate score
@@ -530,8 +550,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // Please note that the search structure
     // ensures this is done only if we are not
     // unwinding the search due to timeout.
-    // This is a common source of bugs. If you wish,
-    // you can add an explicit test for that.
+    // This is a common source of bugs. If you 
+    // wish, add an explicit test for that.
     if (!isExcluded) {
         if (bestMove)
             TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, depth, ply);
@@ -550,7 +570,7 @@ bool SetImproving(int eval, int ply) {
 // We need to know the move type for the pruning decisions
 int GetMoveType(Position* pos, Move move, Move ttMove, int ply) {
 
-    if (move == ttMove) 
+    if (move == ttMove)
         return moveHash;   // move from the hash table
 
     if (IsMoveNoisy(pos, move))
@@ -558,11 +578,11 @@ int GetMoveType(Position* pos, Move move, Move ttMove, int ply) {
 
     if (History.IsKiller(move, ply))
         return moveKiller; // killer move
-   
+
     return moveQuiet;      // quiet move
 }
 
-void TryInterrupting(void) 
+void TryInterrupting(void)
 {
     char command[80];
 
@@ -573,7 +593,7 @@ void TryInterrupting(void)
 
     // Search limited by the nodecount
     // (not entirely precise, see previous comment)
-    if (Timer.GetData(maxNodes) != 0 && !Timer.IsInfiniteMode() ) {
+    if (Timer.GetData(maxNodes) != 0 && !Timer.IsInfiniteMode()) {
         if (nodeCount >= Timer.GetData(maxNodes))
             Timer.isStopping = true;
     }
@@ -581,7 +601,7 @@ void TryInterrupting(void)
     // There are some commands
     // that need to be replied to during search
     if (InputAvailable()) {
- 
+
         std::cin.getline(command, 4096);
 
         // user ordered us to stop
@@ -599,4 +619,93 @@ void TryInterrupting(void)
 
     // check if the time is out
     Timer.TryStopping();
+}
+
+bool MoveGivesCheck(Position* pos, Move move) {
+
+    Bitboard checks, occ;
+    Color color = pos->GetSideToMove();
+    Square fromSquare = GetFromSquare(move);
+    Square toSquare = GetToSquare(move);
+
+    // define moving piece, adjusting for promotion
+    int hunter = pos->PieceTypeOnSq(fromSquare);
+    if (IsMovePromotion(move))
+        hunter = GetPromotedPiece(move);
+    int prey = pos->PieceTypeOnSq(toSquare);
+
+    // locate enemy king
+    Square kingSquare = pos->KingSq(~color);
+
+    // direct checks
+    if (hunter == Pawn) {
+        checks = ForwardOf(SidesOf(Paint(kingSquare)), ~color);
+        if (checks & Paint(toSquare)) return true;
+    }
+
+    occ = pos->Occupied();
+
+    // remove pawn in case of promotion,
+    // otherwise we will not detech checks
+    // along the same ray as the promoting move
+    if (IsMovePromotion(move))
+        occ ^= Paint(fromSquare);
+
+    if (hunter == Knight) {
+        checks = GenerateMoves.Knight(kingSquare);
+        if (checks & Paint(toSquare)) return true;
+    }
+
+    if (hunter == Bishop || hunter == Queen) {
+        checks = GenerateMoves.Bish(occ, kingSquare);
+        if (checks & Paint(toSquare)) return true;
+    }
+
+    if (hunter == Rook || hunter == Queen) {
+        checks = GenerateMoves.Rook(occ, kingSquare);
+        if (checks & Paint(toSquare)) return true;
+    }
+
+    // prepare occupancy map after the move...
+    occ = pos->Occupied() ^ (Paint(fromSquare) | Paint(toSquare));
+
+    // ...remembering to take captures into account
+    if (prey != noPieceType)
+        occ ^= Paint(toSquare);
+    
+    // diagonal discovered checks
+    checks = GenerateMoves.Bish(occ, kingSquare);
+    if (checks & pos->MapDiagonalMovers(color)) return true;
+
+    // orthogonal discovered checks
+    checks = GenerateMoves.Rook(occ, kingSquare);
+    if (checks & pos->MapStraightMovers(color)) return true;
+
+    // checks discovered by en passant capture
+
+    if (GetTypeOfMove(move) == tEnPassant) {
+        if (pos->GetSideToMove() == White)
+            occ ^= Paint(toSquare - 8);
+        else
+            occ ^= Paint(toSquare + 8);
+
+        checks = GenerateMoves.Bish(occ, kingSquare);
+        if (checks & pos->MapDiagonalMovers(color)) return true;
+
+        checks = GenerateMoves.Rook(occ, kingSquare);
+        if (checks & pos->MapStraightMovers(color)) return true;
+    }
+
+    // checks discovered by castling
+    // (we make and unmake a move, as it's rare enough
+    // and writing out correct conditions would be hard)
+    if (GetTypeOfMove(move) == tCastle) {
+        UndoData undo;
+        pos->DoMove(move, &undo);
+        bool isInCheck = pos->IsInCheck();
+        pos->UndoMove(move, &undo);
+        return isInCheck;
+    }
+
+    return false;
 }

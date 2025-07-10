@@ -23,9 +23,9 @@ void Position::Clear() {
         kingSq[color] = sqNone;
     
         // Clear bitboards and piece counts
-        for (int type = 0; type < 6; type++) {
-            pieceBitboard[color][type] = 0ULL;
-            pieceCount[color][type] = 0;
+        for (int pieceType = 0; pieceType < 6; pieceType++) {
+            pieceBitboard[color][pieceType] = 0ULL;
+            pieceCount[color][pieceType] = 0;
         }
     }
 

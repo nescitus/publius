@@ -8,3 +8,4 @@ bool SetImproving(int eval, int ply);
 int GetMoveType(Position* pos, Move move, Move ttMove, int ply);
 void PrintRootInfo(int elapsed, int nps);
 void Think(Position* pos);
+bool MoveGivesCheck(Position* pos, Move move);

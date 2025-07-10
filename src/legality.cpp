@@ -143,9 +143,8 @@ bool IsPawnMoveLegal(Color side, Square fromSquare, Square toSquare, Move move, 
             return false;
 
         // non-capture
-        if (toSquare - fromSquare == 8)
-            if (prey == noPieceType)
-                return true;
+        if (toSquare - fromSquare == 8 && prey == noPieceType)
+           return true;
         
         // capture
         if ((toSquare - fromSquare == 7 && FileOf(fromSquare) != fileA) ||
@@ -159,9 +158,8 @@ bool IsPawnMoveLegal(Color side, Square fromSquare, Square toSquare, Move move, 
             return false;
         
         // non-capture
-        if (toSquare - fromSquare == -8)
-            if (prey == noPieceType)
-                return true;
+        if (toSquare - fromSquare == -8 && prey == noPieceType)
+            return true;
         
         // capture
         if ((toSquare - fromSquare == -9 && FileOf(fromSquare) != fileA) ||
