@@ -262,11 +262,9 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // that if the static evaluation of a node is bad,
     // then quiet moves will lead to no improvement.
     // Score margin is increased with depth. Please
-    // note that our implementation is both unusual
-    // and sub-optimal, because it avoids pruning
-    // moves that give check and - unfortunately -
-    // requires making and unmaking a move just to 
-    // check that. (~2 Elo, so definately needs tuning)
+    // note that our implementation does not prune 
+    // moves that give check, which is slightly unusual.
+    // (~2 Elo, so definately needs tuning)
 
     bool canDoFutility = false;
 
@@ -298,8 +296,6 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // Main loop
 
     while ((move = movePicker.NextMove(pos, ply, modeAll)) != 0) {
-
-        moveType = GetMoveType(pos, move, ttMove, ply);
 
         // In singular search we omit the best move
         // checking whether there are viable alternatives
@@ -352,14 +348,30 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // a refutation.
             if (sc <= newAlpha)
                 doSingularExtension = true;
-        }
+        } // end of singular extension code
+
+        // Determine move type
+        moveType = GetMoveType(pos, move, ttMove, ply);
 
         // - it works (no errors on bench)
         // - it is slower by 500 milliseconds out of 19 seconds at bench 15
-        // - moving up futility pruning and late move pruning, so that
-        // - they do not rely on make/unmake move messes with nodecount
-        // - it happens because of movesTried/quietMovesTried
-        //bool expectsCheck = MoveGivesCheck(pos, move);
+        // - it allowed to move up futility pruning, so that it does not rely 
+        //   on make/unmake move 
+        // - the same can be done with late move pruning
+        // - but it messes with nodecounts because of movesTried/quietMovesTried
+        bool expectsCheck = MoveGivesCheck(pos, move);
+
+        // Futility pruning
+        // (~2 Elo, so definately needs tuning)
+        if (canDoFutility &&
+            movesTried > 0 &&
+           !isPv &&
+           !isInCheckBeforeMoving &&
+           !expectsCheck &&
+            moveType == moveQuiet)
+        {
+            continue;
+        }
 
         // Make move
         pos->DoMove(move, &undo);
@@ -371,7 +383,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         }
 
         // See whether the move we have tried gives check
-        bool moveGivesCheck = pos->IsInCheck();
+        bool moveGivesCheck = expectsCheck;
 
         // Update move statistics
         listOfTriedMoves[movesTried] = move;
@@ -389,19 +401,6 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // Check extension
         else if (moveGivesCheck && (isPv || depth < 4))
             newDepth++;
-
-        // Futility pruning
-        // (~2 Elo, so definately needs tuning)
-        if (canDoFutility &&
-            movesTried > 1 &&
-            !isPv &&
-            !isInCheckBeforeMoving &&
-            !moveGivesCheck &&
-            moveType == moveQuiet)
-        {
-            pos->UndoMove(move, &undo);
-            continue;
-        }
 
         // LATE MOVE PRUNING. Near the leaf nodes
         // quiet moves that are ordered way back
@@ -627,62 +626,65 @@ bool MoveGivesCheck(Position* pos, Move move) {
     Color color = pos->GetSideToMove();
     Square fromSquare = GetFromSquare(move);
     Square toSquare = GetToSquare(move);
-
-    // define moving piece, adjusting for promotion
     int hunter = pos->PieceTypeOnSq(fromSquare);
-    if (IsMovePromotion(move))
-        hunter = GetPromotedPiece(move);
     int prey = pos->PieceTypeOnSq(toSquare);
 
-    // locate enemy king
+    // Handle promotion
+    if (IsMovePromotion(move))
+        hunter = GetPromotedPiece(move);
+
+    // Locate enemy king
     Square kingSquare = pos->KingSq(~color);
 
-    // direct checks
+    // Direct checks by a pawn
     if (hunter == Pawn) {
         checks = ForwardOf(SidesOf(Paint(kingSquare)), ~color);
         if (checks & Paint(toSquare)) return true;
     }
 
+    // Init occupancy bitboard
     occ = pos->Occupied();
 
-    // remove pawn in case of promotion,
+    // Remove pawn in case of promotion,
     // otherwise we will not detech checks
     // along the same ray as the promoting move
     if (IsMovePromotion(move))
         occ ^= Paint(fromSquare);
 
+    // Direct checks by a knight
     if (hunter == Knight) {
         checks = GenerateMoves.Knight(kingSquare);
         if (checks & Paint(toSquare)) return true;
     }
 
+    // Direct diagonal checks
     if (hunter == Bishop || hunter == Queen) {
         checks = GenerateMoves.Bish(occ, kingSquare);
         if (checks & Paint(toSquare)) return true;
     }
 
+    // Direct orthogonal checks
     if (hunter == Rook || hunter == Queen) {
         checks = GenerateMoves.Rook(occ, kingSquare);
         if (checks & Paint(toSquare)) return true;
     }
 
-    // prepare occupancy map after the move...
+    // Prepare occupancy map after the move...
     occ = pos->Occupied() ^ (Paint(fromSquare) | Paint(toSquare));
 
     // ...remembering to take captures into account
     if (prey != noPieceType)
         occ ^= Paint(toSquare);
     
-    // diagonal discovered checks
+    // Diagonal discovered checks
     checks = GenerateMoves.Bish(occ, kingSquare);
     if (checks & pos->MapDiagonalMovers(color)) return true;
 
-    // orthogonal discovered checks
+    // Orthogonal discovered checks
     checks = GenerateMoves.Rook(occ, kingSquare);
     if (checks & pos->MapStraightMovers(color)) return true;
 
-    // checks discovered by en passant capture
-
+    // Checks discovered by en passant capture
     if (GetTypeOfMove(move) == tEnPassant) {
         if (pos->GetSideToMove() == White)
             occ ^= Paint(toSquare - 8);
@@ -696,7 +698,7 @@ bool MoveGivesCheck(Position* pos, Move move) {
         if (checks & pos->MapStraightMovers(color)) return true;
     }
 
-    // checks discovered by castling
+    // Checks discovered by castling
     // (we make and unmake a move, as it's rare enough
     // and writing out correct conditions would be hard)
     if (GetTypeOfMove(move) == tCastle) {
