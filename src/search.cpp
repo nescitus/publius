@@ -359,16 +359,17 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         //   on make/unmake move 
         // - the same can be done with late move pruning
         // - but it messes with nodecounts because of movesTried/quietMovesTried
-        bool expectsCheck = MoveGivesCheck(pos, move);
+        
+        // Detect if a move gives check (without playing it)
+        bool moveGivesCheck = pos->MoveGivesCheck(move);
+
+        // Check basic conditions for pruning a move
+        bool canPruneMove = !isPv && !isInCheckBeforeMoving &&
+                            !moveGivesCheck && moveType == moveQuiet;
 
         // Futility pruning
         // (~2 Elo, so definately needs tuning)
-        if (canDoFutility &&
-            movesTried > 0 &&
-           !isPv &&
-           !isInCheckBeforeMoving &&
-           !expectsCheck &&
-            moveType == moveQuiet)
+        if (canDoFutility && movesTried > 0 && canPruneMove)
         {
             continue;
         }
@@ -381,9 +382,6 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             pos->UndoMove(move, &undo);
             continue;
         }
-
-        // See whether the move we have tried gives check
-        bool moveGivesCheck = expectsCheck;
 
         // Update move statistics
         listOfTriedMoves[movesTried] = move;
@@ -415,10 +413,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // just to test that.
         // (~70 Elo)
         if (depth <= 3 &&
-            !isPv &&
-            !isInCheckBeforeMoving &&
-            !moveGivesCheck &&
-            moveType == moveQuiet &&
+            canPruneMove &&
             quietMovesTried > (3 + improving) * depth)
         {
             pos->UndoMove(move, &undo);
@@ -435,12 +430,12 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         if (depth > 1 &&
             quietMovesTried > 3 &&
             moveType == moveQuiet &&
-            !isInCheckBeforeMoving &&
-            !moveGivesCheck)
+           !isInCheckBeforeMoving &&
+           !moveGivesCheck)
         {
             reduction = Lmr.table[isPv]
-                [std::min(depth, 63)]
-            [std::min(movesTried, 63)];
+                                 [std::min(depth, 63)]
+                                 [std::min(movesTried, 63)];
 
             // TODO: increase reduction when not improving
             //if (reduction > 1 && improving) 
@@ -618,96 +613,4 @@ void TryInterrupting(void)
 
     // check if the time is out
     Timer.TryStopping();
-}
-
-bool MoveGivesCheck(Position* pos, Move move) {
-
-    Bitboard checks, occ;
-    Color color = pos->GetSideToMove();
-    Square fromSquare = GetFromSquare(move);
-    Square toSquare = GetToSquare(move);
-    int hunter = pos->PieceTypeOnSq(fromSquare);
-    int prey = pos->PieceTypeOnSq(toSquare);
-
-    // Handle promotion
-    if (IsMovePromotion(move))
-        hunter = GetPromotedPiece(move);
-
-    // Locate enemy king
-    Square kingSquare = pos->KingSq(~color);
-
-    // Direct checks by a pawn
-    if (hunter == Pawn) {
-        checks = ForwardOf(SidesOf(Paint(kingSquare)), ~color);
-        if (checks & Paint(toSquare)) return true;
-    }
-
-    // Init occupancy bitboard
-    occ = pos->Occupied();
-
-    // Remove pawn in case of promotion,
-    // otherwise we will not detech checks
-    // along the same ray as the promoting move
-    if (IsMovePromotion(move))
-        occ ^= Paint(fromSquare);
-
-    // Direct checks by a knight
-    if (hunter == Knight) {
-        checks = GenerateMoves.Knight(kingSquare);
-        if (checks & Paint(toSquare)) return true;
-    }
-
-    // Direct diagonal checks
-    if (hunter == Bishop || hunter == Queen) {
-        checks = GenerateMoves.Bish(occ, kingSquare);
-        if (checks & Paint(toSquare)) return true;
-    }
-
-    // Direct orthogonal checks
-    if (hunter == Rook || hunter == Queen) {
-        checks = GenerateMoves.Rook(occ, kingSquare);
-        if (checks & Paint(toSquare)) return true;
-    }
-
-    // Prepare occupancy map after the move...
-    occ = pos->Occupied() ^ (Paint(fromSquare) | Paint(toSquare));
-
-    // ...remembering to take captures into account
-    if (prey != noPieceType)
-        occ ^= Paint(toSquare);
-    
-    // Diagonal discovered checks
-    checks = GenerateMoves.Bish(occ, kingSquare);
-    if (checks & pos->MapDiagonalMovers(color)) return true;
-
-    // Orthogonal discovered checks
-    checks = GenerateMoves.Rook(occ, kingSquare);
-    if (checks & pos->MapStraightMovers(color)) return true;
-
-    // Checks discovered by en passant capture
-    if (GetTypeOfMove(move) == tEnPassant) {
-        if (pos->GetSideToMove() == White)
-            occ ^= Paint(toSquare - 8);
-        else
-            occ ^= Paint(toSquare + 8);
-
-        checks = GenerateMoves.Bish(occ, kingSquare);
-        if (checks & pos->MapDiagonalMovers(color)) return true;
-
-        checks = GenerateMoves.Rook(occ, kingSquare);
-        if (checks & pos->MapStraightMovers(color)) return true;
-    }
-
-    // Checks discovered by castling
-    // (we make and unmake a move, as it's rare enough
-    // and writing out correct conditions would be hard)
-    if (GetTypeOfMove(move) == tCastle) {
-        UndoData undo;
-        pos->DoMove(move, &undo);
-        bool isInCheck = pos->IsInCheck();
-        pos->UndoMove(move, &undo);
-        return isInCheck;
-    }
-
-    return false;
 }

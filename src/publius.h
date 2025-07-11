@@ -1,7 +1,7 @@
 #pragma once
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3948 lines
+// 3949 lines
 
 #include <iostream>
 #include <algorithm>
@@ -98,13 +98,14 @@ public:
     bool BlackCanCastleShort() const;
     bool WhiteCanCastleLong() const;
     bool BlackCanCastleLong() const;
+    bool IsOnSq(const Color color, const int piece, const Square square) const;
 
     Bitboard AttacksTo(const Square sq) const;
     Bitboard AllStraightMovers() const;
     Bitboard AllDiagMovers() const;
     Bitboard MapPieceType(const int pieceType) const;
-    bool IsOnSq(const Color color, const int piece, const Square square) const;
     Bitboard AttacksFrom(const Square sq) const;
+    bool MoveGivesCheck(const Move move);
 };
 
 // list

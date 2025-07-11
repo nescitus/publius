@@ -2,10 +2,9 @@
 #include "piece.h"
 #include "publius.h"
 #include "bitboard.h"
-#include "bitgen.h"
 
-// This file contains functions that return information
-// about board position
+// This file contains functions that return 
+// simple information about board position
 
 Color Position::GetSideToMove() const {
     return sideToMove;
@@ -160,42 +159,4 @@ bool Position::LeavesKingInCheck() const {
 
 bool Position::IsOnSq(const Color color, const int piece, const Square square) const {
     return ((Map(color, piece) & Paint(square)) != 0);
-}
-
-bool Position::SquareIsAttacked(const Square sq, const Color color) const {
-
-    return (Map(color, Pawn) & GenerateMoves.Pawn(~color, sq)) ||
-           (Map(color, Knight) & GenerateMoves.Knight(sq)) ||
-           (MapDiagonalMovers(color) & GenerateMoves.Bish(Occupied(), sq)) ||
-           (MapStraightMovers(color) & GenerateMoves.Rook(Occupied(), sq)) ||
-           (Map(color, King) & GenerateMoves.King(sq));
-}
-
-Bitboard Position::AttacksTo(const Square sq) const {
-
-    return (Map(White, Pawn) & GenerateMoves.Pawn(Black, sq)) |
-        (Map(Black, Pawn) & GenerateMoves.Pawn(White, sq)) |
-        (MapPieceType(Knight) & GenerateMoves.Knight(sq)) |
-        ((AllDiagMovers()) & GenerateMoves.Bish(Occupied(), sq)) |
-        ((AllStraightMovers()) & GenerateMoves.Rook(Occupied(), sq)) |
-        (MapPieceType(King) & GenerateMoves.King(sq));
-}
-
-Bitboard Position::AttacksFrom(const Square sq) const {
-
-    switch (PieceTypeOnSq(sq)) {
-    case Pawn:
-        return GenerateMoves.Pawn(ColorOfPiece(pieceLocation[sq]), sq);
-    case Knight:
-        return GenerateMoves.Knight(sq);
-    case Bishop:
-        return GenerateMoves.Bish(Occupied(), sq);
-    case Rook:
-        return GenerateMoves.Rook(Occupied(), sq);
-    case Queen:
-        return GenerateMoves.Queen(Occupied(), sq);
-    case King:
-        return GenerateMoves.King(sq);
-    }
-    return 0;
 }
