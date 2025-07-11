@@ -10,6 +10,10 @@
 
 EvalHashTable EvalHash(1024);
 sPawnHashEntry PawnTT[PAWN_HASH_SIZE];
+Bitboard trappedRookKs[2] = { Paint(G1, H1, H2), Paint(G8, H8, H7) };
+Bitboard trappedRookQs[2] = { Paint(B1, A1, A2), Paint(B8, A8, A7) };
+Bitboard trappingKingKs[2] = { Paint(F1, G1), Paint(F8, G8) };
+Bitboard trappingKingQs[2] = { Paint(C1, B1), Paint(C8, B8) };
 
 int Evaluate(Position* pos, EvalData* e) {
 
@@ -45,6 +49,17 @@ int Evaluate(Position* pos, EvalData* e) {
         EvalBishop(pos, e, color);
         EvalRook(pos, e, color);
         EvalQueen(pos, e, color);
+
+        // rook trapped by uncastled king
+
+        if ((pos->Map(color, King) & trappingKingKs[color]) &&
+            (pos->Map(color, Rook) & trappedRookKs[color]))
+             e->Add(color, -25, -25);
+        
+
+        if ((pos->Map(color, King) & trappingKingQs[color]) &&
+            (pos->Map(color, Rook) & trappedRookQs[color]))
+             e->Add(color, -25, -25);
     }
 
     // Precalculate board control bitboards

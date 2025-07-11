@@ -1,6 +1,5 @@
 #include "types.h"
 #include "square.h"
-#include "publius.h"
 #include "bitboard.h"
 #include "mask.h"
 
@@ -60,12 +59,12 @@ void MaskData::InitAdjacentMask() {
 
 void MaskData::InitSupportMask() {
 
-    for (Square sq = A1; sq < 64; ++sq) {
-        support[White][sq] = SidesOf(Paint(sq));
-        support[White][sq] |= FillSouth(support[White][sq]);
+    for (Square square = A1; square < 64; ++square) {
+        support[White][square] = SidesOf(Paint(square));
+        support[White][square] |= FillSouth(support[White][square]);
 
-        support[Black][sq] = SidesOf(Paint(sq));
-        support[Black][sq] |= FillNorth(support[Black][sq]);
+        support[Black][square] = SidesOf(Paint(square));
+        support[Black][square] |= FillNorth(support[Black][square]);
     }
 }
 
