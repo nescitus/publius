@@ -1,7 +1,7 @@
 #pragma once
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3945 lines
+// 3969 lines
 
 #include <iostream>
 #include <algorithm>
@@ -143,7 +143,6 @@ void PrintBoard(Position* pos);
 Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy);
 void PrintBitboard(Bitboard b);
 
-extern const int bitTable[64];
 extern int rootDepth;
 extern Bitboard nodeCount;
 
