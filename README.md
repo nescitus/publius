@@ -1,6 +1,6 @@
 Publius is a dead simple public domain bitboard chess engine created for didactic purposes. Basically a boilerplate chess engine to build upon, no strings attached.
 
-The current rating estimate is 2854 on the CCRL scale, based on the score against Fruit 2.1.
+The current rating estimate is 2856 on the CCRL scale, based on the score against Fruit 2.1: 717.0/1000 at 30s+0.16s
 
 "Simple" and "teaching engine" are vague concepts, so explanation of constraints is in order:
 
