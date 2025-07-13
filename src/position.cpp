@@ -55,9 +55,7 @@ void Position::Set(const std::string& str) {
 
             if (std::isdigit(letter)) {
                square = square + (int)(letter - '0');
-            }
-            else 
-            {
+            } else {
                 auto tuple = PieceFromChar(letter);
                 Color color = std::get<0>(tuple);
                 int pieceType = std::get<1>(tuple);

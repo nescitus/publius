@@ -393,7 +393,7 @@ void EvalPressure(Position* pos, EvalData* e, Color side) {
     Color oppo;
     Square sq;
     int pieceType, pressureMg, pressureEg;
-    Bitboard enemyPieces, enemyMinors, ctrl, hang, behind;
+    Bitboard enemyPieces, ctrl, hang;
 
     pressureMg = 0;
     pressureEg = 0;
@@ -425,11 +425,6 @@ void EvalPressure(Position* pos, EvalData* e, Color side) {
     }
 
     e->Add(side, pressureMg, pressureEg);
-}
-
-int GetTropism(Square sq1, Square sq2) {
-    return 7 - (std::abs(RankOf(sq1) - RankOf(sq2))
-        + std::abs(FileOf(sq1) - FileOf(sq2)));
 }
 
 // Operations repeated while evaluating any piece:
@@ -469,5 +464,5 @@ int Interpolate(EvalData* e) {
     // Score interpolation
     int mgPhase = std::min(24, e->phase);
     int egPhase = 24 - mgPhase;
-    return (((mgScore * mgPhase) + (egScore * egPhase)) / MaxGamePhase);
+    return ((mgScore * mgPhase + egScore * egPhase) / MaxGamePhase);
 }

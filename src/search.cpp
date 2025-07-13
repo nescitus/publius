@@ -352,13 +352,6 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
         // Determine move type
         moveType = GetMoveType(pos, move, ttMove, ply);
-
-        // - it works (no errors on bench)
-        // - it is slower by 500 milliseconds out of 19 seconds at bench 15
-        // - it allowed to move up futility pruning, so that it does not rely 
-        //   on make/unmake move 
-        // - the same can be done with late move pruning
-        // - but it messes with nodecounts because of movesTried/quietMovesTried
         
         // Detect if a move gives check (without playing it)
         bool moveGivesCheck = pos->MoveGivesCheck(move);
@@ -370,9 +363,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // Futility pruning
         // (~2 Elo, so definately needs tuning)
         if (canDoFutility && movesTried > 0 && canPruneMove)
-        {
             continue;
-        }
 
         // Make move
         pos->DoMove(move, &undo);

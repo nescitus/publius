@@ -30,8 +30,7 @@ void PvCollector::SendBestMove() {
         std::cout << "bestmove " << MoveToString(line[0][0])
                   << " ponder " << MoveToString(line[0][1])
                   << std::endl;
-    }
-    else {
+    } else {
         // print just best move
         std::cout << "bestmove " << MoveToString(line[0][0])
                   << std::endl;

@@ -18,12 +18,12 @@ void EvalData::Clear() {
         rookAttacks[color] = 0;
         queenAttacks[color] = 0;
 
-        // Clear all ttacks bitboard
+        // Clear all attacks bitboard
         allAtt[color] = 0;
         
         // Clear control maps
-        for (int piece = 0; piece < 6; piece++)
-            control[color][piece] = 0;
+        for (int pieceType = 0; pieceType < 6; pieceType++)
+            control[color][pieceType] = 0;
     }
 }
 

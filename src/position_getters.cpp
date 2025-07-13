@@ -72,10 +72,6 @@ Square Position::EnPassantSq() const {
     return enPassantSq;
 }
 
-bool Position::IsEmpty(const Square sq) const {
-    return (Occupied() & Paint(sq)) == 0;
-}
-
 Bitboard Position::MapPieceType(const int pieceType) const {
     return pieceBitboard[White][pieceType] |
            pieceBitboard[Black][pieceType];
@@ -155,8 +151,4 @@ bool Position::IsInCheck() const {
 
 bool Position::LeavesKingInCheck() const {
     return (SquareIsAttacked(KingSq(~sideToMove), sideToMove) != 0);
-}
-
-bool Position::IsOnSq(const Color color, const int piece, const Square square) const {
-    return ((Map(color, piece) & Paint(square)) != 0);
 }

@@ -7,9 +7,9 @@ public:
     void SendBestMove();
     void Display(int score);
 
-    // array keeping principal variation, 
-    // used also to retrieve best move and ponder move
-    // and to print main line
+    // array keeping principal variation, also
+    // used to retrieve best move and ponder move
+    // and to print the main line
     Move line[PlyLimit + 2][PlyLimit + 2];
     int size[PlyLimit + 2];
 };

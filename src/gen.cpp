@@ -243,7 +243,7 @@ void FillQuietList(Position* pos, MoveList* list) {
 void FillCheckList(Position* pos, MoveList* list) {
 
     Bitboard pieces, moves;
-    Square fromSquare, toSquare;
+    Square fromSquare;
     Color color = pos->GetSideToMove();
     Square kingSquare = pos->KingSq(~color);
     

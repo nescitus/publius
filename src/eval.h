@@ -48,7 +48,6 @@ void EvalKingAttacks(EvalData* e, Color color);
 void EvalPasser(const Position* pos, EvalData* e, Color color);
 void EvalPressure(Position* pos, EvalData* e, Color side);
 int GetDrawMul(Position* pos, const Color strong, const Color weak);
-int GetTropism(Square sq1, Square sq2);
 int Interpolate(EvalData* e);
 
 const int mgPieceValue[6] = { 93, 402, 407, 589, 1250, 0 };

@@ -17,6 +17,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     EvalData e;
     UndoData undo;
     MovePicker movePicker;
+    bool useTT = true;
 
     // Init
     bestMove = 0;
@@ -37,21 +38,21 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
 
     // Retrieve score from transposition table
     // (in zero window nodes or when we get exact score)
-    if (TT.Retrieve(pos->boardHash, &ttMove, &score, &hashFlag, alpha, beta, 0, ply)) {
+    if (useTT) {
+        if (TT.Retrieve(pos->boardHash, &ttMove, &score, &hashFlag, alpha, beta, 0, ply)) {
 
-        if (!isPv || (score > alpha && score < beta))
-            return score;
+            if (!isPv || (score > alpha && score < beta))
+                return score;
+        }
     }
 
     Pv.size[ply] = ply;
 
-    // Draw detection
+    // Draw detection (and checking for timeout
+    // in case too many draws detected in succession
+    // mess with controlling the time)
     if (pos->IsDraw()) {
-
-        // Too many early exits in a row 
-        // might cause a timeout, so we safeguard
         Timer.TryStopping();
-
         return ScoreDraw;
     }
 
@@ -63,9 +64,8 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     const bool isInCheck = pos->IsInCheck();
 
     // Get a stand-pat score and adjust bounds
-    // (exiting if eval exceeds beta
-    // but starting at the lowest possible value
-    // when in check)
+    // (exiting if eval exceeds beta, but starting
+    // with minus infinity when in check)
     bestScore = isInCheck ? -Infinity : Evaluate(pos, &e);
 
     // Static score cutoff
@@ -83,10 +83,12 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
 
     if (isInCheck)
         movegenMode = modeAll;
-   // else if (qdepth == 0) 
-   //     movegenMode = modeChecks;
-    else
+    else if (qdepth <= 1) 
+        movegenMode = modeChecks;
+    else {
         movegenMode = modeCaptures;
+        useTT = false;
+    }
 
     movePicker.Init(ttMove);
 
@@ -111,7 +113,8 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
 
         // Beta cutoff
         if (score >= beta) {
-            TT.Store(pos->boardHash, move, score, upperBound, 0, ply);
+            if (useTT)
+                TT.Store(pos->boardHash, move, score, upperBound, 0, ply);
             return score;
         }
 
@@ -127,15 +130,16 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     }
     
     // Return correct checkmate/stalemate score
-    if (bestScore == -Infinity) {
+    if (bestScore == -Infinity)
         return pos->IsInCheck() ? -MateScore + ply : 0;
-    }
 
     // Save result in the transpositon table 
-    if (bestMove)
-        TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, 0, ply);
-    else
-        TT.Store(pos->boardHash, 0, bestScore, lowerBound, 0, ply);
+    if (useTT) {
+        if (bestMove)
+            TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, 0, ply);
+        else
+            TT.Store(pos->boardHash, 0, bestScore, lowerBound, 0, ply);
+    }
 
     return bestScore;
 }
