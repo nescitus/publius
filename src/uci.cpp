@@ -51,7 +51,7 @@ bool ParseCommand(std::istringstream& stream, Position* pos) {
 
 void OnUciCommand() {
 
-    std::cout << "id name Publius 0.080" << std::endl;
+    std::cout << "id name Publius 0.081" << std::endl;
     std::cout << "id author Pawel Koziol" << std::endl;
     std::cout << "option name Hash type spin default 16 min 1 max 4096" << std::endl;
     std::cout << "option name Clear Hash type button" << std::endl;
@@ -64,27 +64,28 @@ void OnPositionCommand(std::istringstream& stream, Position* pos) {
     std::string token, fen;
     stream >> token;
 
+    // Set starting position
     if (token == "startpos") {
         fen = startFen;
         stream >> token;
     } 
+    // Set kiwipete fen
     else if (token == "kiwipete") {
         fen = kiwipeteFen;
         stream >> token;
     }
+    // Read fen
     else if (token == "fen") {
         while (stream >> token && token != "moves")
             fen += token + " ";
     }
+    
+    // Set position
     const char* charFen = fen.c_str();
-
     pos->Set(charFen);
 
-    for (bool found = true; stream >> token && found;)
-    {
-        pos->DoMove(StringToMove(pos, token), &undo);
-        pos->TryMarkingIrreversible();
-    }
+    // Execute moves
+    OnStepCommand(stream, pos);
 }
 
 void OnStepCommand(std::istringstream& stream, Position* pos) {
@@ -94,8 +95,7 @@ void OnStepCommand(std::istringstream& stream, Position* pos) {
 
     for (bool found = true; stream >> token && found;)
     {
-        char* moveChar = const_cast<char*>(token.c_str());
-        pos->DoMove(StringToMove(pos, moveChar), &undo);
+        pos->DoMove(StringToMove(pos, token), &undo);
         pos->TryMarkingIrreversible();
     }
 }
@@ -198,7 +198,6 @@ void OnPerftCommand(std::istringstream& stream, Position* pos) {
 
     int moveCount;
     int depth = 4; // default
-
     stream >> depth;
     std::cout << "Running perft test at depth " << depth << std::endl;
 
@@ -222,6 +221,7 @@ void OnStopCommand() {
     Timer.isStopping = true;
     Timer.SetData(isInfinite, 0);
 
+    // UCI protocol requires us to wait
     // after finishing "go infinite" run
     // due to reaching ply limit
     if (Timer.waitingForStop) {
