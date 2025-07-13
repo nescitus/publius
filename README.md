@@ -18,8 +18,8 @@ The current rating estimate is 2856 on the CCRL scale, based on the score agains
 GENERAL:
 
 - basic UCI support
-- kindergarten bitboard move generator
-- pseudo-legal move list
+- kindergarten bitboards
+- pseudo-legal, staged move generator
 - static exchange evaluator to detect bad captures
 - perft
 - bench
@@ -52,6 +52,7 @@ EVAL
 - supported pawns (phalanx or defended)
 - hanging pieces
 - minor pieces attacking each other
+- rook blocked by an uncastled king
 - very primitive evaluation of king's pawn shield
 - very basic evaluation of non-winnable positions
 
