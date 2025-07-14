@@ -5,7 +5,7 @@
 #include "publius.h"
 #include "bitboard.h"
 
-// #define FAST_POPCNT
+ #define FAST_POPCNT
 // uncomment this when compiling for modern Windows systems
 // to gain a little speedup.
 
