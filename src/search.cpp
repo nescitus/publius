@@ -266,14 +266,10 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // moves that give check, which is slightly unusual.
     // (~2 Elo, so definately needs tuning)
 
-    bool canDoFutility = false;
-
-    if (depth <= 6 &&
+    bool canDoFutility = (depth <= 6 &&
         !isInCheckBeforeMoving &&
         !isPv &&
-        eval + 75 * depth < beta) {
-        canDoFutility = true;
-    }
+         eval + 75 * depth < beta);
 
     // INTERNAL ITERATIVE REDUCTION (non-standard).
     // Reduce when position is not on transposition table.
@@ -302,19 +298,11 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         if (move == excludedMove && isExcluded)
             continue;
 
-        // Detect if a move gives check (without playing it)
-        bool moveGivesCheck = pos->MoveGivesCheck(move);
-
-        // Are we extending?
-        bool isExtending = false;
-
-        // Check extension
-        if (moveGivesCheck && (isPv || depth < 4))
-            isExtending = true;
+        // Are we doing singular extension?
+        bool doSingularExtension = false;
 
         // Singular extension: tried once per search
         if (depth > singularDepth &&
-           !isExtending &&
             singularMove &&
             move == singularMove && // we are about to search the best move from tt
             singularExtension &&    // conditions for the singular search are met
@@ -355,20 +343,34 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // a shame if a deeper search revealed
             // a refutation.
             if (sc <= newAlpha)
-                isExtending = true;
+                doSingularExtension = true;
         } // end of singular extension code
 
         // Determine move type
         moveType = GetMoveType(pos, move, ttMove, ply);
 
+        // Detect if a move gives check (without playing it)
+        bool moveGivesCheck = pos->MoveGivesCheck(move);
+
         // Check basic conditions for pruning a move
         bool canPruneMove = !isPv && !isInCheckBeforeMoving &&
-                            !moveGivesCheck && moveType == moveQuiet;
+            !moveGivesCheck && moveType == moveQuiet;
 
-        // Futility pruning
+        // FUTILITY PRUNING
         // (~2 Elo, so definately needs tuning)
         if (canDoFutility && movesTried > 0 && canPruneMove)
             continue;
+
+        // SEE PRUNING - TO TEST
+        //if (movePicker.stage == stageReturnBad &&
+        //   !isInCheckBeforeMoving &&
+        //   !moveGivesCheck &&
+        //    alpha > -MateScore + 500 &&
+        //    movesTried > 1) 
+        //{
+        //    if (Swap(pos, GetFromSquare(move), GetToSquare(move)) < -25 * depth * depth)
+        //        continue;
+        //}
 
         // Make move
         pos->DoMove(move, &undo);
@@ -386,7 +388,15 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             quietMovesTried++;
 
         // Set new search depth
-        newDepth = depth - 1 + isExtending;
+        newDepth = depth - 1;
+
+        // Singular extension
+        if (doSingularExtension)
+            newDepth++;
+
+        // Check extension
+        else if (moveGivesCheck && (isPv || depth < 4))
+            newDepth++;
 
         // LATE MOVE PRUNING. Near the leaf nodes
         // quiet moves that are ordered way back
@@ -418,12 +428,12 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         if (depth > 1 &&
             quietMovesTried > 3 &&
             moveType == moveQuiet &&
-           !isInCheckBeforeMoving &&
-           !moveGivesCheck)
+            !isInCheckBeforeMoving &&
+            !moveGivesCheck)
         {
             reduction = Lmr.table[isPv]
-                                 [std::min(depth, 63)]
-                                 [std::min(movesTried, 63)];
+                [std::min(depth, 63)]
+            [std::min(movesTried, 63)];
 
             // TODO: increase reduction when not improving
             //if (reduction > 1 && improving) 
