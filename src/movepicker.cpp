@@ -1,13 +1,17 @@
 ﻿#include "types.h"
 #include "publius.h"
 #include "legality.h"
+#include "move.h"
 #include "gen.h"
 #include "movepicker.h"
 
-void MovePicker::Init(Move ttMove) {
+void MovePicker::Init(Move ttMove, Move firstKiller, Move secondKiller) {
     
     moveFromTT = ttMove;
+    killer1 = firstKiller;
+    killer2 = secondKiller;
     stage = stageTT;
+    currentMoveStage = stageTT;
 }
 
 Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
@@ -19,7 +23,8 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
             case stageTT:
             {
                 stage = stageGenCapt;
-                if (IsPseudoLegal(pos, moveFromTT))
+                if (moveFromTT &&
+                    IsPseudoLegal(pos, moveFromTT))
                     return moveFromTT;
                 break;
             }
@@ -51,6 +56,7 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
                 goodNoisyLength = goodNoisyList.GetInd();
                 goodNoisyCnt = 0;
                 stage = stageReturnGoodCapt;
+                currentMoveStage = stageReturnGoodCapt;
                 break;
             }
 
@@ -70,19 +76,43 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
                     // with the later stages of move generation.
 
                     stage = (mode == modeCaptures) ? stageEnd 
-                                                   : stageGenQuiet;
+                                                   : stageFirstKiller;
                     break;
                 }
+
+            case stageFirstKiller:
+            {
+                stage = stageSecondKiller;
+                if (killer1 &&
+                    !IsMoveNoisy(pos, killer1) &&
+                    IsPseudoLegal(pos, killer1)) {
+                    currentMoveStage = stageFirstKiller;
+                    return killer1;
+                }
+            }
+
+            case stageSecondKiller:
+            {
+                stage = stageGenQuiet;
+                if (killer2 &&
+                    !IsMoveNoisy(pos, killer2) &&
+                    IsPseudoLegal(pos, killer2)) {
+                    currentMoveStage = stageFirstKiller;
+                    return killer2;
+                }
+            }
 
             case stageGenQuiet:
             {
                 quietList.Clear();
                 (mode == modeChecks) ? FillCheckList(pos, &quietList) 
                                      : FillQuietList(pos, &quietList);
-                quietList.ScoreQuiet(pos, ply, moveFromTT);
+
+                quietList.ScoreQuiet(pos);
                 quietLength = quietList.GetInd();
                 quietCnt = 0;
                 stage = stageReturnQuiet;
+                currentMoveStage = stageReturnQuiet;
                 break;
             }
 
@@ -91,8 +121,11 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
                 while (quietCnt < quietLength) {
                     move = quietList.GetMove();
                     quietCnt++;
-                    if (move == moveFromTT)
-                        continue;  // Avoid returning moveFromTT again
+                    if (move == moveFromTT || 
+                        move == killer1 ||
+                        move == killer2
+                )
+                        continue;  // Avoid returning moves from the earlier stages
                     return move;
                 }
 
@@ -104,6 +137,7 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
             case stagePrepareBad:
             {
                 stage = stageReturnBad;
+                currentMoveStage = stageReturnBad;
                 badNoisyList.ScoreNoisy(pos);
                 badNoisyLength = badNoisyList.GetInd();
                 badNoisyCnt = 0;

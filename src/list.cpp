@@ -98,18 +98,8 @@ void MoveList::ScoreNoisy(Position* pos) {
 // does not have to compare quiet moves with tactical
 // ("noisy") moves.
 
-void MoveList::ScoreQuiet(Position* pos, const int ply, const Move ttMove) {
+void MoveList::ScoreQuiet(Position* pos) {
 
-    for (int i = 0; i < ind; i++) {
-
-        // first killer move
-        if (moves[i] == History.GetKiller1(ply))
-            values[i] = Killer1Value;
-        // second killer move
-        else if (moves[i] == History.GetKiller2(ply))
-            values[i] = Killer2Value;
-        // normal move
-        else
-            values[i] = History.GetScore(pos, moves[i]);    
-    }
+    for (int i = 0; i < ind; i++)
+        values[i] = History.GetScore(pos, moves[i]);
 }

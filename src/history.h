@@ -6,6 +6,7 @@ private:
     Move killer2[PlyLimit];
     int cutoffHistory[12][64]; // [12][64][64] failed narrowly 2025-03-16
     int triesHistory[12][64];
+    Square lastCaptureSquare[PlyLimit];
     void Trim(void);
     int Inc(const int depth);
 public:

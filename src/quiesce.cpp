@@ -8,6 +8,7 @@
 #include "search.h"
 #include "trans.h"
 #include "timer.h"
+#include "history.h"
 #include "movepicker.h"
 
 int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
@@ -90,7 +91,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
         useTT = false;
     }
 
-    movePicker.Init(ttMove);
+    movePicker.Init(ttMove, History.GetKiller1(ply), History.GetKiller2(ply) );
 
     while ((move = movePicker.NextMove(pos, ply, movegenMode)) != 0) {
 

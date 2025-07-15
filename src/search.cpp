@@ -29,7 +29,7 @@ int oldEval[PlyLimit];
 int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded) {
 
     int bestScore, newDepth, eval, moveListLength, movesTried, quietMovesTried;
-    int hashFlag, reduction, score, moveType, singularScore;
+    int hashFlag, reduction, score, singularScore;
     Move move, ttMove, bestMove, singularMove;
     EvalData e;
     UndoData undo;
@@ -287,7 +287,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // we are going to search the transposition table
     // move first; in root node we start searching
     // from the best move from the previous iteration.
-    movePicker.Init(isRoot ? Pv.line[0][0] : ttMove);
+    movePicker.Init(isRoot ? Pv.line[0][0] : ttMove, History.GetKiller1(ply), History.GetKiller2(ply));
 
     // Main loop
 
@@ -346,15 +346,12 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
                 doSingularExtension = true;
         } // end of singular extension code
 
-        // Determine move type
-        moveType = GetMoveType(pos, move, ttMove, ply);
-
         // Detect if a move gives check (without playing it)
         bool moveGivesCheck = pos->MoveGivesCheck(move);
 
         // Check basic conditions for pruning a move
         bool canPruneMove = !isPv && !isInCheckBeforeMoving &&
-            !moveGivesCheck && moveType == moveQuiet;
+            !moveGivesCheck && movePicker.currentMoveStage == stageReturnQuiet;
 
         // FUTILITY PRUNING
         // (~2 Elo, so definately needs tuning)
@@ -363,6 +360,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
         // SEE PRUNING - TO TEST
         //if (movePicker.stage == stageReturnBad &&
+        //    depth < 6 && !isPv &&
         //   !isInCheckBeforeMoving &&
         //   !moveGivesCheck &&
         //    alpha > -MateScore + 500 &&
@@ -384,7 +382,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // Update move statistics
         listOfTriedMoves[movesTried] = move;
         movesTried++;
-        if (moveType == moveQuiet)
+        if (movePicker.currentMoveStage == stageReturnQuiet)
             quietMovesTried++;
 
         // Set new search depth
@@ -427,7 +425,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // at the normal depth (~125 Elo)
         if (depth > 1 &&
             quietMovesTried > 3 &&
-            moveType == moveQuiet &&
+            movePicker.currentMoveStage == stageReturnQuiet &&
             !isInCheckBeforeMoving &&
             !moveGivesCheck)
         {
@@ -557,21 +555,6 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 bool SetImproving(int eval, int ply) {
 
     return !(ply > 1 && oldEval[ply - 2] > eval);
-}
-
-// We need to know the move type for the pruning decisions
-int GetMoveType(Position* pos, Move move, Move ttMove, int ply) {
-
-    if (move == ttMove)
-        return moveHash;   // move from the hash table
-
-    if (IsMoveNoisy(pos, move))
-        return moveNoisy;  // capture or promotion
-
-    if (History.IsKiller(move, ply))
-        return moveKiller; // killer move
-
-    return moveQuiet;      // quiet move
 }
 
 void TryInterrupting(void)

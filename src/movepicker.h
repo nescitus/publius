@@ -23,6 +23,8 @@ enum {
     stageGenCapt,         // generate noisy moves, split them to good and bad
     stagePrepareGood,     // score good noisies
     stageReturnGoodCapt,  // return good noisies
+    stageFirstKiller,     // first killer move
+    stageSecondKiller,    // second killer move
     stageGenQuiet,        // generate and score quiet moves
     stageReturnQuiet,     // return quiet moves
     stagePrepareBad,      // score bad noisies
@@ -40,9 +42,12 @@ private:
     int goodNoisyLength, badNoisyLength, quietLength;
     int goodNoisyCnt, badNoisyCnt, quietCnt;
     MoveList allNoisyList, goodNoisyList, badNoisyList, quietList;
+    Move killer1;
+    Move killer2;
 public:
     Move moveFromTT;
     int stage;
-    void Init(Move ttMove);
+    int currentMoveStage;
+    void Init(Move ttMove, Move firstKiller, Move secondKiller);
     Move NextMove(Position* pos, int ply, Mode mode);
 };

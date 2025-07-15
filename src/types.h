@@ -63,4 +63,3 @@ Square operator^(Square d1, int d2);
 
 enum eMoveType { tNormal, tCastle, tEnPassant, tPawnjump, tPromN, tPromB, tPromR, tPromQ };
 enum eCastleFlag { wShortCastle = 1, wLongCastle = 2, bShortCastle = 4, bLongCastle = 8 };
-enum eMoveFlag { moveQuiet, moveHash, moveNoisy, moveBadcapt, moveKiller };
