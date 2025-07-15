@@ -24,26 +24,6 @@ static const int downwardsDiagonal[64] = {
        0,   1,   2,   3,   4,   5,   6,   7
 };
 
-// step through squares, usually in a "for" loop
-Square operator++(Square& d) { 
-    return d = Square(int(d) + 1); 
-}
-
-// add vector to a square
-Square operator+(Square d1, int d2) { 
-    return Square(int(d1) + int(d2)); 
-}
-
-// substract vector from a square
-Square operator-(Square d1, int d2) { 
-    return Square(int(d1) - int(d2)); 
-}
-
-// needed for en passant
-Square operator^(Square d1, int d2) { 
-    return Square(int(d1) ^ d2); 
-}
-
 // given rank and file, define square
 Square MakeSquare(const int rank, int file) {
     return static_cast<Square>((file << 3) | rank);

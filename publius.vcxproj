@@ -123,7 +123,6 @@
     <ClCompile Include="src\badcapture.cpp" />
     <ClCompile Include="src\bitboard.cpp" />
     <ClCompile Include="src\bitgen.cpp" />
-    <ClCompile Include="src\color.cpp" />
     <ClCompile Include="src\diagnostics.cpp" />
     <ClCompile Include="src\endgame.cpp" />
     <ClCompile Include="src\eval.cpp" />
@@ -139,9 +138,12 @@
     <ClCompile Include="src\mask.cpp" />
     <ClCompile Include="src\move.cpp" />
     <ClCompile Include="src\movedo.cpp" />
+    <ClCompile Include="src\movepicker.cpp" />
     <ClCompile Include="src\moveundo.cpp" />
     <ClCompile Include="src\piece.cpp" />
+    <ClCompile Include="src\popcnt.cpp" />
     <ClCompile Include="src\position.cpp" />
+    <ClCompile Include="src\position_detectors.cpp" />
     <ClCompile Include="src\position_getters.cpp" />
     <ClCompile Include="src\pst.cpp" />
     <ClCompile Include="src\pv.cpp" />
@@ -159,6 +161,7 @@
     <ClInclude Include="src\bitgen.h" />
     <ClInclude Include="src\eval.h" />
     <ClInclude Include="src\evaldata.h" />
+    <ClInclude Include="src\gen.h" />
     <ClInclude Include="src\hashkeys.h" />
     <ClInclude Include="src\history.h" />
     <ClInclude Include="src\legality.h" />
@@ -166,6 +169,7 @@
     <ClInclude Include="src\lmr.h" />
     <ClInclude Include="src\mask.h" />
     <ClInclude Include="src\move.h" />
+    <ClInclude Include="src\movepicker.h" />
     <ClInclude Include="src\piece.h" />
     <ClInclude Include="src\publius.h" />
     <ClInclude Include="src\pv.h" />
