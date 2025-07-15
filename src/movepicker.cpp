@@ -84,7 +84,7 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
             {
                 stage = stageSecondKiller;
                 if (killer1 &&
-                    !IsMoveNoisy(pos, killer1) &&
+                   !IsMoveNoisy(pos, killer1) &&
                     IsPseudoLegal(pos, killer1)) {
                     currentMoveStage = stageFirstKiller;
                     return killer1;
@@ -95,7 +95,7 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
             {
                 stage = stageGenQuiet;
                 if (killer2 &&
-                    !IsMoveNoisy(pos, killer2) &&
+                   !IsMoveNoisy(pos, killer2) &&
                     IsPseudoLegal(pos, killer2)) {
                     currentMoveStage = stageFirstKiller;
                     return killer2;

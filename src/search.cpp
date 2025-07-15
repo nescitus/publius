@@ -298,11 +298,15 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         if (move == excludedMove && isExcluded)
             continue;
 
-        // Are we doing singular extension?
-        bool doSingularExtension = false;
+        // Detect if a move gives check (without playing it)
+        bool moveGivesCheck = pos->MoveGivesCheck(move);
+
+        // Check extension
+        bool doExtension = moveGivesCheck && (isPv || depth < 4);
 
         // Singular extension: tried once per search
         if (depth > singularDepth &&
+           !doExtension &&
             singularMove &&
             move == singularMove && // we are about to search the best move from tt
             singularExtension &&    // conditions for the singular search are met
@@ -343,11 +347,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // a shame if a deeper search revealed
             // a refutation.
             if (sc <= newAlpha)
-                doSingularExtension = true;
+                doExtension = true;
         } // end of singular extension code
-
-        // Detect if a move gives check (without playing it)
-        bool moveGivesCheck = pos->MoveGivesCheck(move);
 
         // Check basic conditions for pruning a move
         bool canPruneMove = !isPv && !isInCheckBeforeMoving &&
@@ -386,15 +387,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             quietMovesTried++;
 
         // Set new search depth
-        newDepth = depth - 1;
-
-        // Singular extension
-        if (doSingularExtension)
-            newDepth++;
-
-        // Check extension
-        else if (moveGivesCheck && (isPv || depth < 4))
-            newDepth++;
+        newDepth = depth - 1 + doExtension;
 
         // LATE MOVE PRUNING. Near the leaf nodes
         // quiet moves that are ordered way back
