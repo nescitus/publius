@@ -287,7 +287,9 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // we are going to search the transposition table
     // move first; in root node we start searching
     // from the best move from the previous iteration.
-    movePicker.Init(isRoot ? Pv.line[0][0] : ttMove, History.GetKiller1(ply), History.GetKiller2(ply));
+    movePicker.Init(isRoot ? Pv.line[0][0] : ttMove, 
+                    History.GetKiller1(ply), 
+                    History.GetKiller2(ply));
 
     // Main loop
 
@@ -324,14 +326,13 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // candidate.
             excludedMove = move;
 
-            // The only instance when we search
-            // with isExcluded flag set to "true".
-            // The flag switches off all the node-level
-            // pruning techniques, including reading
-            // score from the transposition table.
-            // After all, to test alternatives
-            // to the singular move, we need to
-            // search them. We will also refrain
+            // The only instance when we search with
+            // isExcluded flag set to "true". The flag
+            // switches off all the node-level pruning
+            // techniques, including reading score from
+            // the transposition table. After all, to 
+            // test alternatives to the singular move, 
+            // we need to search them. We also refrain
             // from saving the result of this search
             // in the transposition table, because
             // it actively avoids searching the best move.
@@ -358,6 +359,22 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // (~2 Elo, so definately needs tuning)
         if (canDoFutility && movesTried > 0 && canPruneMove)
             continue;
+
+        // LATE MOVE PRUNING. Near the leaf nodes
+        // quiet moves that are ordered way back
+        // are unlikely to succeed, so we prune them.
+        // This may lead to an error, but statistically
+        // speaking, depth gain is more important
+        // and a deeper search will fix the error.
+        // Please note that our implementation is
+        // slightly unusual, because it avoids pruning 
+        // moves that give check. (~70 Elo)
+        if (depth <= 3 &&
+            canPruneMove &&
+            quietMovesTried > ((3 + improving) * depth) - 1)
+        {
+            continue;
+        }
 
         // SEE PRUNING - TO TEST
         //if (movePicker.stage == stageReturnBad &&
@@ -388,26 +405,6 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
         // Set new search depth
         newDepth = depth - 1 + doExtension;
-
-        // LATE MOVE PRUNING. Near the leaf nodes
-        // quiet moves that are ordered way back
-        // are unlikely to succeed, so we prune them.
-        // This may lead to an error, but statistically
-        // speaking, depth gain is more important
-        // and a deeper search will fix the error.
-        // Please note that our implementation is
-        // both unusual and sub-optimal, because
-        // it avoids pruning moves that give check
-        // and requires making and unmaking a move
-        // just to test that.
-        // (~70 Elo)
-        if (depth <= 3 &&
-            canPruneMove &&
-            quietMovesTried > (3 + improving) * depth)
-        {
-            pos->UndoMove(move, &undo);
-            continue;
-        }
 
         // LATE MOVE REDUCTION (LMR). We assume
         // that with decent move ordering cutoffs
