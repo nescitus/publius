@@ -54,50 +54,50 @@ std::string MoveToString(const Move move) {
 
 Move StringToMove(Position* pos, const std::string& moveString) {
 
-    Square from, to;
-    int type;
-    std::string move_str;
-    move_str = moveString;
+    Square fromSquare, toSquare;
+    int moveFlag;
+    std::string moveStr;
+    moveStr = moveString;
 
-    from = MakeSquare(move_str[0] - 'a', move_str[1] - '1');
-    to = MakeSquare(move_str[2] - 'a', move_str[3] - '1');
-    type = tNormal;
+    fromSquare = MakeSquare(moveStr[0] - 'a', moveStr[1] - '1');
+    toSquare = MakeSquare(moveStr[2] - 'a', moveStr[3] - '1');
+    moveFlag = tNormal;
 
     // a king moves by two squares - must be castling
-    if (pos->PieceTypeOnSq(from) == King && 
-        AbsoluteDelta(to, from) == 2) {
-        type = tCastle;
+    if (pos->PieceTypeOnSq(fromSquare) == King && 
+        AbsoluteDelta(toSquare, fromSquare) == 2) {
+        moveFlag = tCastle;
     }
 
     // there are many special pawn moves:
-    else if (pos->PieceTypeOnSq(from) == Pawn) {
+    else if (pos->PieceTypeOnSq(fromSquare) == Pawn) {
         // en passant capture
-        if (to == pos->EnPassantSq()) {
-            type = tEnPassant;
-        }
+        if (toSquare == pos->EnPassantSq())
+            moveFlag = tEnPassant;
+
         // double move whuch might set en passant square
-        else if (AbsoluteDelta(to, from) == 16) {
-            type = tPawnjump;
-        }
+        else if (AbsoluteDelta(toSquare, fromSquare) == 16)
+            moveFlag = tPawnjump;
+       
         // promotion
-        else if (move_str.length() > 4 && move_str[4] != '\0') {
-            switch (move_str[4]) {
+        else if (moveStr.length() > 4 && moveStr[4] != '\0') {
+            switch (moveStr[4]) {
             case 'n':
-                type = tPromN;
+                moveFlag = tPromN;
                 break;
             case 'b':
-                type = tPromB;
+                moveFlag = tPromB;
                 break;
             case 'r':
-                type = tPromR;
+                moveFlag = tPromR;
                 break;
             case 'q':
-                type = tPromQ;
+                moveFlag = tPromQ;
                 break;
             }
         }
     }
 
-    return CreateMove(from, to, type);
+    return CreateMove(fromSquare, toSquare, moveFlag);
 }
 

@@ -77,9 +77,8 @@ void PrintBoard(Position* pos) {
         std::cout << piece_name[pos->GetPiece(mappedSquare)];
 
         // print numbers and start new line with spaces
-        if ((square + 1) % 8 == 0) {
+        if ((square + 1) % 8 == 0)
             std::cout << "  " << 9 - ((square + 1) / 8) << std::endl << "  ";
-        }
     }
     // print letters
     std::cout << std::endl << "  a b c d e f g h" << std::endl << std::endl;
@@ -111,15 +110,17 @@ Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
             continue;
         }
 
-        localCount = (depth == 1) ? 1 
-                                  : Perft(pos, ply + 1, depth - 1, isNoisy);
+        localCount = (depth == 1) 
+                   ? 1 
+                   : Perft(pos, ply + 1, depth - 1, isNoisy);
+
         moveCount += localCount;
 
         pos->UndoMove(move, &undo);
 
         if (ply == 0 && isNoisy)
             std::cout << MoveToString(move) << ": " << localCount << std::endl;
-        }
+    }
     
     return moveCount;
 }

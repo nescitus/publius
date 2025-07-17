@@ -62,7 +62,6 @@ void OnUciCommand() {
 
 void OnPositionCommand(std::istringstream& stream, Position* pos) {
 
-    UndoData undo;
     std::string token, fen;
     stream >> token;
 

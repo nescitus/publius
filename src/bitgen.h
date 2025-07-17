@@ -21,8 +21,7 @@ private:
     Bitboard RankAttacks(const Bitboard occ, const Square sq);
     Bitboard DiagAttacks(const Bitboard occ, const Square sq);
     Bitboard AntiDiagAttacks(const Bitboard occ, const Square sq);
-    void InitRankAttacks();
-    void InitFileAttacks();
+    void InitRankAndFileAttacks();
 public:
     void Init(void);
     Bitboard Pawn(const Color color, const Square sq);

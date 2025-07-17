@@ -36,8 +36,7 @@ void MoveGenerator::Init() {
         InitLineMasks(square); // kindergarten bitboards
     }
 
-    InitRankAttacks(); // kindergarten bitboards
-    InitFileAttacks(); // kindergarten bitboards
+    InitRankAndFileAttacks(); // kindergarten bitboards
 }
 
 void MoveGenerator::InitPawnAttacks(const Square sq, const Bitboard b) {
@@ -75,8 +74,10 @@ void MoveGenerator::InitKingAttacks(const Square sq, const Bitboard b) {
 // if you intersect it with a diagonal and ignore 
 // bits that are unused because the diagonal may be 
 // too short, the result will also be identical.
+// Files require different magic formula, but are 
+// just like ranks, only rotated by 90 degrees.
 
-void MoveGenerator::InitRankAttacks() {
+void MoveGenerator::InitRankAndFileAttacks() {
 
     int lineIndex, occupancyIndex;
 
@@ -85,42 +86,27 @@ void MoveGenerator::InitRankAttacks() {
             
             // clear data
             rankAttacks[lineIndex][occupancyIndex] = 0;
+            fileAttacks[lineIndex][occupancyIndex] = 0;
 
-            // include data for bigger rank indices
+            // include rank data for bigger rank indices
             for (int biggerRank = lineIndex + 1; biggerRank < 8; biggerRank++) {
                 rankAttacks[lineIndex][occupancyIndex] |= bbFileA << biggerRank;
                 if ((1 << biggerRank) & (occupancyIndex << 1)) break;
             }
 
-            // include data for smaller rank indices
+            // include rank data for smaller rank indices
             for (int smallerRank = lineIndex - 1; smallerRank >= 0; smallerRank--) {
                 rankAttacks[lineIndex][occupancyIndex] |= bbFileA << smallerRank;
                 if ((1 << smallerRank) & (occupancyIndex << 1)) break;
             }
-        }
-}
 
-// Files require different magic formula,
-// but are just like ranks, only rotated
-// by 90 degrees.
-
-void MoveGenerator::InitFileAttacks() {
-
-    int lineIndex, occupancyIndex;
-
-    for (lineIndex = 0; lineIndex < 8; lineIndex++)
-        for (occupancyIndex = 0; occupancyIndex < 64; occupancyIndex++) {
-            
-            // clear data
-            fileAttacks[lineIndex][occupancyIndex] = 0;
-
-            // include data for bigger file indices
+            // include file data for bigger file indices
             for (int biggerFile = lineIndex + 1; biggerFile < 8; biggerFile++) {
                 fileAttacks[lineIndex][occupancyIndex] |= bbRank1 << (biggerFile << 3);
                 if ((1 << biggerFile) & (occupancyIndex << 1)) break;
             }
 
-            // include data for smaller file indices
+            // include file data for smaller file indices
             for (int smallerFile = lineIndex - 1; smallerFile >= 0; smallerFile--) {
                 fileAttacks[lineIndex][occupancyIndex] |= bbRank1 << (smallerFile << 3);
                 if ((1 << smallerFile) & (occupancyIndex << 1)) break;

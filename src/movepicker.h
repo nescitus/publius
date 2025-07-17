@@ -46,6 +46,7 @@ private:
     MoveList allNoisyList, goodNoisyList, badNoisyList, quietList;
     Move killer1;
     Move killer2;
+    bool IsAcceptableKiller(Position* pos, Move killer);
 public:
     Move moveFromTT;
     int stage;

@@ -95,6 +95,7 @@ int Swap(const Position* pos, const Square fromSquare, const Square toSquare) {
         // looking for pieces aligned with the "hunter"
         if (hunter == Pawn || hunter == Bishop || hunter == Queen)
             attackers |= (GenerateMoves.Bish(occupancy, toSquare) & pos->AllDiagMovers());
+        
         if (hunter == Rook || hunter == Queen)
             attackers |= (GenerateMoves.Rook(occupancy, toSquare) & pos->AllStraightMovers());
         

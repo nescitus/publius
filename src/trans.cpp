@@ -84,9 +84,8 @@ void TransTable::Store(Bitboard key, Move move, int score, int flags, int depth,
     slot = FindSlot(key);
 
     // Don't overwrite better entries
-    if (slot->key == key && slot->depth > depth) {
+    if (slot->key == key && slot->depth > depth)
         return;
-    }
 
     // Save the data
     slot->key = key;

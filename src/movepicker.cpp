@@ -25,8 +25,7 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
             case stageTT:
             {
                 stage = stageGenCapt;
-                if (moveFromTT &&
-                    IsPseudoLegal(pos, moveFromTT))
+                if (moveFromTT && IsPseudoLegal(pos, moveFromTT))
                     return moveFromTT;
                 break;
             }
@@ -85,9 +84,7 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
             case stageFirstKiller:
             {
                 stage = stageSecondKiller;
-                if (killer1 &&
-                   !IsMoveNoisy(pos, killer1) &&
-                    IsPseudoLegal(pos, killer1)) {
+                if (IsAcceptableKiller(pos, killer1)) {
                     currentMoveStage = stageFirstKiller;
                     return killer1;
                 }
@@ -96,9 +93,7 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
             case stageSecondKiller:
             {
                 stage = stageGenQuiet;
-                if (killer2 &&
-                   !IsMoveNoisy(pos, killer2) &&
-                    IsPseudoLegal(pos, killer2)) {
+                if (IsAcceptableKiller(pos, killer2)) {
                     currentMoveStage = stageFirstKiller;
                     return killer2;
                 }
@@ -123,11 +118,11 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
                 while (quietCnt < quietLength) {
                     move = quietList.GetMove();
                     quietCnt++;
-                    if (move == moveFromTT || 
-                        move == killer1 ||
-                        move == killer2
-                )
-                        continue;  // Avoid returning moves from the earlier stages
+                    
+                    // Avoid returning moves tried at the earlier stages
+                    if (move == moveFromTT || move == killer1 || move == killer2)
+                        continue;
+
                     return move;
                 }
 
@@ -165,4 +160,8 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
             }
         }
     }
+}
+
+bool MovePicker::IsAcceptableKiller(Position* pos, Move killer) {
+    return (killer && !IsMoveNoisy(pos, killer) && IsPseudoLegal(pos, killer));
 }
