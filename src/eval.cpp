@@ -196,7 +196,7 @@ void EvalKnight(const Position* pos, EvalData* e, Color color) {
 
         // Knight attacks on the enemy king zone
         if (GenerateMoves.Knight(square) & e->enemyKingZone[color])
-            e->minorAttacks[color]++;
+            e->minorAttackers[color]++;
     }
 }
 
@@ -227,7 +227,7 @@ void EvalBishop(const Position* pos, EvalData* e, Color color) {
         occupancy = pos->Occupied() ^ pos->Map(color, Queen);
         att = GenerateMoves.Bish(occupancy, square);
         if (att & e->enemyKingZone[color])
-            e->minorAttacks[color]++;
+            e->minorAttackers[color]++;
     }
 }
 
@@ -259,7 +259,7 @@ void EvalRook(const Position* pos, EvalData* e, Color color) {
         occupancy = pos->Occupied() ^ transparent;
         att = GenerateMoves.Rook(occupancy, square);
         if (att & e->enemyKingZone[color])
-            e->rookAttacks[color]++;
+            e->rookAttackers[color]++;
 
         // Rook on a (semi) open file
         file = FillNorth(Paint(square)) | FillSouth(Paint(square));
@@ -323,7 +323,7 @@ void EvalQueen(const Position* pos, EvalData* e, Color color) {
 
         // register the attack
         if (att & e->enemyKingZone[color])
-            e->queenAttacks[color]++;
+            e->queenAttackers[color]++;
     }
 }
 
@@ -443,14 +443,14 @@ void EvalBasic(EvalData* e, const Color color, const int piece, const int sq) {
 // more heavy attackers = better, attack with just minor pieces = meh.
 void EvalKingAttacks(EvalData* e, Color color) {
 
-    int result = 2 * e->queenAttacks[color] * e->rookAttacks[color] * e->minorAttacks[color];
-    result += 17 * e->queenAttacks[color] * e->rookAttacks[color];
-    result += 12 * e->queenAttacks[color] * e->minorAttacks[color];
-    result += 9 * e->rookAttacks[color] * e->minorAttacks[color];
-    result += 3 * e->minorAttacks[color] * e->minorAttacks[color];
-    result += 1 * e->queenAttacks[color];
-    result += 3 * e->rookAttacks[color];
-    result -= 3 * e->minorAttacks[color];
+    int result = 2 * e->queenAttackers[color] * e->rookAttackers[color] * e->minorAttackers[color];
+    result += 17 * e->queenAttackers[color] * e->rookAttackers[color];
+    result += 12 * e->queenAttackers[color] * e->minorAttackers[color];
+    result += 9 * e->rookAttackers[color] * e->minorAttackers[color];
+    result += 3 * e->minorAttackers[color] * e->minorAttackers[color];
+    result += 1 * e->queenAttackers[color];
+    result += 3 * e->rookAttackers[color];
+    result -= 3 * e->minorAttackers[color];
 
     e->Add(color, 400 * result / 100, 0);
 }

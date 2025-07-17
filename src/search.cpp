@@ -368,7 +368,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // and a deeper search will fix the error.
         // Please note that our implementation is
         // slightly unusual, because it avoids pruning 
-        // moves that give check. (~70 Elo)
+        // moves that give check. (~90 Elo)
         if (depth <= 3 &&
             canPruneMove &&
             quietMovesTried > ((3 + improving) * depth) - 1)
@@ -406,12 +406,12 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // Set new search depth
         newDepth = depth - 1 + doExtension;
 
-        // LATE MOVE REDUCTION (LMR). We assume
-        // that with decent move ordering cutoffs
-        // will be caused by the moves tried early on.
-        // That's why we search later moves at the 
-        // reduced depth. However, if a reduced depth
-        // search scores above beta, we need to search
+        // LATE MOVE REDUCTION (LMR). We assume that
+        // with decent move ordering early moves are
+        // much more likely to cause a cutoff. That's
+        // why we search later moves at the  reduced
+        // depth. However, if a reduced depth search
+        // scores  above beta, we need to  re-search
         // at the normal depth (~125 Elo)
         if (depth > 1 &&
             quietMovesTried > 3 &&
@@ -420,24 +420,23 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             !moveGivesCheck)
         {
             reduction = Lmr.table[isPv]
-                [std::min(depth, 63)]
-            [std::min(movesTried, 63)];
+                                 [std::min(depth, 63)]
+                                 [std::min(movesTried, 63)];
 
             // TODO: increase reduction when not improving
             //if (reduction > 1 && improving) 
             //    reduction--;
 
-            // for now it is redundant, but as you add
-            // add more conditions, it will come handy
+            // For now it is redundant, but as you add
+            // more conditions, it will come handy.
             reduction = std::min(reduction, newDepth - 1);
 
             // do a reduced depth search
             if (reduction > 0) {
                 score = -Search(pos, ply + 1, -alpha - 1, -alpha, newDepth - reduction, false, false);
 
-                // if the reduced search score falls
-                // below alpha, don't bother with
-                // full depth search
+                // If  the reduced search score falls  below
+                // alpha, don't bother with full depth search
                 if (score <= alpha) {
                     pos->UndoMove(move, &undo);
                     if (Timer.isStopping)
