@@ -1,6 +1,6 @@
-#pragma once
+// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
-// mask
+#pragma once
 
 class MaskData {
 private:

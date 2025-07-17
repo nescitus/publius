@@ -1,6 +1,6 @@
-#pragma once
+// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
-// move
+#pragma once
 
 int GetTypeOfMove(const Move move);
 int GetPromotedPiece(const Move move);

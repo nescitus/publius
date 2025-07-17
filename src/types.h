@@ -1,3 +1,5 @@
+// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+
 #pragma once
 
 typedef unsigned long long Bitboard;

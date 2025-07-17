@@ -1,7 +1,9 @@
+// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+
 #pragma once
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3974 lines
+// 3972 lines
 
 #include <iostream>
 #include <algorithm>

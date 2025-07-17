@@ -1,4 +1,4 @@
-// Publius 1.0. Didactic bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
 #include "types.h"
 #include "square.h"
@@ -133,17 +133,11 @@ void MoveGenerator::InitFileAttacks() {
 // board occupancy data relevant to the moving piece.
 void MoveGenerator::InitLineMasks(Square sq) {
 
-    rankMask[sq] = FillOcclEast(Paint(sq), ~0)
-                 | FillOcclWest(Paint(sq), ~0);
-
-    fileMask[sq] = FillOcclNorth(Paint(sq), ~0)
-                 | FillOcclSouth(Paint(sq), ~0);
-
-    diagonalMask[sq] = FillOcclNE(Paint(sq), ~0)
-                     | FillOcclSW(Paint(sq), ~0);
-
-    antiDiagMask[sq] = FillOcclNW(Paint(sq), ~0)
-                     | FillOcclSE(Paint(sq), ~0);
+    Bitboard b = Paint(sq);
+    rankMask[sq] = FillOcclEast(b, ~0) | FillOcclWest(b, ~0);
+    fileMask[sq] = FillOcclNorth(b, ~0) | FillOcclSouth(b, ~0);
+    diagonalMask[sq] = FillOcclNE(b, ~0) | FillOcclSW(b, ~0);
+    antiDiagMask[sq] = FillOcclNW(b, ~0) | FillOcclSE(b, ~0);
 }
 
 Bitboard MoveGenerator::Pawn(const Color color, const Square sq) { 
@@ -180,10 +174,7 @@ Bitboard MoveGenerator::FileAttacks(const Bitboard occ, const Square sq) {
 
 Bitboard MoveGenerator::RankAttacks(const Bitboard occ, const Square sq) {
     
-    // masked occupancy
     const Bitboard maskedOccupancy = bbFileA & (occ >> FileOf(sq));
-
-    // occupancy index
     const int occupancyIndex = (maskedOccupancy * bbB8H2diag) >> 58;
     
     // fileAttacks[RankOf(sq)][occupancyIndex] contains the same
@@ -196,10 +187,7 @@ Bitboard MoveGenerator::RankAttacks(const Bitboard occ, const Square sq) {
 
 Bitboard MoveGenerator::DiagAttacks(const Bitboard occ, const Square sq) {
     
-    // masked occupancy
     const Bitboard maskedOccupancy = occ & diagonalMask[sq];
-    
-    // occupancy index
     const int occupancyIndex = (maskedOccupancy * bbFileB) >> 58;
 
     // The interesting thing about kindergarten bitboards

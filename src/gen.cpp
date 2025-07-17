@@ -1,4 +1,4 @@
-// Publius 1.0. Didactic bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
 #include "types.h"
 #include "publius.h"

@@ -1,3 +1,5 @@
+// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+
 #define NOMINMAX
 
 #if defined(_WIN32) || defined(_WIN64)

@@ -1,3 +1,5 @@
+// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+
 #include <tuple>
 #include <cctype> // isdigit
 #include "types.h"

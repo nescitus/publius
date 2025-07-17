@@ -1,3 +1,5 @@
+// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+
 #include "types.h"
 #include "limits.h"
 #include "publius.h"
@@ -77,8 +79,11 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     if (bestScore > alpha)
         alpha = bestScore;
 
-    // Generate and sort move list, depending
-    // on the current mode.
+    // Decide what subset of moves we want to generate.
+    // In the first two plies of our quiescence search
+    // we generate checking moves, later we restrict
+    // ourselves to (good) captures, unless we are in
+    // check - then we generate evasions.
 
     Mode movegenMode;
 

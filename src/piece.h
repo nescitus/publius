@@ -1,3 +1,5 @@
+// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+
 #pragma once
 
 Color ColorOfPiece(int piece);                     // given a piece value, return its color

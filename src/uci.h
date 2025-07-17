@@ -1,3 +1,5 @@
+// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+
 void UciLoop(void);
 bool ParseCommand(std::istringstream& stream, Position* pos);
 void OnUciCommand();

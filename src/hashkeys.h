@@ -1,3 +1,5 @@
+// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+
 #pragma once
 
 static constexpr auto sideRandom = ~((Bitboard)0);

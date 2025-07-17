@@ -1,3 +1,5 @@
+// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+
 #pragma once
 bool IsPseudoLegal(Position* pos, int move);
 bool IsWhiteShortCastleLegal(Position* pos);

@@ -1,4 +1,6 @@
-﻿#include "types.h"
+﻿// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+
+#include "types.h"
 #include "publius.h"
 #include "legality.h"
 #include "move.h"

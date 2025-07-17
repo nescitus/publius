@@ -1,6 +1,6 @@
-#pragma once
+// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
-// bitgen
+#pragma once
 
 class MoveGenerator {
 private:

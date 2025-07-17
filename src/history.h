@@ -1,10 +1,12 @@
+// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+
 #pragma once
 
 class HistoryData {
 private:
     Move killer1[PlyLimit];
     Move killer2[PlyLimit];
-    int cutoffHistory[12][64]; // [12][64][64] failed narrowly 2025-03-16
+    int cutoffHistory[12][64];
     int triesHistory[12][64];
     Square lastCaptureSquare[PlyLimit];
     void Trim(void);
