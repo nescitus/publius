@@ -1,10 +1,10 @@
 Publius is a dead simple public domain bitboard chess engine created for didactic purposes. Basically a boilerplate chess engine to build upon, no strings attached.
 
-The current rating estimate is 2856 on the CCRL scale, based on the score against Fruit 2.1: 717.0/1000 at 30s+0.16s
+The current rating estimate is 2874 on the CCRL scale, based on the score against Fruit 2.1: 738.0/1000 at 30s+0.16s
 
 "Simple" and "teaching engine" are vague concepts, so explanation of constraints is in order:
 
-- eval is done, if not necessarily tuned. It takes into account material, bishop pair, piece/square tables, mobility, passed, doubled and isolated pawns, intentionally primitive king safety and some detection of drawish endgames.
+- eval is done, if not necessarily tuned. It takes into account material, bishop pair, piece/square tables, mobility, passed, doubled and isolated pawns, king safety based on attack units and some detection of drawish endgames.
 - quiescence search is probably done, unless I make delta pruning work.
 - search is under active developement and there will be more stuff added.
 - board update relies on four functions: AddPiece, DeletePiece, MovePiece and ChangePiece.
@@ -45,7 +45,7 @@ EVAL
 - piece/square tables
 - mobility evaluation
 - rooks on open files and 7th rank
-- primitive king safety
+- king safety based on attack units and a sigmoid-shaped curve
 - passed pawns (plus control of the blockade square) 
 - isolated pawns
 - doubled pawns
