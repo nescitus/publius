@@ -10,6 +10,17 @@
 #include "eval.h"
 #include "mask.h"
 
+const Square kingRoot[64] = {
+    B2, B2, C2, D2, E2, F2, G2, G2,
+    B2, B2, C2, D2, E2, F2, G2, G2,
+    B3, B3, C3, D3, E3, F3, G3, G3,
+    B4, B4, C4, D4, E4, F4, G4, G4,
+    B5, B5, C5, D5, E5, F5, G5, G5,
+    B6, B6, C6, D6, E6, F6, G6, G6,
+    B7, B7, C7, D7, E7, F7, G7, G7,
+    B7, B7, C7, D7, E7, F7, G7, G7
+};
+
 EvalHashTable EvalHash(1024);
 sPawnHashEntry PawnTT[PAWN_HASH_SIZE];
 Bitboard trappedRookKs[2] = { Paint(G1, H1, H2), Paint(G8, H8, H7) };
@@ -27,8 +38,8 @@ int Evaluate(Position* pos, EvalData* e) {
 
     // Init eval data
     e->Clear();
-    e->enemyKingZone[White] = GenerateMoves.King(pos->KingSq(Black));
-    e->enemyKingZone[Black] = GenerateMoves.King(pos->KingSq(White));
+    e->enemyKingZone[White] = GenerateMoves.King(kingRoot[pos->KingSq(Black)]);
+    e->enemyKingZone[Black] = GenerateMoves.King(kingRoot[pos->KingSq(White)]);
     e->control[White][Pawn] = GetWPAttacks(pos->Map(White, Pawn));
     e->control[Black][Pawn] = GetBPAttacks(pos->Map(Black, Pawn));
     e->control[White][King] = GenerateMoves.King(pos->KingSq(White));
@@ -56,12 +67,12 @@ int Evaluate(Position* pos, EvalData* e) {
 
         if ((pos->Map(color, King) & trappingKingKs[color]) &&
             (pos->Map(color, Rook) & trappedRookKs[color]))
-             e->Add(color, -25, -25);
-        
+            e->Add(color, -25, -25);
+
 
         if ((pos->Map(color, King) & trappingKingQs[color]) &&
             (pos->Map(color, Rook) & trappedRookQs[color]))
-             e->Add(color, -25, -25);
+            e->Add(color, -25, -25);
     }
 
     // Precalculate board control bitboards
@@ -198,9 +209,11 @@ void EvalKnight(const Position* pos, EvalData* e, Color color) {
 
         // Knight attacks on the enemy king zone
         att = GenerateMoves.Knight(square) & e->enemyKingZone[color];
-        if (att) 
-            e->kingAttUnits[color] += 4 * PopCnt(att);
-        
+        if (att) {
+            e->kingAttUnits[color] += 4 * PopCnt(att & ~e->control[~color][Pawn]);
+            e->kingAttUnits[color] += 3 * PopCnt(att & e->control[~color][Pawn]);
+        }
+
     }
 }
 
@@ -232,8 +245,10 @@ void EvalBishop(const Position* pos, EvalData* e, Color color) {
         att = GenerateMoves.Bish(occupancy, square);
         att &= e->enemyKingZone[color];
 
-        if (att)
-            e->kingAttUnits[color] += 4 * PopCnt(att);
+        if (att) {
+            e->kingAttUnits[color] += 4 * PopCnt(att & ~e->control[~color][Pawn]);
+            e->kingAttUnits[color] += 3 * PopCnt(att & e->control[~color][Pawn]);
+        }
     }
 }
 
@@ -266,8 +281,10 @@ void EvalRook(const Position* pos, EvalData* e, Color color) {
         att = GenerateMoves.Rook(occupancy, square);
         att &= e->enemyKingZone[color];
 
-        if (att) 
-            e->kingAttUnits[color] += 6 * PopCnt(att);
+        if (att) {
+            e->kingAttUnits[color] += 6 * PopCnt(att & ~e->control[~color][Pawn]);
+            e->kingAttUnits[color] += 4 * PopCnt(att & e->control[~color][Pawn]);
+        }
 
         // Rook on a (semi) open file
         file = FillNorth(Paint(square)) | FillSouth(Paint(square));
@@ -298,6 +315,8 @@ void EvalQueen(const Position* pos, EvalData* e, Color color) {
     int cnt;
     Bitboard b, mobility, transparent, occupancy, att;
 
+    Bitboard queenChecks = GenerateMoves.Queen(pos->Occupied(), pos->KingSq(~color));
+
     b = pos->Map(color, Queen);
 
     while (b) {
@@ -311,6 +330,10 @@ void EvalQueen(const Position* pos, EvalData* e, Color color) {
         mobility = GenerateMoves.Queen(pos->Occupied(), square);
         cnt = PopCnt(mobility);
         e->Add(color, queenMobMg[cnt], queenMobEg[cnt]);
+
+        // Queen check threats
+        if (mobility & queenChecks)
+            e->kingAttUnits[color] += 2;
 
         // Board control update
         e->control[color][Queen] |= mobility;
@@ -331,8 +354,13 @@ void EvalQueen(const Position* pos, EvalData* e, Color color) {
 
         att &= e->enemyKingZone[color];
 
-        if (att) 
-            e->kingAttUnits[color] += 9 * PopCnt(att);
+        // queen attack bonuses seem small,
+        // but most of the time they are check threats
+        // at the same time, so they are scored twice
+        if (att) {
+            e->kingAttUnits[color] += 7 * PopCnt(att & ~e->control[~color][Pawn]);
+            e->kingAttUnits[color] += 5 * PopCnt(att & e->control[~color][Pawn]);
+        }
     }
 }
 
@@ -454,7 +482,7 @@ void EvalBasic(EvalData* e, const Color color, const int piece, const int sq) {
 void EvalKingAttacks(EvalData* e, Color color) {
 
     int att = Mask.kingAttack[std::min(e->kingAttUnits[color], 255)];
-    e->Add(color, std::min(att, 500) , 0);
+    e->Add(color, std::min(att, 600), 0);
 }
 
 int Interpolate(EvalData* e) {
