@@ -177,7 +177,7 @@ void EvalPawn(const Position* pos, EvalData* e, Color color) {
 void EvalKnight(const Position* pos, EvalData* e, Color color) {
 
     int cnt;
-    Bitboard b, mobility;
+    Bitboard b, mobility, att;
 
     b = pos->Map(color, Knight);
 
@@ -197,8 +197,10 @@ void EvalKnight(const Position* pos, EvalData* e, Color color) {
         e->control[color][Knight] |= GenerateMoves.Knight(square);
 
         // Knight attacks on the enemy king zone
-        if (GenerateMoves.Knight(square) & e->enemyKingZone[color])
-            e->minorAttackers[color]++;
+        att = GenerateMoves.Knight(square) & e->enemyKingZone[color];
+        if (att) 
+            e->kingAttUnits[color] += 4 * PopCnt(att);
+        
     }
 }
 
@@ -228,8 +230,10 @@ void EvalBishop(const Position* pos, EvalData* e, Color color) {
         // including attacks through own queen
         occupancy = pos->Occupied() ^ pos->Map(color, Queen);
         att = GenerateMoves.Bish(occupancy, square);
-        if (att & e->enemyKingZone[color])
-            e->minorAttackers[color]++;
+        att &= e->enemyKingZone[color];
+
+        if (att)
+            e->kingAttUnits[color] += 4 * PopCnt(att);
     }
 }
 
@@ -260,8 +264,10 @@ void EvalRook(const Position* pos, EvalData* e, Color color) {
         transparent = pos->MapStraightMovers(color);
         occupancy = pos->Occupied() ^ transparent;
         att = GenerateMoves.Rook(occupancy, square);
-        if (att & e->enemyKingZone[color])
-            e->rookAttackers[color]++;
+        att &= e->enemyKingZone[color];
+
+        if (att) 
+            e->kingAttUnits[color] += 6 * PopCnt(att);
 
         // Rook on a (semi) open file
         file = FillNorth(Paint(square)) | FillSouth(Paint(square));
@@ -323,9 +329,10 @@ void EvalQueen(const Position* pos, EvalData* e, Color color) {
         occupancy = pos->Occupied() ^ transparent;
         att |= GenerateMoves.Rook(occupancy, square);
 
-        // register the attack
-        if (att & e->enemyKingZone[color])
-            e->queenAttackers[color]++;
+        att &= e->enemyKingZone[color];
+
+        if (att) 
+            e->kingAttUnits[color] += 9 * PopCnt(att);
     }
 }
 
@@ -440,21 +447,14 @@ void EvalBasic(EvalData* e, const Color color, const int piece, const int sq) {
         Params.egPst[color][piece][sq]);
 }
 
-// Simple king attack calculation, relying just on the number
-// of attackers and their strength. More attacking pieces = good,
-// more heavy attackers = better, attack with just minor pieces = meh.
+// King attack calculation, relying on the number
+// of "attack units" and table lookup. Attack units
+// are awarded for eah possibility of movig a piece
+// to squares adjacent to the opponent's king.
 void EvalKingAttacks(EvalData* e, Color color) {
 
-    int result = 2 * e->queenAttackers[color] * e->rookAttackers[color] * e->minorAttackers[color];
-    result += 17 * e->queenAttackers[color] * e->rookAttackers[color];
-    result += 12 * e->queenAttackers[color] * e->minorAttackers[color];
-    result += 9 * e->rookAttackers[color] * e->minorAttackers[color];
-    result += 3 * e->minorAttackers[color] * e->minorAttackers[color];
-    result += 1 * e->queenAttackers[color];
-    result += 3 * e->rookAttackers[color];
-    result -= 3 * e->minorAttackers[color];
-
-    e->Add(color, 400 * result / 100, 0);
+    int att = Mask.kingAttack[std::min(e->kingAttUnits[color], 255)];
+    e->Add(color, std::min(att, 500) , 0);
 }
 
 int Interpolate(EvalData* e) {

@@ -12,6 +12,11 @@ MaskData::MaskData() {
     InitAdjacentMask();
     InitStrongPawn();
     InitSupportMask();
+    for (int i = 0; i < 255; i++) {
+        kingAttack[i] = (int)((0.226 * pow(i, 1.75)));
+        //printf("%4d ", kingAttack[i]);
+        //if (i % 10 == 0) printf("\n");
+    }
 }
 
 void MaskData::InitRanks() {

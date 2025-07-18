@@ -15,10 +15,8 @@ void EvalData::Clear() {
         mgPawn[color] = 0;
         egPawn[color] = 0;
 
-        // Clear king attacker counters
-        minorAttackers[color] = 0;
-        rookAttackers[color] = 0;
-        queenAttackers[color] = 0;
+        // Clear king attacker counter
+        kingAttUnits[color] = 0;
 
         // Clear all attacks bitboard
         allAtt[color] = 0;

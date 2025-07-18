@@ -10,6 +10,7 @@ private:
     void InitSupportMask();
     void InitStrongPawn();
 public:
+    int kingAttack[256];
     Bitboard rank[8];
     Bitboard file[8];
     Bitboard rr[2][8]; // relative rank

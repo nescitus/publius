@@ -9,9 +9,7 @@ public:
     int mgPawn[2];
     int egPawn[2];
     Bitboard enemyKingZone[2];
-    int minorAttackers[2];
-    int rookAttackers[2];
-    int queenAttackers[2];
+    int kingAttUnits[2];
     Bitboard control[2][6];
     Bitboard allAtt[2];
     int phase; // game phase (24 for starting position)
