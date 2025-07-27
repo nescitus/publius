@@ -96,6 +96,8 @@ const int kingPseudoShield = 8;
 const int kingOpenFilePenalty = -8;
 const int kingNearOpenPenalty = -6;
 const int minorOnMinor = 15;
+const int trappedRookMg = -25;
+const int trappedRookEg = -25;
 
 const int p_support[64] = {
   0,   0,   0,   0,   0,   0,   0,   0,

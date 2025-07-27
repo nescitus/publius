@@ -10,6 +10,15 @@
 #include "eval.h"
 #include "mask.h"
 
+// "Fake" king location, used to initialize
+// king attack zone. This has two benefits:
+// - increases number of squares taken into
+//   account during attack evaluation of
+//   a castled king (for Kg1, f3, g3 and h3
+//   are included)
+// - does not create an additional incentive
+//   for playing Kg1-h1
+
 const Square kingRoot[64] = {
     B2, B2, C2, D2, E2, F2, G2, G2,
     B2, B2, C2, D2, E2, F2, G2, G2,
@@ -21,8 +30,10 @@ const Square kingRoot[64] = {
     B7, B7, C7, D7, E7, F7, G7, G7
 };
 
+// eval hashtables
 EvalHashTable EvalHash(1024);
 sPawnHashEntry PawnTT[PAWN_HASH_SIZE];
+
 Bitboard trappedRookKs[2] = { Paint(G1, H1, H2), Paint(G8, H8, H7) };
 Bitboard trappedRookQs[2] = { Paint(B1, A1, A2), Paint(B8, A8, A7) };
 Bitboard trappingKingKs[2] = { Paint(F1, G1), Paint(F8, G8) };
@@ -63,23 +74,20 @@ int Evaluate(Position* pos, EvalData* e) {
         EvalRook(pos, e, color);
         EvalQueen(pos, e, color);
 
-        // rook trapped by uncastled king
-
+        // Rook trapped by uncastled king (kingside)
         if ((pos->Map(color, King) & trappingKingKs[color]) &&
             (pos->Map(color, Rook) & trappedRookKs[color]))
-            e->Add(color, -25, -25);
+            e->Add(color, trappedRookMg, trappedRookEg);
 
-
+        // Rook trapped by uncastled king (queenside)
         if ((pos->Map(color, King) & trappingKingQs[color]) &&
             (pos->Map(color, Rook) & trappedRookQs[color]))
-            e->Add(color, -25, -25);
-    }
+            e->Add(color, trappedRookMg, trappedRookEg);
 
-    // Precalculate board control bitboards
-
-    for (int piece = Pawn; piece <= King; piece++) {
-        e->allAtt[White] |= e->control[White][piece];
-        e->allAtt[Black] |= e->control[Black][piece];
+        // Precalculate board control bitboards
+        // for passer and pressure eval
+        for (int piece = Pawn; piece <= King; piece++)
+            e->allAtt[color] |= e->control[color][piece];
     }
 
     EvalPasser(pos, e, White);
@@ -338,9 +346,9 @@ void EvalQueen(const Position* pos, EvalData* e, Color color) {
         // Board control update
         e->control[color][Queen] |= mobility;
 
-        // Queen attacks on enemy king zone
-        // including attacks through own lesser pieces
-        // moving along the same ray
+        // Queen attacks on enemy king zone,
+        // including attacks through own lesser 
+        // pieces moving along the same ray
 
         // diagonal attacks
         transparent = pos->Map(color, Bishop);
@@ -352,11 +360,12 @@ void EvalQueen(const Position* pos, EvalData* e, Color color) {
         occupancy = pos->Occupied() ^ transparent;
         att |= GenerateMoves.Rook(occupancy, square);
 
+        // merge attacks with enemy king zone
         att &= e->enemyKingZone[color];
 
         // queen attack bonuses seem small,
-        // but most of the time they are check threats
-        // at the same time, so they are scored twice
+        // but usually they are check threats too,
+        // so they are scored twice
         if (att) {
             e->kingAttUnits[color] += 7 * PopCnt(att & ~e->control[~color][Pawn]);
             e->kingAttUnits[color] += 5 * PopCnt(att & e->control[~color][Pawn]);
@@ -372,7 +381,7 @@ void EvalKing(const Position* pos, EvalData* e, Color color) {
 
     // King piece/square table score
     e->AddPawn(color, Params.mgPst[color][King][square],
-        Params.egPst[color][King][square]);
+                      Params.egPst[color][King][square]);
 
     // Penalising open files near the king
     kingsFile = FillNorth(Paint(square)) | FillSouth(Paint(square)) | Paint(square);
@@ -472,7 +481,7 @@ void EvalBasic(EvalData* e, const Color color, const int piece, const int sq) {
     e->phase += phaseTable[piece];
     //e->Add(color, mgPieceValue[piece], egPieceValue[piece]); // merged with pst
     e->Add(color, Params.mgPst[color][piece][sq],
-        Params.egPst[color][piece][sq]);
+                  Params.egPst[color][piece][sq]);
 }
 
 // King attack calculation, relying on the number
