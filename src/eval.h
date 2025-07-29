@@ -18,7 +18,7 @@ struct EvalTTEntry {
     int val;
 };
 
-const int PAWN_HASH_SIZE = 1024;
+const int PAWN_HASH_SIZE = 16384;
 
 extern sPawnHashEntry PawnTT[PAWN_HASH_SIZE];
 

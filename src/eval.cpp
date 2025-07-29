@@ -31,7 +31,7 @@ const Square kingRoot[64] = {
 };
 
 // eval hashtables
-EvalHashTable EvalHash(1024);
+EvalHashTable EvalHash(16384);
 sPawnHashEntry PawnTT[PAWN_HASH_SIZE];
 
 Bitboard trappedRookKs[2] = { Paint(G1, H1, H2), Paint(G8, H8, H7) };
