@@ -6,6 +6,7 @@
 #include "publius.h"
 #include "timer.h"
 #include "history.h"
+#include "corrhist.h"
 #include "pv.h"
 #include "search.h"
 
@@ -15,6 +16,7 @@ void Think(Position* pos) {
 
     Timer.isStopping = false;
     History.Clear();
+    Corrhist.Clear();
     nodeCount = 0;
     Timer.SetStartTime();
     Iterate(pos);

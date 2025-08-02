@@ -7,6 +7,7 @@
 #include "publius.h"
 #include "timer.h"
 #include "history.h"
+#include "corrhist.h"
 #include "trans.h"
 #include "move.h"
 #include "lmr.h"
@@ -32,7 +33,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
     int bestScore, newDepth, eval, moveListLength, movesTried, quietMovesTried;
     int hashFlag, reduction, score, singularScore;
-    Move move, ttMove, bestMove, singularMove;
+    Move move, ttMove, bestMove = dummyMove, singularMove;
     EvalData e;
     UndoData undo;
     MovePicker movePicker;
@@ -164,7 +165,9 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // less interesting and warrant more pruning.
 
     // Evaluate position, unless in check
-    eval = isInCheckBeforeMoving ? -Infinity : Evaluate(pos, &e);
+    eval = isInCheckBeforeMoving 
+         ? -Infinity 
+         : Corrhist.Correct(pos, Evaluate(pos, &e));
 
     // Adjust node eval by using score from the trans-
     // position table. It modifies a few things, including 
@@ -540,16 +543,30 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             TT.Store(pos->boardHash, 0, bestScore, lowerBound, depth, ply);
     }
 
+    if (!isExcluded &&
+        !isInCheckBeforeMoving &&
+        !IsMateScore(score) &&
+        (bestMove == dummyMove || !IsMoveNoisy(pos, bestMove) &&
+            (hashFlag == exactEntry ||
+             hashFlag == upperBound && bestScore < eval ||
+             hashFlag == lowerBound && bestScore > eval)))
+    {
+        Corrhist.Update(pos, bestScore, eval, depth);
+    }
+
     return bestScore;
 }
 
 bool SetImproving(int eval, int ply) {
-
     return !(ply > 1 && oldEval[ply - 2] > eval);
 }
 
-void TryInterrupting(void)
-{
+bool IsMateScore(int score) {
+    return std::abs(score) > EvalLimit;
+}
+
+void TryInterrupting(void) {
+
     char command[80];
 
     // We don't check for timeout in every node,
