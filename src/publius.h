@@ -67,7 +67,7 @@ private:
     bool IsDrawByInsufficientMaterial() const;
 public:
     Bitboard boardHash;
-    Bitboard pawnHash;
+    Bitboard pawnKingHash;
     bool SquareIsAttacked(const Square sq, const Color color) const;
     void Set(const std::string& str);
     void DoMove(const Move move, UndoData* undo);

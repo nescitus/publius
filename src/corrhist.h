@@ -2,10 +2,12 @@
 
 #pragma once
 
+const int corrhistSize = 16384;
+
 class CorrHist {
 private:
     int GetPawnKey(Position* pos);
-    int pawnCorrhist[16384];
+    int pawnCorrhist[2][corrhistSize];
 public:
     void Clear(void);
     void Update(Position* pos, int score, int eval, int depth);

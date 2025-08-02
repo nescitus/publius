@@ -128,9 +128,9 @@ int Evaluate(Position* pos, EvalData* e) {
 
 void EvalPawnStructure(const Position* pos, EvalData* e) {
 
-    int addr = pos->pawnHash % PAWN_HASH_SIZE;
+    int addr = pos->pawnKingHash % PAWN_HASH_SIZE;
 
-    if (PawnTT[addr].key == pos->pawnHash) {
+    if (PawnTT[addr].key == pos->pawnKingHash) {
         e->mgPawn[White] = PawnTT[addr].mg[White];
         e->mgPawn[Black] = PawnTT[addr].mg[Black];
         e->egPawn[White] = PawnTT[addr].eg[White];
@@ -143,7 +143,7 @@ void EvalPawnStructure(const Position* pos, EvalData* e) {
         EvalKing(pos, e, White);
         EvalKing(pos, e, Black);
 
-        PawnTT[addr].key = pos->pawnHash;
+        PawnTT[addr].key = pos->pawnKingHash;
         PawnTT[addr].mg[White] = e->mgPawn[White];
         PawnTT[addr].mg[Black] = e->mgPawn[Black];
         PawnTT[addr].eg[White] = e->egPawn[White];

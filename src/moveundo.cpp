@@ -20,7 +20,7 @@ void Position::UndoMove(const Move move, UndoData* undo) {
     enPassantSq = undo->enPassantSq;
     reversibleMoves = undo->reversibleMoves;
     boardHash = undo->boardHash;
-    pawnHash = undo->pawnHash;
+    pawnKingHash = undo->pawnHash;
     repetitionIndex--;
 
     // Move piece

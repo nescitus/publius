@@ -94,7 +94,7 @@ void Position::Set(const std::string& str) {
     }
     
     boardHash = CalculateHashKey();
-    pawnHash = CalculatePawnKey();
+    pawnKingHash = CalculatePawnKey();
 }
 
 Bitboard Position::CalculateHashKey() {
