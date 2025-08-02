@@ -9,6 +9,7 @@
 #include "mask.h"
 #include "hashkeys.h"
 #include "history.h"
+#include "corrhist.h"
 #include "trans.h"
 #include "bitgen.h"
 #include "lmr.h"
@@ -21,6 +22,7 @@ HashKeys Key;
 Parameters Params;
 MoveGenerator GenerateMoves;
 HistoryData History;
+CorrHist Corrhist;
 TransTable TT;
 LmrData Lmr;
 PvCollector Pv;

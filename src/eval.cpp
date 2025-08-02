@@ -381,7 +381,7 @@ void EvalKing(const Position* pos, EvalData* e, Color color) {
 
     // King piece/square table score
     e->AddPawn(color, Params.mgPst[color][King][square],
-                      Params.egPst[color][King][square]);
+        Params.egPst[color][King][square]);
 
     // Penalising open files near the king
     kingsFile = FillNorth(Paint(square)) | FillSouth(Paint(square)) | Paint(square);
@@ -481,7 +481,7 @@ void EvalBasic(EvalData* e, const Color color, const int piece, const int sq) {
     e->phase += phaseTable[piece];
     //e->Add(color, mgPieceValue[piece], egPieceValue[piece]); // merged with pst
     e->Add(color, Params.mgPst[color][piece][sq],
-                  Params.egPst[color][piece][sq]);
+        Params.egPst[color][piece][sq]);
 }
 
 // King attack calculation, relying on the number

@@ -76,8 +76,9 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
                     // only good or equal captures, not bothering
                     // with the later stages of move generation.
 
-                    stage = (mode == modeCaptures) ? stageEnd 
-                                                   : stageFirstKiller;
+                    stage = (mode == modeCaptures) 
+                          ? stageEnd 
+                          : stageFirstKiller;
                     break;
                 }
 
@@ -126,8 +127,9 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
                     return move;
                 }
 
-                stage = (mode == modeChecks) ? stageEnd
-                                             : stagePrepareBad;
+                stage = (mode == modeChecks) 
+                      ? stageEnd
+                      : stagePrepareBad;
                 break;
             }
 
