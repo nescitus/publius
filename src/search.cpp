@@ -124,9 +124,9 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
         // Remember that pv-nodes don't use some 
         // pruning/reduction techniques. Because 
-        // of that, we cannot use score from the
-        // zero  window nodes. Despite the  same
-        // nominal depth, they represent more
+        // of  that, we cannot reuse scores from
+        // the zero window nodes. Despite the same
+        // nominal  depth,  they  represent  more
         // shallow and less precise search.
         if (!isPv || (score > alpha && score < beta)) {
             if (!isExcluded)
@@ -135,9 +135,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     }
 
     // Safeguard against ply limit overflow
-    if (ply >= PlyLimit - 1) {
+    if (ply >= PlyLimit - 1)
         return Evaluate(pos, &e);
-    }
 
     // Prepare for singular extension
     if (!isRoot &&                  // we are not at the root
@@ -147,11 +146,11 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
         if (TT.Retrieve(pos->boardHash, &singularMove, &singularScore, &hashFlag, alpha, beta, depth - 4, ply)) {
 
-            if ((hashFlag & lowerBound) &&  // we have found lower bound hash entry 
-                singularScore < EvalLimit)  // and it is not a checkmate score
-            {
-                singularExtension = true;   // we can try the singular extension
-            }
+            // We have found lower bound hash entry
+            // and it is not a checkmate score, so
+            // we can try the singular extension.
+            if ((hashFlag & lowerBound) && singularScore < EvalLimit)  
+                singularExtension = true;
         }
     }
 
@@ -302,7 +301,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         if (move == excludedMove && isExcluded)
             continue;
 
-        // Detect if a move gives check (without playing it)
+        // Detect if a move gives check (without playing it).
+        // This is not a popular idea, but Koivisto does it.
         bool moveGivesCheck = pos->MoveGivesCheck(move);
 
         // Check extension
@@ -317,10 +317,10 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             excludedMove == dummyMove) {
 
             // Move from the transposition table
-            // is a candidate for the singular
-            // move. We are checking whether any 
-            // move comes close to it. If not,
-            // we will extend.
+            // moght be a singular move. We are
+            // trying to disprove it, looking for 
+            // moves that  comes close to it. If 
+            // there are none, we will extend.
             int newAlpha = -singularScore - 50;
 
             // We are checking for decent alternatives,
@@ -362,15 +362,13 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         if (canDoFutility && movesTried > 0 && canPruneMove)
             continue;
 
-        // LATE MOVE PRUNING. Near the leaf nodes
-        // quiet moves that are ordered way back
-        // are unlikely to succeed, so we prune them.
-        // This may lead to an error, but statistically
-        // speaking, depth gain is more important
-        // and a deeper search will fix the error.
-        // Please note that our implementation is
-        // slightly unusual, because it avoids pruning 
-        // moves that give check. (~90 Elo)
+        // LATE MOVE PRUNING. At low depths quiet moves 
+        // near the end of the move list are unlikely to 
+        // succeed, so we prune them. This may lead to an 
+        // error, but usually depth gain is more important
+        // and  a  deeper search will fix the  error.  Our 
+        // implementation is slightly unusual, because it 
+        // avoids pruning moves that give check. (~90 Elo)
         if (depth <= 3 &&
             canPruneMove &&
             quietMovesTried > ((3 + improving) * depth) - 1)
@@ -378,9 +376,11 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             continue;
         }
 
-        // SEE PRUNING - TO TEST
+        // SEE PRUNING. At low depths bad captures are
+        // unlikely to succeed, so we prune them. Static
+        // exchange evaluation margin increases with depth.
         //if (movePicker.stage == stageReturnBad &&
-        //    depth < 6 && !isPv &&
+        //    depth < 4 && !isPv &&
         //   !isInCheckBeforeMoving &&
         //   !moveGivesCheck &&
         //    alpha > -MateScore + 500 &&
