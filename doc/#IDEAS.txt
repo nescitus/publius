@@ -1,0 +1,55 @@
+
+- do tt adjustement of node eval only after improving test
+- reset killermoves for grandchildren
+- smaller lmr of killer moves (currently none)
+- LMP formula of (3 + depth * depth) / (2 - improving))
+- LMR of checking moves, just smaller
+- recapture extension
+- check whether the depth limit for check extension is OK
+- simple eval pattern: trapped bishop
+- no razoring if std::abs(alpha) > EvalLimit
+- mate distance pruning uses own qlph and beta
+- history: you aren't supposed to penalize moves that were pruned
+
+#define MakeScore(mg, eg) ((int)((unsigned int)(eg) << 16) + (mg))
+#define ScoreMG(s) ((int16_t)((uint16_t)((unsigned)((s)))))
+#define ScoreEG(s) ((int16_t)((uint16_t)((unsigned)((s) + 0x8000) >> 16)))
+
+apparently this is a good simple tuner: https://github.com/87flowers/bannou/blob/main/src/generate_psts.zig
+ (this parses textual fens, which i would recommend against)
+it turns each fen into an array of { index, weight } pairs (each pair represents a feature)
+
+DONE:
+
+- givescheck function like https://github.com/Luecx/Koivisto/blob/master/src_files/board.cpp#L851
+- simple eval pattern: rook blocked by uncastled king
+- do MoveGivesCheck before singular extension, and don't enter this code block 
+  if check extension would happen anyway
+
+LIMBO:
+
+-  // Knight loses value as pawns disappear
+   cnt = pos->Count(color, Pawn);
+   e->Add(color, 6 * (cnt - 4), 6 * (cnt - 4));
+   (gains points too slowly)
+
+- uncommenting SEE pruning of bad captures (0.25 after 4.4 k games)
+
+FAILED:
+
+- simple eval pattern: bishop blocked on initial square
+- disable IRR in singular search
+- IIR before canDoFutility test (might work with changed futility margin)
+- no IIR if isExcluded = true
+- corrhist branch (failure gets evident if we use pawn corrhist on top of pst-only eval)
+
+LTC
+
+fastchess.exe -openings order=random file=c:\fastchess\UHO_Lichess_4852_v1.epd -engine proto=uci name=new cmd=c:\fastchess\lemon1.exe -engine proto=uci name=base cmd=c:\fastchess\base.exe -concurrency 5 -each tc=16+0.16 -rounds 100000 -repeat -recover -sprt alpha=0.05 beta=0.10 elo0=0 elo1=10
+
+NORMAL
+
+fastchess.exe -openings order=random file=c:\fastchess\UHO_Lichess_4852_v1.epd -engine proto=uci name=new cmd=c:\fastchess\new1.exe -engine proto=uci name=base cmd=c:\fastchess\base.exe -concurrency 5 -each tc=8+0.08 -rounds 100000 -repeat -recover -sprt alpha=0.05 beta=0.10 elo0=0 elo1=10
+
+NON_REGRESSION
+fastchess.exe -openings order=random file=c:\fastchess\UHO_Lichess_4852_v1.epd -engine proto=uci name=new cmd=c:\fastchess\new1.exe -engine proto=uci name=base cmd=c:\fastchess\base.exe -concurrency 5 -each tc=8+0.08 -rounds 100000 -repeat -recover -sprt alpha=0.05 beta=0.10 elo0=-10 elo1=0
