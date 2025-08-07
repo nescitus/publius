@@ -1,6 +1,7 @@
 // Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
 #include "types.h"
+#include "bitboard.h"
 #include "evaldata.h"
 
 void EvalData::Clear() {
@@ -9,13 +10,11 @@ void EvalData::Clear() {
     
     for (Color color = White; color < colorNone; ++color) {
         
-        // Clean partial scores
-        mg[color] = 0;
-        eg[color] = 0;
-        mgPawn[color] = 0;
-        egPawn[color] = 0;
+        // Clean scores
+        score[color] = 0;
+        pawnScore[color] = 0;
 
-        // Clear king attacker counter
+        // Clear king attack units counter
         kingAttUnits[color] = 0;
 
         // Clear all attacks bitboard
@@ -27,15 +26,21 @@ void EvalData::Clear() {
     }
 }
 
-// Add score
-void EvalData::Add(Color color, int mgVal, int egVal) {
-    mg[color] += mgVal;
-    eg[color] += egVal;
+// Add
+void EvalData::Add(Color color, int val) {
+    score[color] += val;
 }
 
-// Add pawn score. Pawn scores are handled separately,
-// so that they can be saved in pawn hashtable.
-void EvalData::AddPawn(Color color, int mgVal, int egVal) {
-    mgPawn[color] += mgVal;
-    egPawn[color] += egVal;
+// Add pawn score. It is handled separately,
+// so that it can be saved in pawn hashtable.
+void EvalData::AddPawn(Color color, int val) {
+    pawnScore[color] += val;
+}
+
+void EvalData::AddAttacks(Color color, Bitboard att, int strong, int weak) {
+    
+    if (att) {
+        kingAttUnits[color] += strong * PopCnt(att & ~control[~color][Pawn]);
+        kingAttUnits[color] += weak * PopCnt(att & control[~color][Pawn]);
+    }
 }

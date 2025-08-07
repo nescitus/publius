@@ -3,13 +3,31 @@
 #pragma once
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3960 lines
+// 3893 lines
 
 #include <iostream>
 #include <algorithm>
 
 static constexpr auto startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -";
 static constexpr auto kiwipeteFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
+
+// We pack (mg, eg) score into a single integer.
+// This gais some speed (by not adding the values
+// twice), but more importantly simplifies the code.
+
+constexpr int MakeScore(int mg, int eg) {
+    return ((unsigned int)(eg) << 16) + mg;
+}
+
+constexpr int ScoreMG(int s) {
+    return (int16_t)((uint16_t)((unsigned)(s)));
+}
+
+constexpr int ScoreEG(int s) {
+    return (int16_t)((uint16_t)((unsigned)(s + 0x8000) >> 16));
+}
+
+#define S(mg, eg) MakeScore(mg, eg)
 
 // data for undoing a move
 
@@ -27,8 +45,7 @@ class Parameters {
 public:
     void Init();
     int pawnSupport[2][64];
-    int mgPst[2][6][64];
-    int egPst[2][6][64];
+    int pst[2][6][64];
 };
 
 extern Parameters Params;
