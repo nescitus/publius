@@ -544,7 +544,6 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 }
 
 bool SetImproving(int eval, int ply) {
-
     return !(ply > 1 && oldEval[ply - 2] > eval);
 }
 

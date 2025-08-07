@@ -128,32 +128,32 @@ int Evaluate(Position* pos, EvalData* e) {
 
 void EvalPawnStructure(const Position* pos, EvalData* e) {
 
+    // Find appropriate slot in the pawn hashtable
     int addr = pos->pawnHash % PAWN_HASH_SIZE;
 
+    // Try reading score from the pawn hashtable
     if (PawnTT[addr].key == pos->pawnHash) {
-        e->mgPawn[White] = PawnTT[addr].mg[White];
-        e->mgPawn[Black] = PawnTT[addr].mg[Black];
-        e->egPawn[White] = PawnTT[addr].eg[White];
-        e->egPawn[Black] = PawnTT[addr].eg[Black];
-    }
-    else
-    {
-        EvalPawn(pos, e, White);
-        EvalPawn(pos, e, Black);
-        EvalKing(pos, e, White);
-        EvalKing(pos, e, Black);
+        for (Color color = White; color < colorNone; ++color) {
+            e->mgPawn[color] = PawnTT[addr].mg[color];
+            e->egPawn[color] = PawnTT[addr].eg[color];
+        }
+    } else {
 
+        // Evaluate pawns and save result in the pawn hashtable
         PawnTT[addr].key = pos->pawnHash;
-        PawnTT[addr].mg[White] = e->mgPawn[White];
-        PawnTT[addr].mg[Black] = e->mgPawn[Black];
-        PawnTT[addr].eg[White] = e->egPawn[White];
-        PawnTT[addr].eg[Black] = e->egPawn[Black];
+
+        for (Color color = White; color < colorNone; ++color) {
+            EvalPawn(pos, e, color);
+            EvalKing(pos, e, color);
+            PawnTT[addr].mg[color] = e->mgPawn[color];
+            PawnTT[addr].eg[color] = e->egPawn[color];
+        }
     }
 
-    e->mg[White] += e->mgPawn[White];
-    e->eg[White] += e->egPawn[White];
-    e->mg[Black] += e->mgPawn[Black];
-    e->eg[Black] += e->egPawn[Black];
+    // Merge pawn eval with total eval
+    for (Color color = White; color < colorNone; ++color)
+        e->Add(color, e->mgPawn[color], e->egPawn[color]);
+
 }
 
 void EvalPawn(const Position* pos, EvalData* e, Color color) {
