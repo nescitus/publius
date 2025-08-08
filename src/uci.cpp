@@ -94,8 +94,7 @@ void OnStepCommand(std::istringstream& stream, Position* pos) {
     std::string token;
     UndoData undo;
 
-    for (bool found = true; stream >> token && found;)
-    {
+    for (bool found = true; stream >> token && found;) {
         pos->DoMove(StringToMove(pos, token), &undo);
         pos->TryMarkingIrreversible();
     }

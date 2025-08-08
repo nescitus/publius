@@ -10,10 +10,9 @@ public:
     int kingAttUnits[2];
     Bitboard control[2][6];
     Bitboard allAtt[2];
-    int phase; // game phase (24 for starting position)
+    int gamePhase; // game phase (24 for starting position)
     void Clear();
     void Add(Color color, int val);
     void AddPawn(Color color, int val);
     void AddAttacks(Color color, Bitboard att, int strong, int weak);
-
 };

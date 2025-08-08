@@ -3,7 +3,7 @@
 #pragma once
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3893 lines
+// 3882 lines
 
 #include <iostream>
 #include <algorithm>
@@ -79,7 +79,6 @@ private:
     Bitboard CalculateHashKey();
     Bitboard CalculatePawnKey();
     
-    bool IsDrawBy50MoveRule() const;
     bool IsDrawByRepetition() const;
     bool IsDrawByInsufficientMaterial() const;
 public:

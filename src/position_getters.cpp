@@ -109,7 +109,8 @@ bool Position::CanTryNullMove() const {
 
 bool Position::IsDraw() const {
 
-    if (IsDrawBy50MoveRule())
+    // draw by 50 move rule
+    if (reversibleMoves > 100)
         return true;
 
     if (IsDrawByRepetition())
@@ -121,16 +122,11 @@ bool Position::IsDraw() const {
     return false;
 }
 
-bool Position::IsDrawBy50MoveRule() const {
-    return (reversibleMoves > 100);
-}
-
 bool Position::IsDrawByRepetition() const {
 
     for (int i = 4; i <= reversibleMoves; i += 2) {
-        if (boardHash == repetitionList[repetitionIndex - i]) {
+        if (boardHash == repetitionList[repetitionIndex - i])
             return true;
-        }
     }
 
     return false;

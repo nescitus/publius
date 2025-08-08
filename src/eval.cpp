@@ -59,6 +59,7 @@ int Evaluate(Position* pos, EvalData* e) {
     // Tempo bonus
     e->Add(pos->GetSideToMove(), tempo);
 
+    // Evaluate pawn structure, using pawn hashtable if possible
     EvalPawnStructure(pos, e);
 
     // Evaluate pieces
@@ -90,15 +91,14 @@ int Evaluate(Position* pos, EvalData* e) {
             e->allAtt[color] |= e->control[color][piece];
     }
 
-    EvalPasser(pos, e, White);
-    EvalPasser(pos, e, Black);
-
-    EvalPressure(pos, e, White);
-    EvalPressure(pos, e, Black);
-
-    // Finalize king attacks eval
-    EvalKingAttacks(e, White);
-    EvalKingAttacks(e, Black);
+    // Passer and pressure eval are done in 
+    // the second loop, because they rely on 
+    // e->Allatt being filled
+    for (Color color = White; color < colorNone; ++color) {
+        EvalPasser(pos, e, color);
+        EvalPressure(pos, e, color);
+        EvalKingAttacks(e, color);
+    }
 
     // Interpolate between midgame and endgame scores
     score = Interpolate(e);
@@ -149,7 +149,6 @@ void EvalPawnStructure(const Position* pos, EvalData* e) {
     // Merge pawn eval with total eval
     for (Color color = White; color < colorNone; ++color)
         e->Add(color, e->pawnScore[color]);
-
 }
 
 void EvalPawn(const Position* pos, EvalData* e, Color color) {
@@ -180,7 +179,7 @@ void EvalPawn(const Position* pos, EvalData* e, Color color) {
 
         // Isolated pawn
         else if ((Mask.adjacentFiles[FileOf(square)] & pos->Map(color, Pawn)) == 0)
-            e->AddPawn(color, isolPawn + isolOpen * isOpen);
+            e->AddPawn(color, isolPawn + isOpen * isolOpen);
 
         // Backward pawn
         else if ((Mask.support[color][square] & pos->Map(color, Pawn)) == 0)
@@ -405,11 +404,16 @@ void EvalPasser(const Position* pos, EvalData* e, Color color) {
 
         // Passed pawn
         if (!(Mask.passed[color][square] & pos->Map(~color, Pawn))) {
+            
+            // Multiplier reflects both blockade
+            // and support to a passer
             int mul = 100;
             if (stop & e->allAtt[color]) mul += 33;
             if (stop & e->allAtt[~color]) mul -= 33;
             if (stop & pos->Occupied()) mul -= 15;
 
+            // Because of multiplier, we unpack score
+            // and pack it again
             int s = passedBonus[color][RankOf(square)];
             e->Add(color, MakeScore((ScoreMG(s) * mul / 100),
                                     (ScoreEG(s) * mul / 100)));
@@ -447,6 +451,7 @@ void EvalPressure(Position* pos, EvalData* e, Color side) {
         pressure += pressureBonus[pieceType];
     }
 
+    // finalize
     e->Add(side, pressure);
 }
 
@@ -455,7 +460,7 @@ void EvalPressure(Position* pos, EvalData* e, Color side) {
 // and calculating the game phase.
 void EvalBasic(EvalData* e, const Color color, const int piece, const int sq) {
 
-    e->phase += phaseTable[piece];
+    e->gamePhase += phaseTable[piece];
     //e->Add(color, mgPieceValue[piece], egPieceValue[piece]); // merged with pst
     e->Add(color, Params.pst[color][piece][sq]);
 }
@@ -480,7 +485,7 @@ int Interpolate(EvalData* e) {
                 - ScoreEG(e->score[Black]);
 
     // Score interpolation
-    int mgPhase = std::min(24, e->phase);
+    int mgPhase = std::min(24, e->gamePhase);
     int egPhase = 24 - mgPhase;
     return ((mgScore * mgPhase + egScore * egPhase) / MaxGamePhase);
 }

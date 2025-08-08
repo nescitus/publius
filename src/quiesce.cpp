@@ -20,7 +20,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     EvalData e;
     UndoData undo;
     MovePicker movePicker;
-    bool useTT = true;
+    bool saveInTT = true;
 
     // Init
     bestMove = 0;
@@ -41,12 +41,10 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
 
     // Retrieve score from transposition table
     // (in zero window nodes or when we get exact score)
-    if (useTT) {
-        if (TT.Retrieve(pos->boardHash, &ttMove, &score, &hashFlag, alpha, beta, 0, ply)) {
+    if (TT.Retrieve(pos->boardHash, &ttMove, &score, &hashFlag, alpha, beta, 0, ply)) {
 
-            if (!isPv || (score > alpha && score < beta))
-                return score;
-        }
+        if (!isPv || (score > alpha && score < beta))
+            return score;
     }
 
     Pv.size[ply] = ply;
@@ -93,7 +91,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
         movegenMode = modeChecks;
     else {
         movegenMode = modeCaptures;
-        useTT = false;
+        saveInTT = false;
     }
 
     movePicker.Init(ttMove, History.GetKiller1(ply), History.GetKiller2(ply) );
@@ -119,7 +117,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
 
         // Beta cutoff
         if (score >= beta) {
-            if (useTT)
+            if (saveInTT)
                 TT.Store(pos->boardHash, move, score, upperBound, 0, ply);
             return score;
         }
@@ -140,7 +138,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
         return pos->IsInCheck() ? -MateScore + ply : 0;
 
     // Save result in the transpositon table 
-    if (useTT) {
+    if (saveInTT) {
         if (bestMove)
             TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, 0, ply);
         else

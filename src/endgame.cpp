@@ -62,8 +62,7 @@ int GetDrawMul(Position* pos, const Color strong, const Color weak) {
         if (pos->Count(weak, Pawn) == 0) {
 
             // No minors of either color
-            if (pos->CountMinors(strong) == 0 &&
-                pos->CountMinors(weak) == 0) {
+            if (pos->CountMinors(strong) + pos->CountMinors(weak) == 0) {
 
                 // Equal count of rooks and queens -> pull towards draw,
                 // as wins are achievable mainly by short term tactics
@@ -73,8 +72,7 @@ int GetDrawMul(Position* pos, const Color strong, const Color weak) {
             }
 
             // No major pieces of either color
-            if (pos->CountMajors(strong) == 0 &&
-                pos->CountMajors(weak) == 0) {
+            if (pos->CountMajors(strong) + pos->CountMajors(weak) == 0) {
 
                 // Equal count of minor pieces - pull towards draw
                 if (pos->CountMinors(strong) == pos->CountMinors(weak))

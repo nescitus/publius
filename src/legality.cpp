@@ -10,7 +10,8 @@
 
 bool IsPseudoLegal(Position* pos, int move) {
 
-    if (move == 0) return false;
+    if (move == 0) 
+        return false;
 
     Color side = pos->GetSideToMove();
     Square fromSquare = GetFromSquare(move);

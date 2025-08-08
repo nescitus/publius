@@ -6,7 +6,7 @@
 
 void EvalData::Clear() {
 
-    phase = 0;
+    gamePhase = 0;
     
     for (Color color = White; color < colorNone; ++color) {
         
@@ -26,7 +26,7 @@ void EvalData::Clear() {
     }
 }
 
-// Add
+// Add score
 void EvalData::Add(Color color, int val) {
     score[color] += val;
 }
@@ -37,6 +37,10 @@ void EvalData::AddPawn(Color color, int val) {
     pawnScore[color] += val;
 }
 
+// Add attacks to enemy king. We divide them
+// into two cathegories: weak attacks on
+// squares controlled by enemy pawns and strong
+// attacks if it is not the case.
 void EvalData::AddAttacks(Color color, Bitboard att, int strong, int weak) {
     
     if (att) {

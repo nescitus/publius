@@ -12,12 +12,10 @@ MaskData::MaskData() {
     InitAdjacentMask();
     InitStrongPawn();
     InitSupportMask();
-    for (int i = 0; i < 255; i++) {
-        kingAttack[i] = int(480 * i * i / (i * i + 4200)); // (int)((0.226 * pow(i, 1.75)));
-        //kingAttack[i] = (int)((0.226 * pow(i, 1.75)));
-        //printf("%4d ", kingAttack[i]);
-        //if (i % 10 == 0) printf("\n");
-    }
+
+    // Init king attack table
+    for (int i = 0; i < 255; i++)
+        kingAttack[i] = int(480 * i * i / (i * i + 4200));
 }
 
 void MaskData::InitRanks() {
