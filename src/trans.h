@@ -4,7 +4,7 @@
 
 // bound types
 
-enum eHashEntry { None, lowerBound, upperBound, exactEntry };
+enum eHashEntry { None, upperBound, lowerBound, exactEntry };
 
 // transposition table record
 

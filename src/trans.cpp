@@ -65,8 +65,8 @@ bool TransTable::Retrieve(Bitboard key, Move* move, int* score, int* flag, int a
             *score = ScoreFromTT(slot->score, ply);
 
             // Score from the transposition table can be used in search
-            if ((slot->flags & lowerBound && *score <= alpha) ||
-                (slot->flags & upperBound && *score >= beta))
+            if ((slot->flags & upperBound && *score <= alpha) ||
+                (slot->flags & lowerBound && *score >= beta))
                 return true;
         }
     }

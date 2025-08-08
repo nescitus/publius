@@ -118,7 +118,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
         // Beta cutoff
         if (score >= beta) {
             if (saveInTT)
-                TT.Store(pos->boardHash, move, score, upperBound, 0, ply);
+                TT.Store(pos->boardHash, move, score, lowerBound, 0, ply);
             return score;
         }
 
@@ -142,7 +142,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
         if (bestMove)
             TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, 0, ply);
         else
-            TT.Store(pos->boardHash, 0, bestScore, lowerBound, 0, ply);
+            TT.Store(pos->boardHash, 0, bestScore, upperBound, 0, ply);
     }
 
     return bestScore;

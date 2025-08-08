@@ -149,7 +149,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // We have found lower bound hash entry
             // and it is not a checkmate score, so
             // we can try the singular extension.
-            if ((hashFlag & lowerBound) && singularScore < EvalLimit)  
+            if ((hashFlag & upperBound) && singularScore < EvalLimit)  
                 singularExtension = true;
         }
     }
@@ -167,9 +167,9 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
     // Adjust node eval by using score from the trans-
     // position table. It modifies a few things, including 
-    // null move probability.
+    // null move probability (~20 Elo)
     if (foundTTrecord) {
-        if (hashFlag & (score > eval ? lowerBound : upperBound))
+        if (hashFlag & (score > eval ? upperBound : lowerBound))
             eval = score;
     }
 
@@ -484,7 +484,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
             // Store move in the transposition table
             if (!isExcluded)
-                TT.Store(pos->boardHash, move, score, upperBound, depth, ply);
+                TT.Store(pos->boardHash, move, score, lowerBound, depth, ply);
 
             // If beta cutoff occurs at the root, 
             // change the best move and display
@@ -537,7 +537,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         if (bestMove)
             TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, depth, ply);
         else
-            TT.Store(pos->boardHash, 0, bestScore, lowerBound, depth, ply);
+            TT.Store(pos->boardHash, 0, bestScore, upperBound, depth, ply);
     }
 
     return bestScore;
