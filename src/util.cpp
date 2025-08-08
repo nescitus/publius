@@ -11,6 +11,9 @@
 #include "types.h"
 #include "publius.h"
 #include "move.h"
+#include "timer.h"
+#include "evaldata.h"
+#include "eval.h"
 
 // TODO: model after hakkapeliitta
 
@@ -63,3 +66,72 @@ std::string ToLower(const std::string& str) {
 bool IsSameOrLowercase(const std::string& str1, const std::string& str2) {
     return str1 == str2 || ToLower(str1) == ToLower(str2);
 }
+
+#ifdef USE_TUNING
+
+void cTuner::Init(int filter) {
+    dataset.clear();
+    dataset.reserve(5'800'000); // guess to reduce reallocations; safe if exceeded
+
+    std::ifstream in("c:/test/epd/quiet.epd");
+    std::cout << "reading quiet.epd: " << (in ? "success" : "failure") << "\n";
+    if (!in) return;
+
+    std::srand(Timer.Now()); // keep your RNG source
+
+    std::string line;
+    int readCnt = 0;
+
+    while (std::getline(in, line)) {
+        if (filter) {
+            if ((std::rand() % 100000) > filter) continue;
+        }
+
+        ++readCnt;
+        if ((readCnt % 1'000'000) == 0)
+            std::cout << readCnt << " positions loaded\n";
+
+        // detect result; most EPD sets put it at end
+        double res;
+        if (line.find("1/2-1/2") != std::string::npos) res = 0.5; // fallback
+        else if (line.find("1-0") != std::string::npos) res = 1.0;
+        else if (line.find("0-1") != std::string::npos) res = 0.0;
+        else continue; // skip lines without a result tag
+
+        dataset.push_back({ std::move(line), res });
+    }
+
+    std::cout << readCnt << " total lines read, " << dataset.size() << " usable samples\n";
+}
+
+double cTuner::TexelFit(Position* p) {
+
+    if (dataset.empty()) return 0.0;
+
+    EvalData e;
+    double sum = 0.0;
+
+    // 1 / (1 + 10^(-k*score/400))  ==  1 / (1 + exp(-(k*ln10/400)*score))
+    const double k_const = 1.250;
+    const double a = k_const * std::log(10.0) / 400.0; // precompute
+
+    int iteration = 0;
+    for (const auto& s : dataset) {
+        ++iteration;
+
+        // assumes you have Position::Set(const std::string&). If not, add it.
+        p->Set(s.epd);
+
+        int score = Evaluate(p, &e);
+        if (p->GetSideToMove() == Black)
+            score = -score;
+
+        const double sigmoid = 1.0 / (1.0 + std::exp(-a * (double)score));
+        const double diff = (s.result - sigmoid);
+        sum += diff * diff;
+    }
+
+    return 1000.0 * (sum / iteration);
+}
+
+#endif

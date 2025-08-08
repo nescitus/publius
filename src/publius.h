@@ -2,8 +2,10 @@
 
 #pragma once
 
+//#define USE_TUNING
+
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3882 lines
+// 3957 lines
 
 #include <iostream>
 #include <algorithm>
@@ -176,3 +178,30 @@ static const int castleMask[64] = {
 };
 
 std::tuple<Color, int> PieceFromChar(char c);
+
+#ifdef USE_TUNING
+
+// info string current fit: 57.067815
+
+struct Sample {
+    std::string epd;  // full EPD/FEN line
+    double result;    // 1.0 (1-0), 0.0 (0-1), 0.5 (1/2-1/2)
+};
+
+#include <vector>
+#include <cstdint>
+#include <cinttypes>
+#include <string>
+#include <sstream>     // std::getline with std::istringstream
+#include <fstream>     // std::ifstream
+
+class cTuner {
+public:
+    std::vector<Sample> dataset;
+    void Init(int filter);
+    double TexelFit(Position* p);
+};
+
+extern cTuner Tuner;
+
+#endif
