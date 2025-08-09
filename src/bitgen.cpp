@@ -19,12 +19,10 @@ and boiled down to the interesting bits only
 (i.e. to bits that influence the move range).
 */
 
-const Bitboard bbRank1 = 0x00000000000000FF;
-const Bitboard bbFileA = 0x0101010101010101;
-const Bitboard bbFileB = 0x0202020202020202;
-const Bitboard bbA1H8diag = 0x8040201008040201;
-const Bitboard bbA8H1diag = 0x0102040810204080;
-const Bitboard bbB8H2diag = 0x0204081020408000;
+static constexpr Bitboard bbRank1 = 0x00000000000000FFULL;
+static constexpr Bitboard bbFileA = 0x0101010101010101ULL;
+static constexpr Bitboard bbFileB = 0x0202020202020202ULL;
+static constexpr Bitboard bbB8H2diag = 0x0204081020408000ULL;
 
 void MoveGenerator::Init() {
 
@@ -90,25 +88,41 @@ void MoveGenerator::InitRankAndFileAttacks() {
 
             // include rank data for bigger rank indices
             for (int biggerRank = lineIndex + 1; biggerRank < 8; biggerRank++) {
+                
+                // include next square
                 rankAttacks[lineIndex][occupancyIndex] |= bbFileA << biggerRank;
+                
+                // stop ray when next square in that direction is occupied
                 if ((1 << biggerRank) & (occupancyIndex << 1)) break;
             }
 
             // include rank data for smaller rank indices
             for (int smallerRank = lineIndex - 1; smallerRank >= 0; smallerRank--) {
+                
+                // include next square
                 rankAttacks[lineIndex][occupancyIndex] |= bbFileA << smallerRank;
+                
+                // stop ray when next square in that direction is occupied
                 if ((1 << smallerRank) & (occupancyIndex << 1)) break;
             }
 
             // include file data for bigger file indices
             for (int biggerFile = lineIndex + 1; biggerFile < 8; biggerFile++) {
+                
+                // include next square
                 fileAttacks[lineIndex][occupancyIndex] |= bbRank1 << (biggerFile << 3);
+                
+                // stop ray when next square in that direction is occupied
                 if ((1 << biggerFile) & (occupancyIndex << 1)) break;
             }
 
             // include file data for smaller file indices
             for (int smallerFile = lineIndex - 1; smallerFile >= 0; smallerFile--) {
+                
+                // include next square
                 fileAttacks[lineIndex][occupancyIndex] |= bbRank1 << (smallerFile << 3);
+                
+                // stop ray when next square in that direction is occupied
                 if ((1 << smallerFile) & (occupancyIndex << 1)) break;
             }
         }
