@@ -32,10 +32,10 @@ bool IsPseudoLegal(Position* pos, int move) {
         if (side == White && fromSquare == E1) {
 
             if (toSquare == G1) {
-                if (IsWhiteShortCastleLegal(pos))
+                if (pos->IsWhiteShortCastleLegal())
                     return true;
             } else if (toSquare == C1) {
-                if (IsWhiteLongCastleLegal(pos))
+                if (pos->IsWhiteLongCastleLegal())
                     return true;
             }
         } 
@@ -43,10 +43,10 @@ bool IsPseudoLegal(Position* pos, int move) {
         if (side == Black && fromSquare == E8) {
 
             if (toSquare == G8) {
-                if (IsBlackShortCastleLegal(pos))
+                if (pos->IsBlackShortCastleLegal())
                     return true;
             } else if (toSquare == C8) {
-                if (IsBlackLongCastleLegal(pos))
+                if (pos->IsBlackLongCastleLegal())
                     return true;
             }
         }
@@ -72,57 +72,6 @@ bool IsPseudoLegal(Position* pos, int move) {
 
     // normal move - check square accessibility
     return (pos->AttacksFrom(fromSquare) & Paint(toSquare)) != 0;
-}
-
-bool IsWhiteShortCastleLegal(Position* pos) {
-
-    if ((pos->WhiteCanCastleShort()) &&
-        !(pos->Occupied() & Paint(F1, G1))) {
-
-        if (!pos->SquareIsAttacked(E1, Black) &&
-            !pos->SquareIsAttacked(F1, Black))
-            return true;
-    }
-
-    return false;
-}
-
-bool IsWhiteLongCastleLegal(Position* pos) {
-
-    if ((pos->WhiteCanCastleLong()) &&
-        !(pos->Occupied() & Paint(B1, C1, D1))) {
-
-        if (!pos->SquareIsAttacked(E1, Black) &&
-            !pos->SquareIsAttacked(D1, Black))
-            return true;
-    }
-
-    return false;
-}
-
-bool IsBlackShortCastleLegal(Position* pos) {
-
-    if ((pos->BlackCanCastleShort()) &&
-        !(pos->Occupied() & Paint(F8, G8))) {
-
-        if (!pos->SquareIsAttacked(E8, White) &&
-            !pos->SquareIsAttacked(F8, White))
-            return true;
-    }
-
-    return false;
-}
-
-bool IsBlackLongCastleLegal(Position* pos) {
-
-    if ((pos->BlackCanCastleLong()) &&
-        !(pos->Occupied() & Paint(B8, C8, D8))) {
-
-        if (!pos->SquareIsAttacked(E8, White) &&
-            !pos->SquareIsAttacked(D8, White))
-            return true;
-    }
-    return false;
 }
 
 bool IsPawnJumpLegal(Position* pos, Color side, int hunter, int prey,

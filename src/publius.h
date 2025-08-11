@@ -5,7 +5,7 @@
 //#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 4051 lines
+// 4035 lines
 
 #include <iostream>
 #include <algorithm>
@@ -104,17 +104,16 @@ public:
     bool IsInCheck() const;
     bool LeavesKingInCheck() const;
     void TryMarkingIrreversible(void);
-    bool WhiteCanCastleShort() const;
-    bool BlackCanCastleShort() const;
-    bool WhiteCanCastleLong() const;
-    bool BlackCanCastleLong() const;
-
     Bitboard AttacksTo(const Square sq) const;
     Bitboard AllStraightMovers() const;
     Bitboard AllDiagMovers() const;
     Bitboard MapPieceType(const int pieceType) const;
     Bitboard AttacksFrom(const Square sq) const;
     bool MoveGivesCheck(const Move move);
+    bool IsWhiteShortCastleLegal();
+    bool IsWhiteLongCastleLegal();
+    bool IsBlackShortCastleLegal();
+    bool IsBlackLongCastleLegal();
 };
 
 class Parameters {

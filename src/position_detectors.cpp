@@ -141,3 +141,54 @@ bool Position::MoveGivesCheck(const Move move) {
 
     return false;
 }
+
+bool Position::IsWhiteShortCastleLegal() {
+
+    if ((castleFlags & wShortCastle) &&
+        !(Occupied() & Paint(F1, G1))) {
+
+        if (!SquareIsAttacked(E1, Black) &&
+            !SquareIsAttacked(F1, Black))
+            return true;
+    }
+
+    return false;
+}
+
+bool Position::IsWhiteLongCastleLegal() {
+
+    if ((castleFlags & wLongCastle) &&
+        !(Occupied() & Paint(B1, C1, D1))) {
+
+        if (!SquareIsAttacked(E1, Black) &&
+            !SquareIsAttacked(D1, Black))
+            return true;
+    }
+
+    return false;
+}
+
+bool Position::IsBlackShortCastleLegal() {
+
+    if ((castleFlags & bShortCastle) &&
+        !(Occupied() & Paint(F8, G8))) {
+
+        if (!SquareIsAttacked(E8, White) &&
+            !SquareIsAttacked(F8, White))
+            return true;
+    }
+
+    return false;
+}
+
+bool Position::IsBlackLongCastleLegal() {
+
+    if ((castleFlags & bLongCastle) &&
+        !(Occupied() & Paint(B8, C8, D8))) {
+
+        if (!SquareIsAttacked(E8, White) &&
+            !SquareIsAttacked(D8, White))
+            return true;
+    }
+    return false;
+}

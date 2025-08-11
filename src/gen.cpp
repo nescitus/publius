@@ -170,11 +170,11 @@ void FillQuietList(Position* pos, MoveList* list) {
     if (color == White) {
 
         // White short castle
-        if (IsWhiteShortCastleLegal(pos))
+        if (pos->IsWhiteShortCastleLegal())
             list->AddMove(E1, G1, tCastle);
         
         // White long castle
-        if (IsWhiteLongCastleLegal(pos))
+        if (pos->IsWhiteLongCastleLegal())
             list->AddMove(E1, C1, tCastle);
 
         // White double pawn moves
@@ -188,11 +188,11 @@ void FillQuietList(Position* pos, MoveList* list) {
     } else {
  
         // Black short castle
-        if (IsBlackShortCastleLegal(pos))
+        if (pos->IsBlackShortCastleLegal())
            list->AddMove(E8, G8, tCastle);
         
         // Black long castle
-        if (IsBlackLongCastleLegal(pos))
+        if (pos->IsBlackLongCastleLegal())
            list->AddMove(E8, C8, tCastle);
         
         // Black double pawn moves

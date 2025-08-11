@@ -87,22 +87,6 @@ Bitboard Position::AllStraightMovers() const {
     return MapPieceType(Rook) | MapPieceType(Queen);
 }
 
-bool Position::WhiteCanCastleShort() const {
-    return castleFlags & wShortCastle;
-}
-
-bool Position::BlackCanCastleShort() const {
-    return castleFlags & bShortCastle;
-}
-
-bool Position::WhiteCanCastleLong() const {
-    return castleFlags & wLongCastle;
-}
-
-bool Position::BlackCanCastleLong() const {
-    return castleFlags & bLongCastle;
-}
-
 bool Position::CanTryNullMove() const {
     return ((CountMinors(sideToMove) + CountMajors(sideToMove)) > 0);
 }
