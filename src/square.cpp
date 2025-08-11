@@ -70,8 +70,12 @@ bool IsSameDiagonal(const Square s1, const Square s2) {
 // get vertical reflection of a square
 // - InvertSquare(C2) is C7,
 // - InvertSquare(C7) is C2
-Square InvertSquare(const Square square) {
+Square MirrorRank(const Square square) {  // 1 <-> 8
     return square ^ 56;
+}
+
+Square MirrorFile(const Square square) { // A <-> H
+    return Square(square ^ 7); 
 }
 
 // get square relative to the side to move

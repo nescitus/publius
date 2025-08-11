@@ -2,10 +2,10 @@
 
 #pragma once
 
-//#define USE_TUNING
+#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 4035 lines
+// 4032 lines
 
 #include <iostream>
 #include <algorithm>
@@ -122,7 +122,7 @@ public:
     int pawnSupport[2][64];
     int pst[2][6][64];
 #ifdef USE_TUNING
-    double TryChangeMgPst(Position* pos, int piece, Square square, int delta, double baselineLoss);
+    double TryChangeMgPst(Position* pos, int piece, Square sq, int delta, double baselineLoss);
     double TryChangeEgPst(Position* pos, int piece, Square sq, int delta, double baselineLoss);
     void PrintPst(int piece);
     double TuneSingleSquare(Position* pos, int piece, Square s, double currentFit);

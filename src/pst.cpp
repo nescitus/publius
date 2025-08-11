@@ -7,9 +7,6 @@
 #include "evaldata.h"
 #include "eval.h"
 
-Square MirrorFile(Square sq) { return Square(sq ^ 7); }  // A<->H
-Square MirrorRank(Square sq) { return Square(sq ^ 56); }  // 1<->8
-
 void Parameters::Init(void) {
 
     for (Color color = White; color < colorNone; ++color) {
@@ -77,47 +74,46 @@ void Parameters::PrintPst(int piece) {
         std::cout << "};";
 }
 
-double Parameters::TryChangeMgPst(Position *pos, int piece, Square square, int delta, double baselineLoss) { 
+double Parameters::TryChangeMgPst(Position *pos, int piece, Square sq, int delta, double baselineLoss) { 
     
-    int oldWeight = Params.pst[White][piece][square];
+    int oldWeight = Params.pst[White][piece][sq];
     int mgWeight = ScoreMG(oldWeight);
     int egWeight = ScoreEG(oldWeight);
-    int mirror = InvertSquare(square);
+    int mirror = MirrorRank(sq);
 
-    Params.pst[White][piece][square] = MakeScore(mgWeight + delta, egWeight);
+    Params.pst[White][piece][sq] = MakeScore(mgWeight + delta, egWeight);
     Params.pst[Black][piece][mirror] = MakeScore(mgWeight + delta, egWeight);
 
     double newLoss = Tuner.TexelFit(pos);
 
     if (newLoss + 1e-12 < baselineLoss) {
-        std::cout << "MG success: piece " << piece << " sq " << int(sq)
+        std::cout << "MG success: piece " << piece << " sq " << SquareName(sq)
                   << " delta " << delta << " -> loss " << newLoss
                   << " (was " << baselineLoss << ")\n";
         return newLoss; // keep new values
     }
     else {
-        // revert
-        pst[White][piece][square] = oldWeight;
+        pst[White][piece][sq] = oldWeight;
         pst[Black][piece][mirror] = oldWeight;
-        std::cout << "EG no-improve: loss " << baselineLoss << "\n";
-        return baselineLoss;
+        std::cout << "MG no-improve: loss " << baselineLoss << "\n";
+        return baselineLoss; // revert
     }
 }
 
 double Parameters::TryChangeEgPst(Position* pos, int piece, Square sq, int delta, double baselineLoss) {
     
     // File-mirror inside same color
-    const Square sqF = MirrorFile(sq);
+    const Square floppedSquare = MirrorFile(sq);
 
     // Map to black by rank-mirroring
-    const Square bSq = MirrorRank(sq);
-    const Square bSqF = MirrorRank(sqF);
+    const Square blackSquare = MirrorRank(sq);
+    const Square blackFlopped = MirrorRank(floppedSquare);
 
-    // Save old packed scores (we need all four to revert correctly)
+    // Save old packed score (we need separate weights
+    // even though endgame tables are symmetrical,
+    // because midgame tables aren't 
     const int wOld1 = pst[White][piece][sq];
-    const int wOld2 = pst[White][piece][sqF];
-    const int bOld1 = pst[Black][piece][bSq];
-    const int bOld2 = pst[Black][piece][bSqF];
+    const int wOld2 = pst[White][piece][floppedSquare];
 
     auto bumpEG = [&](int packed, int d) {
         return MakeScore(ScoreMG(packed), ScoreEG(packed) + d);
@@ -125,14 +121,14 @@ double Parameters::TryChangeEgPst(Position* pos, int piece, Square sq, int delta
 
     // Apply symmetric EG adjustments
     pst[White][piece][sq] = bumpEG(wOld1, delta);
-    pst[White][piece][sqF] = bumpEG(wOld2, delta);
-    pst[Black][piece][bSq] = bumpEG(bOld1, delta);
-    pst[Black][piece][bSqF] = bumpEG(bOld2, delta);
+    pst[White][piece][floppedSquare] = bumpEG(wOld2, delta);
+    pst[Black][piece][blackSquare] = bumpEG(wOld1, delta);
+    pst[Black][piece][blackFlopped] = bumpEG(wOld2, delta);
 
     const double newLoss = Tuner.TexelFit(pos);
 
     if (newLoss + 1e-12 < baselineLoss) {
-        std::cout << "EG success: piece " << piece << " sq " << int(sq)
+        std::cout << "EG success: piece " << piece << " sq " << SquareName(sq)
                   << " delta " << delta << " -> loss " << newLoss
                   << " (was " << baselineLoss << ")\n";
         return newLoss; // keep
@@ -140,9 +136,9 @@ double Parameters::TryChangeEgPst(Position* pos, int piece, Square sq, int delta
 
     // Revert all four squares
     pst[White][piece][sq] = wOld1;
-    pst[White][piece][sqF] = wOld2;
-    pst[Black][piece][bSq] = bOld1;
-    pst[Black][piece][bSqF] = bOld2;
+    pst[White][piece][floppedSquare] = wOld2;
+    pst[Black][piece][blackSquare] = wOld1;
+    pst[Black][piece][blackFlopped] = wOld2;
 
     std::cout << "EG no-improve: loss " << baselineLoss << "\n";
     return baselineLoss;

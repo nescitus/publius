@@ -100,10 +100,7 @@ bool Position::IsDraw() const {
     if (IsDrawByRepetition())
         return true;
 
-    if (IsDrawByInsufficientMaterial())
-        return true;
-
-    return false;
+    return IsDrawByInsufficientMaterial();
 }
 
 bool Position::IsDrawByRepetition() const {

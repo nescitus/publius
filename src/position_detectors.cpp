@@ -116,10 +116,8 @@ bool Position::MoveGivesCheck(const Move move) {
 
     // Checks discovered by en passant capture
     if (GetTypeOfMove(move) == tEnPassant) {
-        if (GetSideToMove() == White)
-            occ ^= Paint(toSquare - 8);
-        else
-            occ ^= Paint(toSquare + 8);
+        int dir = (GetSideToMove() == White ? -8 : 8);
+        occ ^= Paint(toSquare + dir);
 
         checks = GenerateMoves.Bish(occ, kingSquare);
         if (checks & MapDiagonalMovers(color)) return true;

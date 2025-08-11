@@ -73,7 +73,7 @@ void PrintBoard(Position* pos) {
     for (Square square = A1; square < 64; ++square) {
 
         // print square content
-        Square mappedSquare = InvertSquare(square);
+        Square mappedSquare = MirrorRank(square);
         std::cout << piece_name[pos->GetPiece(mappedSquare)];
 
         // print numbers and start new line with spaces

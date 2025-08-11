@@ -62,9 +62,9 @@ void Position::Set(const std::string& str) {
                 Color color = std::get<0>(tuple);
                 int pieceType = std::get<1>(tuple);
                 if (color != colorNone) {
-                    AddPieceNoHash(color, pieceType, InvertSquare(square));
+                    AddPieceNoHash(color, pieceType, MirrorRank(square));
                     if (pieceType == King)
-                        kingSq[color] = InvertSquare(square);
+                        kingSq[color] = MirrorRank(square);
                     ++square;
                 }
             }
