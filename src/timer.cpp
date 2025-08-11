@@ -46,13 +46,10 @@ void UCItimer::SetStartTime(void) {
 void UCItimer::SetMoveTiming(void) {
 
     // Certain settings forbid using tricks to finish earlier
-    if (data[maxDepth] < 64 || // depth limit set
-        data[maxNodes] > 0 ||  // node limit set
-        data[moveTime])    //||  // time per move set
-     //   isRepeating)           // repeating time control
-        isStrict = true;
-    else
-        isStrict = false;
+    isStrict = (data[maxDepth] < 64 || // depth limit set
+                data[maxNodes] > 0 ||  // node limit set
+                data[moveTime]);       //||  // time per move set
+     //   isRepeating)                 // repeating time control
 
     // TODO: test whether repeating time control
     // benefits from strict mode (I hope not)

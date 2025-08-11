@@ -7,9 +7,8 @@
 
 // Constructor definition
 EvalHashTable::EvalHashTable(size_t size) : tableSize(size), EvalTT(new EvalTTEntry[size]) {
-    if ((size & (size - 1)) != 0) {
+    if ((size & (size - 1)) != 0)
         throw std::invalid_argument("Table size must be a power of two.");
-    }
 }
 
 EvalHashTable::~EvalHashTable() {

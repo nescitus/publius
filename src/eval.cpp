@@ -43,9 +43,11 @@ int Evaluate(Position* pos, EvalData* e) {
 
     int score = 0;
 
+#ifndef USE_TUNING
     // Try to retrieve the score from the evaluation hashtable
     if (EvalHash.Retrieve(pos->boardHash, &score))
         return score;
+#endif
 
     // Init eval data
     e->Clear();
@@ -131,12 +133,16 @@ void EvalPawnStructure(const Position* pos, EvalData* e) {
     // Find appropriate slot in the pawn hashtable
     int addr = pos->pawnHash % PAWN_HASH_SIZE;
 
+#ifndef USE_TUNING
     // Try reading score from the pawn hashtable
     if (PawnTT[addr].key == pos->pawnHash) {
         for (Color color = White; color < colorNone; ++color)
             e->AddPawn(color, PawnTT[addr].val[color]);
     // If not possible, evaluate pawns, saving result in the pawn hashtable
-    } else {
+    }
+    else
+#endif
+    {
         PawnTT[addr].key = pos->pawnHash;
 
         for (Color color = White; color < colorNone; ++color) {
@@ -212,7 +218,6 @@ void EvalKnight(const Position* pos, EvalData* e, Color color) {
         // Knight attacks on the enemy king zone
         att = GenerateMoves.Knight(square) & e->enemyKingZone[color];
         e->AddAttacks(color, att, 4, 3);
-
     }
 }
 
@@ -350,7 +355,6 @@ void EvalQueen(const Position* pos, EvalData* e, Color color) {
         // but usually they are check threats too,
         // so they are scored twice
         e->AddAttacks(color, att, 7, 5);
-
     }
 }
 

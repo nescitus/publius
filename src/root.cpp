@@ -54,8 +54,7 @@ void PrintRootInfo(int elapsed, int nps) {
         std::cout << "info depth " << rootDepth
         << " time " << elapsed
         << " nodes " << nodeCount
-        << " nps " << nps
-        << std::endl;
+        << " nps " << nps << std::endl;
 }
 
 int Widen(Position* pos, int depth, int lastScore) {
@@ -89,6 +88,5 @@ int Widen(Position* pos, int depth, int lastScore) {
     }
 
     // full window search
-    return Search(pos, 0, -Infinity, Infinity, depth, false, false);
-    
+    return Search(pos, 0, -Infinity, Infinity, depth, false, false);  
 }

@@ -5,7 +5,7 @@
 //#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3957 lines
+// 4051 lines
 
 #include <iostream>
 #include <algorithm>
@@ -42,15 +42,6 @@ typedef struct {
     Bitboard boardHash;
     Bitboard pawnHash;
 } UndoData;
-
-class Parameters {
-public:
-    void Init();
-    int pawnSupport[2][64];
-    int pst[2][6][64];
-};
-
-extern Parameters Params;
 
 // position
 
@@ -126,6 +117,21 @@ public:
     bool MoveGivesCheck(const Move move);
 };
 
+class Parameters {
+public:
+    void Init();
+    int pawnSupport[2][64];
+    int pst[2][6][64];
+#ifdef USE_TUNING
+    double TryChangeMgPst(Position* pos, int piece, Square square, int delta, double baselineLoss);
+    double TryChangeEgPst(Position* pos, int piece, Square sq, int delta, double baselineLoss);
+    void PrintPst(int piece);
+    double TuneSingleSquare(Position* pos, int piece, Square s, double currentFit);
+#endif
+};
+
+extern Parameters Params;
+
 // list
 
 constexpr int MovesLimit = 256;
@@ -180,8 +186,6 @@ static const int castleMask[64] = {
 std::tuple<Color, int> PieceFromChar(char c);
 
 #ifdef USE_TUNING
-
-// info string current fit: 57.067815
 
 struct Sample {
     std::string epd;  // full EPD/FEN line

@@ -73,7 +73,7 @@ void cTuner::Init(int filter) {
     dataset.clear();
     dataset.reserve(5'800'000); // guess to reduce reallocations; safe if exceeded
 
-    std::ifstream in("c:/test/epd/quiet.epd");
+    std::ifstream in("c:/test/epd/lichess_resolved.epd");
     std::cout << "reading quiet.epd: " << (in ? "success" : "failure") << "\n";
     if (!in) return;
 
@@ -96,6 +96,9 @@ void cTuner::Init(int filter) {
         if (line.find("1/2-1/2") != std::string::npos) res = 0.5; // fallback
         else if (line.find("1-0") != std::string::npos) res = 1.0;
         else if (line.find("0-1") != std::string::npos) res = 0.0;
+        else if (line.find("[0.5]") != std::string::npos) res = 0.5; // fallback
+        else if (line.find("[1.0]") != std::string::npos) res = 1.0;
+        else if (line.find("[0.0]") != std::string::npos) res = 0.0;
         else continue; // skip lines without a result tag
 
         dataset.push_back({ std::move(line), res });
@@ -112,7 +115,7 @@ double cTuner::TexelFit(Position* p) {
     double sum = 0.0;
 
     // 1 / (1 + 10^(-k*score/400))  ==  1 / (1 + exp(-(k*ln10/400)*score))
-    const double k_const = 1.250;
+    const double k_const = 1.325; // 77.263200
     const double a = k_const * std::log(10.0) / 400.0; // precompute
 
     int iteration = 0;

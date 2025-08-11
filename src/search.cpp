@@ -146,7 +146,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
         if (TT.Retrieve(pos->boardHash, &singularMove, &singularScore, &hashFlag, alpha, beta, depth - 4, ply)) {
 
-            // We have found lower bound hash entry
+            // We have found upper bound hash entry
             // and it is not a checkmate score, so
             // we can try the singular extension.
             if ((hashFlag & upperBound) && singularScore < EvalLimit)  
@@ -218,7 +218,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         }
 
         // NULL MOVE PRUNING means allowing the opponent
-        // to execute two moves in a row, for eample 
+        // to execute two moves in a row, for example 
         // capturing something and escaping a recapture. 
         // If this cannot  wreck our position, then it is 
         // so good that there's  no  point in searching 
@@ -227,7 +227,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // searched at the smaller depth. "wasNull" flag
         // above takes care of that. Also, null move is 
         // not used in the endgame because of the risk 
-        // of zugzwang - se CanTryNullMove() function 
+        // of zugzwang - see CanTryNullMove() function 
         // for details. (~82 Elo)
 
         if (eval > beta && depth > 1) {
@@ -317,7 +317,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             excludedMove == dummyMove) {
 
             // Move from the transposition table
-            // moght be a singular move. We are
+            // might be a singular move. We are
             // trying to disprove it, looking for 
             // moves that  comes close to it. If 
             // there are none, we will extend.
@@ -428,9 +428,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // TODO: increase reduction when not improving
             //if (reduction > 1 && improving) 
             //    reduction--;
-
-            // For now it is redundant, but as you add
-            // more conditions, it will come handy.
+            
+            // Reduction cannot exceed actual depth
             reduction = std::min(reduction, newDepth - 1);
 
             // do a reduced depth search
@@ -489,7 +488,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // If beta cutoff occurs at the root, 
             // change the best move and display
             // the new mainline. (cutoffs can happen
-            // in the root node because er are using
+            // in the root node because we are using
             // the aspiration window).
             if (isRoot) {
                 Pv.Update(ply, move);

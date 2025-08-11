@@ -155,9 +155,7 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
             }
 
             case stageEnd: 
-            {
-                return 0;
-            }
+                return 0;      
         }
     }
 }
