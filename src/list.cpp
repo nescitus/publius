@@ -49,7 +49,7 @@ Move MoveList::GetNextRawMove() {
 
 // Get the best remaining move from a sorted list
 
-Move MoveList::GetMove() { 
+Move MoveList::GetBestMove() { 
 
     Move move;
     int min = -4 * HistLimit;

@@ -55,24 +55,23 @@ double Parameters::TuneSingleSquare(Position* pos, int piece, Square s, double c
 }
 
 void Parameters::PrintPst(int piece) {
-    std::cout << "{\n  ";
-    for (Square sq = A1; sq <= H8; ++sq) {
 
-        // revert initialization by subtracting material value
-        int v = pst[White][piece][sq] - pieceValue[piece];
-        int mg = ScoreMG(v);
-        int eg = ScoreEG(v);
+    std::cout << "{\n";
+    for (int r = 0; r < 8; ++r) {
+        std::cout << "  ";
+        for (int f = 0; f < 8; ++f) {
+            Square square = MakeSquare(f, r);
 
-        std::cout << "S(" << std::setw(3) << mg << "," << std::setw(3) << eg << ")";
-
-        // print commas except after the last element
-        if (sq != H8) std::cout << ", ";
-
-        // newline after every 8 squares
-        if (FileOf(sq) == 7 && sq != H8)
-            std::cout << "\n  ";
-    }
-    std::cout << "\n};\n";
+            // revert initialization by substracting material value
+            int v = pst[White][piece][square] - pieceValue[piece];
+            int mg = ScoreMG(v);
+            int eg = ScoreEG(v);
+            std::cout << "S(" << std::setw(3) << mg << "," << std::setw(3) << eg << ")";
+                if (r != 7 || f != 7) std::cout << ", ";
+            }
+            std::cout << "\n";
+        }
+        std::cout << "};";
 }
 
 double Parameters::TryChangeMgPst(Position *pos, int piece, Square sq, int delta, double baselineLoss) { 

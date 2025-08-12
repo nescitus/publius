@@ -115,7 +115,7 @@ double cTuner::TexelFit(Position* p) {
     double sum = 0.0;
 
     // 1 / (1 + 10^(-k*score/400))  ==  1 / (1 + exp(-(k*ln10/400)*score))
-    const double k_const = 1.325;
+    const double k_const = 1.325; // 77.263200
     const double a = k_const * std::log(10.0) / 400.0; // precompute
 
     int iteration = 0;

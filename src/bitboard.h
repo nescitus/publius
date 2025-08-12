@@ -18,7 +18,7 @@ Square PopFirstBit(Bitboard* b);
 // that white moves north, that is up the board,
 // like on a chess diagram.
 
-constexpr inline Bitboard NorthOf(Bitboard b) {return(b << 8);}
+constexpr inline Bitboard NorthOf(Bitboard b) { return(b << 8); }
 constexpr inline Bitboard SouthOf(Bitboard b) { return (b >> 8); }
 constexpr inline Bitboard WestOf(Bitboard b) { return ((b & excludeA) >> 1); }
 constexpr inline Bitboard EastOf(Bitboard b) { return ((b & excludeH) << 1); }

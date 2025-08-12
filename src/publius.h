@@ -5,7 +5,7 @@
 //#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3987 lines
+// 3992 lines
 
 #include <iostream>
 #include <algorithm>
@@ -148,7 +148,7 @@ public:
     void AddMove(Move move);
     int GetInd();
     Move GetNextRawMove();
-    Move GetMove();
+    Move GetBestMove();
     void ScoreNoisy(Position* pos);
     void ScoreQuiet(Position* pos);
 };

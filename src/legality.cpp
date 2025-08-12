@@ -51,22 +51,24 @@ bool IsPseudoLegal(Position* pos, int move) {
     return (pos->AttacksFrom(fromSquare) & Paint(toSquare)) != 0;
 }
 
-bool IsCastlingLegal(Position* pos, Color side, Square fromSquare, Square toSquare) {
-
+bool IsCastlingLegal(Position *pos, Color side, Square fromSquare, Square toSquare) {
+    
     if (side == White && fromSquare == E1) {
 
         if (toSquare == G1)
-            return (pos->IsWhiteShortCastleLegal());
+            return pos->IsWhiteShortCastleLegal();
+
         else if (toSquare == C1)
-            return (pos->IsWhiteLongCastleLegal());
+            return pos->IsWhiteLongCastleLegal();
     }
 
     if (side == Black && fromSquare == E8) {
 
         if (toSquare == G8)
-            return (pos->IsBlackShortCastleLegal());
+            return pos->IsBlackShortCastleLegal();
+
         else if (toSquare == C8)
-            return (pos->IsBlackLongCastleLegal());
+            return pos->IsBlackLongCastleLegal();
     }
 
     return false;
@@ -100,7 +102,7 @@ bool IsPawnMoveLegal(Color side, Square fromSquare, Square toSquare, Move move, 
         if ((toSquare - fromSquare == 7 && FileOf(fromSquare) != fileA) ||
             (toSquare - fromSquare == 9 && FileOf(fromSquare) != fileH))
             return (prey != noPieceType);
-   
+ 
     } else {
 
         // missing promotion flag

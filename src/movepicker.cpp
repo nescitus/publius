@@ -64,7 +64,7 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
             case stageReturnGoodCapt:
                 {
                     while (goodNoisyCnt < goodNoisyLength) {
-                        move = goodNoisyList.GetMove();
+                        move = goodNoisyList.GetBestMove();
                         goodNoisyCnt++;
                         if (move == moveFromTT)
                             continue;  // Avoid returning moveFromTT again
@@ -116,7 +116,7 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
             case stageReturnQuiet:
             {
                 while (quietCnt < quietLength) {
-                    move = quietList.GetMove();
+                    move = quietList.GetBestMove();
                     quietCnt++;
                     
                     // Avoid returning moves tried at the earlier stages
@@ -144,7 +144,7 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
             case stageReturnBad:
             {
                 while (badNoisyCnt < badNoisyLength) {
-                    move = badNoisyList.GetMove();
+                    move = badNoisyList.GetBestMove();
                     badNoisyCnt++;
                     if (move == moveFromTT)
                         continue;
