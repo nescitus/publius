@@ -27,18 +27,8 @@ static const int downwardsDiagonal[64] = {
 };
 
 // given rank and file, define square
-Square MakeSquare(const int rank, int file) {
+Square MakeSquare(const int file, const int rank) {
     return static_cast<Square>((file << 3) | rank);
-}
-
-// get rank that a square belongs to
-int RankOf(const Square square) {
-    return square >> 3;
-}
-
-// get file that a square belongs to
-int FileOf(const Square square) {
-    return  square & 7;
 }
 
 // rank, file and diagonal comparison routines
@@ -68,7 +58,7 @@ bool IsSameDiagonal(const Square s1, const Square s2) {
 }
 
 // get vertical reflection of a square
-// - InvertSquare(C2) is C7,
+// - InvertSquare(C2) is C7, 
 // - InvertSquare(C7) is C2
 Square MirrorRank(const Square square) {  // 1 <-> 8
     return square ^ 56;

@@ -19,63 +19,6 @@ Bitboard Paint(const Square s1, const Square s2, const Square s3) {
     return Paint(s1,s2) | Paint(s3);
 }
 
-// Functions to shift a bitboard in the given direction.
-// They are named after cardinal directions and we assume
-// that white moves north, that is up the board,
-// like on a chess diagram.
-
-Bitboard NorthOf(const Bitboard b) {
-    return(b << 8);
-}
-
-Bitboard SouthOf(const Bitboard b) {
-    return (b >> 8);
-}
-
-Bitboard WestOf(const Bitboard b) {
-    return ((b & excludeA) >> 1);
-}
-
-Bitboard EastOf(const Bitboard b) {
-    return ((b & excludeH) << 1);
-}
-
-Bitboard NWOf(const Bitboard b) {
-    return ((b & excludeA) << 7);
-}
-
-Bitboard NEOf(const Bitboard b) {
-    return ((b & excludeH) << 9);
-}
-
-Bitboard SWOf(const Bitboard b) {
-    return ((b & excludeA) >> 9);
-}
-
-Bitboard SEOf(const Bitboard b) {
-    return ((b & excludeH) >> 7);
-}
-
-// get pawn bitboard attacks
-
-Bitboard GetWPAttacks(const Bitboard b) {
-    return (NEOf(b) | NWOf(b));
-}
-
-Bitboard GetBPAttacks(const Bitboard b) {
-    return (SEOf(b) | SWOf(b));
-}
-
-// shift the bitboard to both sides
-Bitboard SidesOf(const Bitboard b) {
-    return (WestOf(b) | EastOf(b));
-}
-
-// color-dependent forward shift
-Bitboard ForwardOf(const Bitboard b, const Color color) {
-    return (color == White) ? NorthOf(b) : SouthOf(b);
-}
-
 // color-dependent forward fill
 Bitboard FrontSpan(const Bitboard b, const Color color) {
 

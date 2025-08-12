@@ -3,9 +3,13 @@
 #pragma once
 #include <iostream>
 
-Square MakeSquare(const int rank, const int file);
-int RankOf(const Square square);
-int FileOf(const Square square);
+// get rank that a square belongs to
+constexpr inline int RankOf(Square square) { return square >> 3; }
+
+// get file that a square belongs to
+constexpr inline int FileOf(Square square) { return  square & 7; }
+
+Square MakeSquare(const int file, const int rank);
 bool IsSameRank(const Square s1, const Square s2);
 bool IsSameFile(const Square s1, const Square s2);
 bool IsSameUpwardsDiag(const Square s1, const Square s2);

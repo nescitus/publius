@@ -2,10 +2,10 @@
 
 #pragma once
 
-#define USE_TUNING
+//#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 4023 lines
+// 3987 lines
 
 #include <iostream>
 #include <algorithm>
