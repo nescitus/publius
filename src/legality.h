@@ -2,6 +2,7 @@
 
 #pragma once
 bool IsPseudoLegal(Position* pos, int move);
+bool IsCastlingLegal(Position* pos, Color side, Square fromSquare, Square toSquare);
 bool IsPawnJumpLegal(Position* pos, Color side, int hunter, int prey,
     Square fromSquare, Square toSquare);
 bool IsPawnMoveLegal(Color side, Square fromSquare, Square toSquare,

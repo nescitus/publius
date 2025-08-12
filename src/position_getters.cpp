@@ -115,13 +115,9 @@ bool Position::IsDrawByRepetition() const {
 
 bool Position::IsDrawByInsufficientMaterial() const {
 
-    if (!LeavesKingInCheck()) {
-        if (CountAllPawns() + CountMajors(White) + CountMajors(Black) == 0 &&
-            CountMinors(White) + CountMinors(Black) <= 1) 
-            return true;
-    }
-
-    return false;
+    return (!LeavesKingInCheck() &&
+           (CountAllPawns() + CountMajors(White) + CountMajors(Black) == 0) &&
+           (CountMinors(White) + CountMinors(Black) <= 1) ); 
 }
 
 bool Position::IsInCheck() const {

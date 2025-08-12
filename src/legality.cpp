@@ -28,31 +28,8 @@ bool IsPseudoLegal(Position* pos, int move) {
         return false;
 
     // castling
-    if (GetTypeOfMove(move) == tCastle) {
-        if (side == White && fromSquare == E1) {
-
-            if (toSquare == G1) {
-                if (pos->IsWhiteShortCastleLegal())
-                    return true;
-            } else if (toSquare == C1) {
-                if (pos->IsWhiteLongCastleLegal())
-                    return true;
-            }
-        } 
-        
-        if (side == Black && fromSquare == E8) {
-
-            if (toSquare == G8) {
-                if (pos->IsBlackShortCastleLegal())
-                    return true;
-            } else if (toSquare == C8) {
-                if (pos->IsBlackLongCastleLegal())
-                    return true;
-            }
-        }
-
-        return false;
-    }
+    if (GetTypeOfMove(move) == tCastle)
+        return IsCastlingLegal(pos, side, fromSquare, toSquare);
 
     // en passant capture
     if (GetTypeOfMove(move) == tEnPassant)
@@ -72,6 +49,27 @@ bool IsPseudoLegal(Position* pos, int move) {
 
     // normal move - check square accessibility
     return (pos->AttacksFrom(fromSquare) & Paint(toSquare)) != 0;
+}
+
+bool IsCastlingLegal(Position* pos, Color side, Square fromSquare, Square toSquare) {
+
+    if (side == White && fromSquare == E1) {
+
+        if (toSquare == G1)
+            return (pos->IsWhiteShortCastleLegal());
+        else if (toSquare == C1)
+            return (pos->IsWhiteLongCastleLegal());
+    }
+
+    if (side == Black && fromSquare == E8) {
+
+        if (toSquare == G8)
+            return (pos->IsBlackShortCastleLegal());
+        else if (toSquare == C8)
+            return (pos->IsBlackLongCastleLegal());
+    }
+
+    return false;
 }
 
 bool IsPawnJumpLegal(Position* pos, Color side, int hunter, int prey,
@@ -101,8 +99,8 @@ bool IsPawnMoveLegal(Color side, Square fromSquare, Square toSquare, Move move, 
         // capture
         if ((toSquare - fromSquare == 7 && FileOf(fromSquare) != fileA) ||
             (toSquare - fromSquare == 9 && FileOf(fromSquare) != fileH))
-            if (prey != noPieceType)
-                return true;
+            return (prey != noPieceType);
+   
     } else {
 
         // missing promotion flag
@@ -116,8 +114,7 @@ bool IsPawnMoveLegal(Color side, Square fromSquare, Square toSquare, Move move, 
         // capture
         if ((toSquare - fromSquare == -9 && FileOf(fromSquare) != fileA) ||
             (toSquare - fromSquare == -7 && FileOf(fromSquare) != fileH))
-            if (prey != noPieceType)
-                return true;
+            return (prey != noPieceType);
     }
     return false;
 }
