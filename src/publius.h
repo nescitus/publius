@@ -5,7 +5,7 @@
 //#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3992 lines
+// 3990 lines
 
 #include <iostream>
 #include <algorithm>
@@ -70,13 +70,13 @@ private:
     void SetEnPassantSquare(const Color color, Square toSquare);
     void UpdateCastlingRights(const Square fromSquare, const Square toSquare);
     Bitboard CalculateHashKey();
-    Bitboard CalculatePawnKey();
+    Bitboard CalculatePawnKingKey();
     
     bool IsDrawByRepetition() const;
     bool IsDrawByInsufficientMaterial() const;
 public:
     Bitboard boardHash;
-    Bitboard pawnHash;
+    Bitboard pawnKingHash;
     bool SquareIsAttacked(const Square sq, const Color color) const;
     void Set(const std::string& str);
     void DoMove(const Move move, UndoData* undo);

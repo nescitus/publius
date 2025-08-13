@@ -111,7 +111,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     //  READ THE TRANSPOSITION TABLE. If we have 
     //  already searched the current position to 
     //  sufficient depth, we may use the score
-    //  of the pasr search directly. If the depth 
+    //  of the past search directly. If the depth 
     //  was lower, we still expect the move from 
     //  the previous search to be good and we will
     //  try it first.
@@ -149,7 +149,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // We have found upper bound hash entry
             // and it is not a checkmate score, so
             // we can try the singular extension.
-            if ((hashFlag & upperBound) && singularScore < EvalLimit)  
+            if ((hashFlag & lowerBound) && singularScore < EvalLimit)  
                 singularExtension = true;
         }
     }
@@ -159,7 +159,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     const bool isInCheckBeforeMoving = pos->IsInCheck();
 
     // Init eval and improving flag. Nodes where the side 
-    // to move  is not improving the eval are probably 
+    // to move is not improving the eval are probably 
     // less interesting and warrant more pruning.
 
     // Evaluate position, unless in check
@@ -186,7 +186,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // are speculative, but statistically they work.
     //
     // We skip node level pruning after a null move,
-    // in check, in pv-nodes, in the late endgame
+    // when in check, in pv-nodes, in the late endgame
     // and in singular search.
     if (!wasNullMove &&
         !isInCheckBeforeMoving &&

@@ -131,11 +131,11 @@ int Evaluate(Position* pos, EvalData* e) {
 void EvalPawnStructure(const Position* pos, EvalData* e) {
 
     // Find appropriate slot in the pawn hashtable
-    int addr = pos->pawnHash % PAWN_HASH_SIZE;
+    int addr = pos->pawnKingHash % PAWN_HASH_SIZE;
 
 #ifndef USE_TUNING
     // Try reading score from the pawn hashtable
-    if (PawnTT[addr].key == pos->pawnHash) {
+    if (PawnTT[addr].key == pos->pawnKingHash) {
         for (Color color = White; color < colorNone; ++color)
             e->AddPawn(color, PawnTT[addr].val[color]);
     // If not possible, evaluate pawns, saving result in the pawn hashtable
@@ -143,7 +143,7 @@ void EvalPawnStructure(const Position* pos, EvalData* e) {
     else
 #endif
     {
-        PawnTT[addr].key = pos->pawnHash;
+        PawnTT[addr].key = pos->pawnKingHash;
 
         for (Color color = White; color < colorNone; ++color) {
             EvalPawn(pos, e, color);

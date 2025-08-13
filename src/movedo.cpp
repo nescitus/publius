@@ -25,7 +25,7 @@ void Position::DoMove(const Move move, UndoData *undo) {
     undo->enPassantSq = enPassantSq;
     undo->reversibleMoves = reversibleMoves;
     undo->boardHash = boardHash;
-    undo->pawnHash = pawnHash;
+    undo->pawnHash = pawnKingHash;
 
     // Update repetition list
     repetitionList[repetitionIndex++] = boardHash;
@@ -34,7 +34,7 @@ void Position::DoMove(const Move move, UndoData *undo) {
     if (prey != noPieceType) {
         TakePiece(~color, prey, toSquare);
         if (prey == Pawn)
-            pawnHash ^= Key.ForPiece(~color, prey, toSquare);
+            pawnKingHash ^= Key.ForPiece(~color, prey, toSquare);
     }
 
     // Update reversible moves counter
@@ -43,7 +43,7 @@ void Position::DoMove(const Move move, UndoData *undo) {
 
     // Update pawn hash
     if (hunter == Pawn || hunter == King)
-        pawnHash ^= Key.ForPiece(color, hunter, fromSquare) ^
+        pawnKingHash ^= Key.ForPiece(color, hunter, fromSquare) ^
                     Key.ForPiece(color, hunter, toSquare);
 
 
@@ -73,7 +73,7 @@ void Position::DoMove(const Move move, UndoData *undo) {
     // Remove pawn captured en passant
     if (moveType == tEnPassant) {
         TakePiece(~color, Pawn, toSquare ^ 8);
-        pawnHash ^= Key.ForPiece(~color, Pawn, toSquare ^ 8);
+        pawnKingHash ^= Key.ForPiece(~color, Pawn, toSquare ^ 8);
     }
 
     // Set new en passant square
@@ -85,7 +85,7 @@ void Position::DoMove(const Move move, UndoData *undo) {
         const int promoted = GetPromotedPiece(move);
         boardHash ^= Key.ForPiece(color, Pawn, toSquare) ^
                      Key.ForPiece(color, promoted, toSquare);
-        pawnHash ^= Key.ForPiece(color, Pawn, toSquare);
+        pawnKingHash ^= Key.ForPiece(color, Pawn, toSquare);
         ChangePieceNoHash(Pawn, promoted, color, toSquare);
     }
 

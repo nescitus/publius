@@ -87,6 +87,7 @@ Bitboard Position::AllStraightMovers() const {
     return MapPieceType(Rook) | MapPieceType(Queen);
 }
 
+// requires side to move to have at least one non-pawn
 bool Position::CanTryNullMove() const {
     return ((CountMinors(sideToMove) + CountMajors(sideToMove)) > 0);
 }
@@ -94,7 +95,7 @@ bool Position::CanTryNullMove() const {
 bool Position::IsDraw() const {
 
     // draw by 50 move rule
-    if (reversibleMoves > 100)
+    if (reversibleMoves >= 100)
         return true;
 
     if (IsDrawByRepetition())

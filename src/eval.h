@@ -110,6 +110,8 @@ const int kingNearOpenPenalty = S(-6, 0);
 const int minorOnMinor = S(15, 15);
 const int trappedRook = S(-25, -25);
 
+// 77.213972
+
 const int p_support[64] = {
   0,   0,   0,   0,   0,   0,   0,   0,
   3,   3,   1,  -1,   2,   5,   6,   4,

@@ -53,6 +53,7 @@ void Position::Set(const std::string& str) {
     for (int i = 0; i < length; i++) {
         char letter = str.at(i);
 
+        // The first loop sets up the pieves
         if (square < 64) {
 
             if (std::isdigit(letter)) {
@@ -68,7 +69,9 @@ void Position::Set(const std::string& str) {
                     ++square;
                 }
             }
-        } else { // all pieces are in place, now deal with the other data
+
+        // the second loop sets flags
+        } else {
 
             switch (letter) {
                 case 'w': sideToMove = White; break;
@@ -94,7 +97,7 @@ void Position::Set(const std::string& str) {
     }
     
     boardHash = CalculateHashKey();
-    pawnHash = CalculatePawnKey();
+    pawnKingHash = CalculatePawnKingKey();
 }
 
 Bitboard Position::CalculateHashKey() {
@@ -116,7 +119,7 @@ Bitboard Position::CalculateHashKey() {
     return key;
 }
 
-Bitboard Position::CalculatePawnKey() {
+Bitboard Position::CalculatePawnKingKey() {
 
     Bitboard key = 0;
 
