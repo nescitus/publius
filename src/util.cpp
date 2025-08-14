@@ -9,11 +9,13 @@
 #  include <sys/time.h>
 #endif
 #include "types.h"
+#include "position.h"
 #include "publius.h"
 #include "move.h"
 #include "timer.h"
+#include "score.h"
 #include "evaldata.h"
-#include "eval.h"
+#include "eval.h" // tuner
 
 // TODO: model after hakkapeliitta
 

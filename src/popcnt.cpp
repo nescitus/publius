@@ -1,8 +1,6 @@
 // Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
 #include "types.h"
-#include "square.h"
-#include "publius.h"
 #include "bitboard.h"
 
  #define FAST_POPCNT

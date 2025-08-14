@@ -1,8 +1,8 @@
 // Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
 #include "types.h"
-#include "square.h"
 #include "limits.h"
+#include "position.h"
 #include "publius.h"
 #include "timer.h"
 #include "uci.h"

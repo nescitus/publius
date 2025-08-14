@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include "limits.h"
+#include "position.h"
 #include "publius.h"
 #include "move.h"
 #include "bitboard.h"
@@ -69,7 +70,7 @@ int Swap(const Position* pos, const Square fromSquare, const Square toSquare) {
     ply = 1;
 
     // as long as there are the attackers of the right color...
-    while (attackers & pos->Map(color)) {
+    while (attackers & pos->MapColor(color)) {
 
         // special treatment of captures by king
         if (hunter == King) {

@@ -36,7 +36,6 @@ private:
 
 extern EvalHashTable EvalHash;
 
-int Evaluate(Position* pos, EvalData* e);
 void EvalBasic(EvalData* e, const Color color, const int piece, const int sq);
 void EvalPawnStructure(const Position* pos, EvalData* e);
 void EvalPawn(const Position* pos, EvalData* e, Color color);

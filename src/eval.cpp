@@ -1,13 +1,16 @@
 // Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
 #include "types.h"
-#include "square.h"
+#include "square.h" // for file and rank detection
 #include "limits.h"
-#include "publius.h"
+#include "position.h"
 #include "bitboard.h"
 #include "bitgen.h"
+#include "score.h"
+#include "publius.h"
 #include "evaldata.h"
 #include "eval.h"
+#include "api.h"
 #include "mask.h"
 
 // "Fake" king location, used to initialize
@@ -138,7 +141,7 @@ void EvalPawnStructure(const Position* pos, EvalData* e) {
     if (PawnTT[addr].key == pos->pawnKingHash) {
         for (Color color = White; color < colorNone; ++color)
             e->AddPawn(color, PawnTT[addr].val[color]);
-    // If not possible, evaluate pawns, saving result in the pawn hashtable
+        // If not possible, evaluate pawns, saving result in the pawn hashtable
     }
     else
 #endif
@@ -408,7 +411,7 @@ void EvalPasser(const Position* pos, EvalData* e, Color color) {
 
         // Passed pawn
         if (!(Mask.passed[color][square] & pos->Map(~color, Pawn))) {
-            
+
             // Multiplier reflects both blockade
             // and support to a passer
             int mul = 100;
@@ -420,7 +423,7 @@ void EvalPasser(const Position* pos, EvalData* e, Color color) {
             // and pack it again
             int s = passedBonus[color][RankOf(square)];
             e->Add(color, MakeScore((ScoreMG(s) * mul / 100),
-                                    (ScoreEG(s) * mul / 100)));
+                (ScoreEG(s) * mul / 100)));
         }
     }
 }
@@ -434,7 +437,7 @@ void EvalPressure(Position* pos, EvalData* e, Color side) {
 
     pressure = 0;
     oppo = ~side;
-    enemyPieces = pos->Map(oppo);
+    enemyPieces = pos->MapColor(oppo);
 
     // bishop on knight attacks
     if (pos->Map(oppo, Bishop) & e->control[side][Knight])
@@ -483,10 +486,10 @@ int Interpolate(EvalData* e) {
 
     // Sum all the eval factors
     int mgScore = ScoreMG(e->score[White])
-                - ScoreMG(e->score[Black]);
+        - ScoreMG(e->score[Black]);
 
     int egScore = ScoreEG(e->score[White])
-                - ScoreEG(e->score[Black]);
+        - ScoreEG(e->score[Black]);
 
     // Score interpolation
     int mgPhase = std::min(24, e->gamePhase);

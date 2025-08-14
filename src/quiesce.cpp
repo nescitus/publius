@@ -2,11 +2,12 @@
 
 #include "types.h"
 #include "limits.h"
-#include "publius.h"
+#include "position.h"
+#include "publius.h" // for list
 #include "move.h"
 #include "pv.h"
 #include "evaldata.h"
-#include "eval.h"
+#include "api.h"
 #include "search.h"
 #include "trans.h"
 #include "timer.h"
@@ -100,7 +101,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
 
         // Make move, unless illegal
         pos->DoMove(move, &undo);
-        if (pos->LeavesKingInCheck()) {
+        if (pos->IsOwnKingInCheck()) {
             pos->UndoMove(move, &undo);
                 continue;
         }

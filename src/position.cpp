@@ -5,6 +5,7 @@
 #include "types.h"
 #include "piece.h"
 #include "square.h"
+#include "position.h"
 #include "publius.h"
 #include "bitboard.h"
 #include "bitgen.h"

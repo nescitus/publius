@@ -2,7 +2,7 @@
 
 #include "types.h"
 #include "square.h"
-#include "publius.h"
+#include "position.h"
 #include "move.h"
 #include "piece.h"
 

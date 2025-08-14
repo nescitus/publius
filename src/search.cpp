@@ -4,6 +4,7 @@
 #include "bitboard.h"
 #include "bitgen.h"
 #include "limits.h"
+#include "position.h"
 #include "publius.h"
 #include "timer.h"
 #include "history.h"
@@ -12,7 +13,7 @@
 #include "lmr.h"
 #include "pv.h"
 #include "evaldata.h"
-#include "eval.h"
+#include "api.h"
 #include "uci.h"
 #include "movepicker.h"
 #include "search.h"
@@ -394,7 +395,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         pos->DoMove(move, &undo);
 
         // Filter out illegal moves
-        if (pos->LeavesKingInCheck()) {
+        if (pos->IsOwnKingInCheck()) {
             pos->UndoMove(move, &undo);
             continue;
         }

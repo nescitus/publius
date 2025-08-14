@@ -3,6 +3,7 @@
 #include <iostream>
 #include "types.h"
 #include "limits.h"
+#include "position.h"
 #include "publius.h"
 #include "move.h"
 #include "pv.h"

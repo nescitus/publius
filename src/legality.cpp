@@ -2,9 +2,9 @@
 
 #include "types.h"
 #include "piece.h"
-#include "square.h"
+#include "square.h" // for rank and file
 #include "bitboard.h"
-#include "publius.h"
+#include "position.h"
 #include "move.h"
 #include "legality.h"
 

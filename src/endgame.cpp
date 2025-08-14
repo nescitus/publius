@@ -1,7 +1,7 @@
 // Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
 #include "types.h"
-#include "publius.h"
+#include "position.h"
 
 // In the endgames with reduced material, normal
 // evaluation often does not apply. Therefore we use

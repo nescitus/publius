@@ -2,7 +2,7 @@
 
 #include "types.h"
 #include "piece.h"
-#include "publius.h"
+#include "position.h"
 #include "bitboard.h"
 #include "bitgen.h"
 #include "move.h"

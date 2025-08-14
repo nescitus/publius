@@ -15,22 +15,18 @@ together. In fact, there are only two things you can do
 with Color: flip it so that White becomes Black
 or another way round using ~operator or use ++ operator
 to traverse the loop and do something both with white
-and black pieces.
+and black pieces. */
 
-If the operators weren't inlined, they would have to be
-declared here and defined just like functions in a cpp file. */
-
-#pragma once
-
-enum Color { White, Black, colorNone };
+enum Color { White = 0, Black = 1, colorNone = 2 };
+static_assert(White == 0 && Black == 1, "Color encoding required by ~ operator");
 
 // switch color
-inline Color operator~(Color c) {
+constexpr inline Color operator~(Color c) {
     return Color(c ^ Black);
 }
 
 // increment color in a "for" loop
-inline Color operator++(Color& d) {
+constexpr inline Color operator++(Color& d) {
     return d = Color(int(d) + 1);
 }
 
@@ -59,24 +55,26 @@ enum Square {
 // a narrow set of legal operations:
 
 // step through squares, usually in a loop
-inline Square operator++(Square& d) {
+constexpr inline Square operator++(Square& d) {
     return d = Square(int(d) + 1);
 }
 
 // add vector to a square
-inline Square operator+(Square d1, int d2) {
+constexpr inline Square operator+(Square d1, int d2) {
     return Square(int(d1) + int(d2));
 }
 
 // substract vector from a square
-inline Square operator-(Square d1, int d2) {
+constexpr inline Square operator-(Square d1, int d2) {
     return Square(int(d1) - int(d2));
 }
 
 // needed for en passant
-inline Square operator^(Square d1, int d2) {
+constexpr inline Square operator^(Square d1, int d2) {
     return Square(int(d1) ^ d2);
 }
 
 enum eMoveType { tNormal, tCastle, tEnPassant, tPawnjump, tPromN, tPromB, tPromR, tPromQ };
 enum eCastleFlag { wShortCastle = 1, wLongCastle = 2, bShortCastle = 4, bLongCastle = 8 };
+
+static const int noPiece = 12; // constant just outside this range to denote no piece

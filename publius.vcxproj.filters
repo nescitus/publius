@@ -188,5 +188,14 @@
     <ClInclude Include="src\gen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\position.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\score.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

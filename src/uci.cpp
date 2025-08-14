@@ -6,16 +6,17 @@
 #include <sstream>
 #include "types.h"
 #include "limits.h"
+#include "position.h"
 #include "publius.h"
 #include "timer.h"
 #include "history.h"
 #include "trans.h"
 #include "move.h"
-#include "search.h"
+#include "score.h"
 #include "evaldata.h"
-#include "eval.h"
 #include "pv.h"
 #include "uci.h"
+#include "api.h"
 
 #ifdef USE_TUNING
    cTuner Tuner;
@@ -63,7 +64,7 @@ bool ParseCommand(std::istringstream& stream, Position* pos) {
 
 void OnUciCommand() {
 
-    std::cout << "id name Publius 0.093" << std::endl;
+    std::cout << "id name Publius 0.094" << std::endl;
     std::cout << "id author Pawel Koziol" << std::endl;
     std::cout << "option name Hash type spin default 16 min 1 max 4096" << std::endl;
     std::cout << "option name Clear Hash type button" << std::endl;

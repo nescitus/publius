@@ -2,23 +2,11 @@
 
 #include "types.h"
 #include "piece.h"
-#include "publius.h"
+#include "position.h"
 #include "bitboard.h"
 
 // This file contains functions that return 
 // simple information about board position
-
-Color Position::GetSideToMove() const {
-    return sideToMove;
-}
-
-int Position::GetPiece(const Square square) const {
-    return pieceLocation[square];
-}
-
-int Position::Count(const Color color, const int type) const {
-    return pieceCount[color][type];
-}
 
 int Position::CountMinors(const Color color) const {
     return Count(color, Knight) + Count(color, Bishop);
@@ -32,23 +20,15 @@ int Position::CountAllPawns() const {
     return Count(White, Pawn) + Count(Black, Pawn);
 }
 
-Bitboard Position::Map(const Color color, const int piece) const {
-    return (pieceBitboard[color][piece]);
-}
-
-Bitboard Position::Map(const Color color) const {
+Bitboard Position::MapColor(const Color color) const {
 
     return Map(color, Pawn) | Map(color, Knight) | Map(color, Bishop)
          | Map(color, Rook) | Map(color, Queen) | Map(color, King);
 }
 
 Bitboard Position::Occupied() const {
-    return Map(White) | Map(Black);
+    return MapColor(White) | MapColor(Black);
 }
-
-bool Position::IsOccupied(const Square sq) const { 
-    return pieceLocation[sq] != noPiece; 
-};
 
 Bitboard Position::Empty() const {
     return ~Occupied();
@@ -64,14 +44,6 @@ Bitboard Position::MapStraightMovers(const Color color) const {
 
 int Position::PieceTypeOnSq(const Square square) const {
     return TypeOfPiece(pieceLocation[square]);
-}
-
-Square Position::KingSq(const Color color) const {
-    return kingSq[color];
-}
-
-Square Position::EnPassantSq() const {
-    return enPassantSq;
 }
 
 Bitboard Position::MapPieceType(const int pieceType) const {
@@ -116,7 +88,7 @@ bool Position::IsDrawByRepetition() const {
 
 bool Position::IsDrawByInsufficientMaterial() const {
 
-    if (!LeavesKingInCheck()) {
+    if (!IsOwnKingInCheck()) {
         if (CountAllPawns() + CountMajors(White) + CountMajors(Black) == 0 &&
             CountMinors(White) + CountMinors(Black) <= 1) 
             return true;
@@ -129,6 +101,6 @@ bool Position::IsInCheck() const {
     return (SquareIsAttacked(KingSq(sideToMove), ~sideToMove) != 0);
 }
 
-bool Position::LeavesKingInCheck() const {
+bool Position::IsOwnKingInCheck() const {
     return (SquareIsAttacked(KingSq(~sideToMove), sideToMove) != 0);
 }

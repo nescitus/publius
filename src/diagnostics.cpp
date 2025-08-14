@@ -1,7 +1,8 @@
 // Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
 #include "types.h"
-#include "square.h"
+#include "square.h" // for MirrorRank
+#include "position.h"
 #include "publius.h"
 #include "bitboard.h"
 #include "move.h"
@@ -105,7 +106,7 @@ Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
 
         pos->DoMove(move, &undo);
 
-        if (pos->LeavesKingInCheck()) {
+        if (pos->IsOwnKingInCheck()) {
             pos->UndoMove(move, &undo);
             continue;
         }

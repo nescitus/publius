@@ -3,9 +3,11 @@
 #include <iomanip> // for std::setw, std::setprecision
 #include "types.h"
 #include "square.h"
+#include "position.h"
+#include "score.h"
 #include "publius.h"
 #include "evaldata.h"
-#include "eval.h"
+#include "eval.h" // values
 
 void Parameters::Init(void) {
 
@@ -25,15 +27,15 @@ void Parameters::Init(void) {
 
 #ifdef USE_TUNING
     /**
-    PrintPst(King);
+    PrintPst(Pawn);
     Position pos;
     Tuner.Init(4000);
     double currentFit = Tuner.TexelFit(&pos);
     
-    for (Square s = A1; s <= H8; ++s) 
-        currentFit = TuneSingleSquare(&pos, King, s,  currentFit);
+    for (Square s = A2; s <= H7; ++s) 
+        currentFit = TuneSingleSquare(&pos, Pawn, s,  currentFit);
     
-    PrintPst(King);
+    PrintPst(Pawn);
     /**/
 #endif
 }

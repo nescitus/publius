@@ -2,7 +2,7 @@
 
 #include "types.h"
 #include "limits.h"
-#include "publius.h"
+#include "position.h"
 #include "move.h"
 #include "history.h"
 

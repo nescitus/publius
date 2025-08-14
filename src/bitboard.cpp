@@ -1,8 +1,7 @@
 // Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
 #include "types.h"
-#include "square.h"
-#include "publius.h"
+#include "square.h" // for RelativeSq
 #include "bitboard.h"
 
 // convert square(s) to a corresponding bitboard

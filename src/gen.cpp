@@ -1,6 +1,7 @@
 // Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
 #include "types.h"
+#include "position.h"
 #include "publius.h"
 #include "bitboard.h"
 #include "mask.h"
@@ -61,7 +62,7 @@ void FillNoisyList(Position* pos, MoveList* list) {
     Bitboard pieces, moves;
     Square fromSquare, toSquare;
     Color color = pos->GetSideToMove();
-    Bitboard prey = pos->Map(~color);
+    Bitboard prey = pos->MapColor(~color);
 
     if (color == White) {
 
