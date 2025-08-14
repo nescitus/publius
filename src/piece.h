@@ -2,6 +2,18 @@
 
 #pragma once
 
-Color ColorOfPiece(int piece);                     // given a piece value, return its color
-int TypeOfPiece(int piece);                        // given a piece value, return its type
-int CreatePiece(Color pieceColor, int pieceType);  // get unique id of a piece (denoting, say, white knight), range 0-11
+// given a piece, return its color
+constexpr inline Color ColorOfPiece(int piece) {
+    return (Color)(piece & 1);
+}
+
+// given a piece, return its type
+constexpr inline int TypeOfPiece(int piece) {
+    return piece >> 1;
+}
+
+// get unique id of a piece (denoting, say, white knight), range 0-11
+constexpr inline int CreatePiece(Color pieceColor, int pieceType) {
+    return (pieceType << 1) | pieceColor;
+}
+ 

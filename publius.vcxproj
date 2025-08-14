@@ -118,6 +118,9 @@
       <Optimization>MaxSpeed</Optimization>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
+    <Link>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\badcapture.cpp" />
@@ -140,7 +143,6 @@
     <ClCompile Include="src\movedo.cpp" />
     <ClCompile Include="src\movepicker.cpp" />
     <ClCompile Include="src\moveundo.cpp" />
-    <ClCompile Include="src\piece.cpp" />
     <ClCompile Include="src\popcnt.cpp" />
     <ClCompile Include="src\position.cpp" />
     <ClCompile Include="src\position_detectors.cpp" />
@@ -152,6 +154,7 @@
     <ClCompile Include="src\search.cpp" />
     <ClCompile Include="src\timer.cpp" />
     <ClCompile Include="src\trans.cpp" />
+    <ClCompile Include="src\tuner.cpp" />
     <ClCompile Include="src\uci.cpp" />
     <ClCompile Include="src\util.cpp" />
   </ItemGroup>
@@ -170,6 +173,7 @@
     <ClInclude Include="src\mask.h" />
     <ClInclude Include="src\move.h" />
     <ClInclude Include="src\movepicker.h" />
+    <ClInclude Include="src\params.h" />
     <ClInclude Include="src\piece.h" />
     <ClInclude Include="src\position.h" />
     <ClInclude Include="src\publius.h" />
@@ -179,6 +183,7 @@
     <ClInclude Include="src\square.h" />
     <ClInclude Include="src\timer.h" />
     <ClInclude Include="src\trans.h" />
+    <ClInclude Include="src\tuner.h" />
     <ClInclude Include="src\types.h" />
     <ClInclude Include="src\uci.h" />
   </ItemGroup>
