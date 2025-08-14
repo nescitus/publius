@@ -111,3 +111,6 @@ public:
     [[nodiscard]] Square EnPassantSq() const { return enPassantSq; }
     [[nodiscard]] int PieceTypeOnSq(Square sq) const;
 };
+
+// this helps keeping Position::Set() more concise
+std::tuple<Color, int> PieceFromChar(char c);

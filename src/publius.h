@@ -5,7 +5,7 @@
 //#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3987 lines
+// 4000 lines
 
 #include <iostream>
 #include <algorithm>
@@ -59,5 +59,3 @@ static const int castleMask[64] = {
     15, 15, 15, 15, 15, 15, 15, 15,
     7,  15, 15, 15,  3, 15, 15, 11,
 };
-
-std::tuple<Color, int> PieceFromChar(char c);

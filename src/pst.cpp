@@ -6,8 +6,8 @@
 #include "position.h"
 #include "score.h"
 #include "evaldata.h"
-#include "eval.h" // values
 #include "publius.h" // USE_TUNING
+#include "score.h"
 #include "params.h"
 #include "tuner.h"
 
@@ -28,18 +28,36 @@ void Parameters::Init(void) {
     }
 
 #ifdef USE_TUNING
-    /**/
-    PrintPst(Pawn);
+    
     Position pos;
-    Tuner.Init(4000);
+    Tuner.Init(1000);
     double currentFit = Tuner.TexelFit(&pos);
+    int delta = 2;
     
     for (Square s = A2; s <= H7; ++s) 
-        currentFit = Tuner.TuneSingleSquare(&pos, this, Pawn, s,  currentFit);
-    
-    PrintPst(Pawn);
-    /**/
+        currentFit = Tuner.TuneSingleSquare(&pos, this, Pawn, s, delta, currentFit);
+    for (Square s = A1; s <= H8; ++s)
+        currentFit = Tuner.TuneSingleSquare(&pos, this, Knight, s, delta, currentFit);
+    for (Square s = A1; s <= H8; ++s)
+        currentFit = Tuner.TuneSingleSquare(&pos, this, Bishop, s, delta, currentFit);
+    for (Square s = A1; s <= H8; ++s)
+        currentFit = Tuner.TuneSingleSquare(&pos, this, Rook, s, delta, currentFit);
+    for (Square s = A1; s <= H8; ++s)
+        currentFit = Tuner.TuneSingleSquare(&pos, this, Queen, s, delta, currentFit);
+    for (Square s = A1; s <= H8; ++s)
+        currentFit = Tuner.TuneSingleSquare(&pos, this, King, s, delta, currentFit);
+
+    PrintAll();
 #endif
+}
+
+void Parameters::PrintAll() {
+    std::cout << "const int pawnPst[64] = "; PrintPst(Pawn);
+    std::cout << std::endl << "const int knightPst[64] = "; PrintPst(Knight);
+    std::cout << std::endl << "const int bishopPst[64] = "; PrintPst(Bishop);
+    std::cout << std::endl << "const int rookPst[64] = "; PrintPst(Rook);
+    std::cout << std::endl << "const int queenPst[64] = "; PrintPst(Queen);
+    std::cout << std::endl << "const int kingPst[64] = "; PrintPst(King);
 }
 
 void Parameters::PrintPst(int piece) {

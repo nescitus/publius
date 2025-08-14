@@ -16,7 +16,7 @@
 #include "timer.h"
 #include "score.h"
 #include "evaldata.h"
-#include "eval.h"
+#include "score.h"
 #include "params.h"
 #include "tuner.h"
 #include "api.h"
@@ -88,18 +88,18 @@ double cTuner::TexelFit(Position* p) {
 }
 
 double cTuner::TuneSingleSquare(Position* pos, Parameters* params,
-       int piece, Square s, double currentFit) {
+       int piece, Square s, int delta, double currentFit) {
 
-    currentFit = TryChangeMgPst(pos, params, piece, s, 1, currentFit);
-    currentFit = TryChangeMgPst(pos, params, piece, s, -1, currentFit);
-    currentFit = TryChangeMgPst(pos, params, piece, s, 1, currentFit);
-    currentFit = TryChangeMgPst(pos, params, piece, s, -1, currentFit);
+    currentFit = TryChangeMgPst(pos, params, piece, s, delta, currentFit);
+    currentFit = TryChangeMgPst(pos, params, piece, s, -delta, currentFit);
+    currentFit = TryChangeMgPst(pos, params, piece, s, delta, currentFit);
+    currentFit = TryChangeMgPst(pos, params, piece, s, -delta, currentFit);
 
     // Due to symmetry, endgame tables are updated twice;
     // we compensate for that by calling TryChangeMgPst()
     // more often.
-    currentFit = TryChangeEgPst(pos, params, piece, s, 1, currentFit);
-    currentFit = TryChangeEgPst(pos, params, piece, s, -1, currentFit);
+    currentFit = TryChangeEgPst(pos, params, piece, s, delta, currentFit);
+    currentFit = TryChangeEgPst(pos, params, piece, s, -delta, currentFit);
     return currentFit;
 }
 

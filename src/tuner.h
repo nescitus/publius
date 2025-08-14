@@ -23,7 +23,7 @@ public:
     std::vector<Sample> dataset;
     void Init(int filter);
     double TexelFit(Position* p);
-    double TuneSingleSquare(Position* pos, Parameters* params, int piece, Square s, double currentFit);
+    double TuneSingleSquare(Position* pos, Parameters* params, int piece, Square s, int delta, double currentFit);
     double TryChangeMgPst(Position* pos, Parameters* params, int piece, Square sq, int delta, double baselineLoss);
     double TryChangeEgPst(Position* pos, Parameters* params, int piece, Square sq, int delta, double baselineLoss);
 };

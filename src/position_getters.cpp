@@ -66,14 +66,9 @@ bool Position::CanTryNullMove() const {
 
 bool Position::IsDraw() const {
 
-    // draw by 50 move rule
-    if (reversibleMoves >= 100)
-        return true;
-
-    if (IsDrawByRepetition())
-        return true;
-
-    return IsDrawByInsufficientMaterial();
+    return (reversibleMoves >= 100) || 
+            IsDrawByRepetition()||
+            IsDrawByInsufficientMaterial();
 }
 
 bool Position::IsDrawByRepetition() const {

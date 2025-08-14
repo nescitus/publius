@@ -23,79 +23,78 @@ const int noDrawMultiplier = 64;
 
 int GetDrawMul(Position* pos, const Color strong, const Color weak) {
 
+    // Cache counts
+    const int sP = pos->Count(strong, Pawn);
+    const int sN = pos->Count(strong, Knight);
+    const int sB = pos->Count(strong, Bishop);
+    const int sR = pos->Count(strong, Rook);
+    const int sQ = pos->Count(strong, Queen);
+    const int sMi = sN + sB;
+    const int sMa = sR + sQ;
+
+    const int wP = pos->Count(weak, Pawn);
+    const int wN = pos->Count(weak, Knight);
+    const int wB = pos->Count(weak, Bishop);
+    const int wR = pos->Count(weak, Rook);
+    const int wQ = pos->Count(weak, Queen);
+    const int wMi = wN + wB;
+    const int wMa = wR + wQ;
+
     // Stronger side has no pawns
-    if (pos->Count(strong, Pawn) == 0) {
+    if (sP == 0) {
 
         // With no pawns, a single minor piece 
         // cannot win (KK, KBK, KNK, KBKP, KNKP)
-        if (pos->CountMajors(strong) == 0 &&
-            pos->CountMinors(strong) <= 1)
+        if (sMa == 0 && sMi <= 1)
             return certainDrawMultiplier;
 
         // KR vs Km(p)
-        if (pos->Count(strong, Queen) == 0 &&
-            pos->Count(strong, Rook) == 1 &&
-            pos->CountMinors(strong) == 0 &&
-            pos->CountMajors(weak) == 0 &&
-            pos->CountMinors(weak) == 1
-            ) return drawishMultiplier;
+        if (sQ == 0 && sR == 1 && sMi == 0 && wMa == 0 && wMi == 1 ) 
+            return drawishMultiplier;
 
         // KRm vs KR(p)
-        if (pos->Count(strong, Queen) == 0 &&
-            pos->Count(strong, Rook) == 1 &&
-            pos->CountMinors(strong) == 1 &&
-            pos->Count(weak, Queen) == 0 &&
-            pos->Count(weak, Rook) == 1 &&
-            pos->CountMinors(weak) == 0
-            ) return drawishMultiplier;
+        if (sQ == 0 && sR == 1 && sMi == 1 && wQ == 0 && wR == 1 && wMi == 0)
+           return drawishMultiplier;
 
         // KQm vs KQ(p)
-        if (pos->Count(strong, Queen) == 1 &&
-            pos->Count(strong, Rook) == 0 &&
-            pos->CountMinors(strong) == 1 &&
-            pos->Count(weak, Queen) == 1 &&
-            pos->Count(weak, Rook) == 0 &&
-            pos->CountMinors(weak) == 0 
-            ) return drawishMultiplier;
+        if (sQ == 1 && sR == 0 && sMi == 1 && wQ == 1 && wR == 0 && wMi == 0) 
+            return drawishMultiplier;
 
         // No pawns of either side
         if (pos->Count(weak, Pawn) == 0) {
 
             // No minors of either color
-            if (pos->CountMinors(strong) + pos->CountMinors(weak) == 0) {
+            if (sMi + wMi == 0) {
 
                 // Equal count of rooks and queens -> pull towards draw,
                 // as wins are achievable mainly by short term tactics
-                if (pos->Count(strong, Rook) == pos->Count(weak, Rook) &&
-                    pos->Count(strong, Queen) == pos->Count(weak, Queen))
+                if (sR == wR && sQ == wQ)
                     return drawishMultiplier;
             }
 
             // No major pieces of either color
-            if (pos->CountMajors(strong) + pos->CountMajors(weak) == 0) {
+            if (sMa + wMa == 0) {
 
                 // Equal count of minor pieces - pull towards draw
-                if (pos->CountMinors(strong) == pos->CountMinors(weak))
+                if (sMi == wMi)
                     return drawishMultiplier;
 
                 // Stronger side has two minor pieces
-                if (pos->CountMinors(strong) == 2) {
+                if (sMi == 2) {
                     
                     // Two knights will not win,
                     // alone or against a minor piece
                     // (note that two knights vs a pawn
                     // is already excluded by the earlier 
                     // conditions)
-                    if (pos->Count(strong, Knight) == 2)
+                    if (sN == 2)
                         return certainDrawMultiplier;
                     
                     // Two minors vs one is generally a draw,
                     // but two bishops may win against a knight
-                    if (pos->CountMinors(weak) == 1) {
-                        if (pos->Count(weak, Bishop) == 1 ||
-                            pos->Count(strong, Knight) > 0)
-                            return drawishMultiplier;
-                    }
+                    if (wMi == 1 && (sB == 1 || sN > 0) )
+                        return drawishMultiplier;
+                    
                 } // stronger side has two minors
             } // no major pieces of either color
         } // no pawns of either color
