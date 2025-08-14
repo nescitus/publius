@@ -16,6 +16,7 @@
 #include "evaldata.h"
 #include "pv.h"
 #include "uci.h"
+#include "tuner.h"
 #include "api.h"
 
 #ifdef USE_TUNING

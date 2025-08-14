@@ -8,3 +8,4 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta);
 bool SetImproving(int eval, int ply);
 void PrintRootInfo(int elapsed, int nps);
+void TryInterrupting(void);

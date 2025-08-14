@@ -13,6 +13,7 @@
 #include "bitgen.h"
 #include "lmr.h"
 #include "pv.h"
+#include "params.h"
 #include <stdio.h>
 
 UCItimer Timer;

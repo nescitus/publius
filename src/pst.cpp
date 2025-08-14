@@ -5,9 +5,11 @@
 #include "square.h"
 #include "position.h"
 #include "score.h"
-#include "publius.h"
 #include "evaldata.h"
 #include "eval.h" // values
+#include "publius.h" // USE_TUNING
+#include "params.h"
+#include "tuner.h"
 
 void Parameters::Init(void) {
 
@@ -26,34 +28,18 @@ void Parameters::Init(void) {
     }
 
 #ifdef USE_TUNING
-    /**
+    /**/
     PrintPst(Pawn);
     Position pos;
     Tuner.Init(4000);
     double currentFit = Tuner.TexelFit(&pos);
     
     for (Square s = A2; s <= H7; ++s) 
-        currentFit = TuneSingleSquare(&pos, Pawn, s,  currentFit);
+        currentFit = Tuner.TuneSingleSquare(&pos, this, Pawn, s,  currentFit);
     
     PrintPst(Pawn);
     /**/
 #endif
-}
-
-#ifdef USE_TUNING   
-double Parameters::TuneSingleSquare(Position* pos, int piece, Square s, double currentFit) {
-
-    currentFit = TryChangeMgPst(pos, piece, s, 1, currentFit);
-    currentFit = TryChangeMgPst(pos, piece, s, -1, currentFit);
-    currentFit = TryChangeMgPst(pos, piece, s, 1, currentFit);
-    currentFit = TryChangeMgPst(pos, piece, s, -1, currentFit);
-
-    // Due to symmetry, endgame tables are updated twice;
-    // we compensate for that by calling TryChangeMgPst()
-    // more often.
-    currentFit = TryChangeEgPst(pos, piece, s, 1, currentFit);
-    currentFit = TryChangeEgPst(pos, piece, s, -1, currentFit);
-    return currentFit;
 }
 
 void Parameters::PrintPst(int piece) {
@@ -69,81 +55,9 @@ void Parameters::PrintPst(int piece) {
             int mg = ScoreMG(v);
             int eg = ScoreEG(v);
             std::cout << "S(" << std::setw(3) << mg << "," << std::setw(3) << eg << ")";
-                if (r != 7 || f != 7) std::cout << ", ";
-            }
-            std::cout << "\n";
+            if (r != 7 || f != 7) std::cout << ", ";
         }
-        std::cout << "};";
-}
-
-double Parameters::TryChangeMgPst(Position *pos, int piece, Square sq, int delta, double baselineLoss) { 
-    
-    int oldWeight = Params.pst[White][piece][sq];
-    int mgWeight = ScoreMG(oldWeight);
-    int egWeight = ScoreEG(oldWeight);
-    int mirror = MirrorRank(sq);
-
-    Params.pst[White][piece][sq] = MakeScore(mgWeight + delta, egWeight);
-    Params.pst[Black][piece][mirror] = MakeScore(mgWeight + delta, egWeight);
-
-    double newLoss = Tuner.TexelFit(pos);
-
-    if (newLoss + 1e-12 < baselineLoss) {
-        std::cout << "MG success: piece " << piece << " sq " << SquareName(sq)
-                  << " delta " << delta << " -> loss " << newLoss
-                  << " (was " << baselineLoss << ")\n";
-        return newLoss; // keep new values
+        std::cout << "\n";
     }
-    else {
-        pst[White][piece][sq] = oldWeight;
-        pst[Black][piece][mirror] = oldWeight;
-        std::cout << "MG no-improve: loss " << baselineLoss << "\n";
-        return baselineLoss; // revert
-    }
+    std::cout << "};";
 }
-
-double Parameters::TryChangeEgPst(Position* pos, int piece, Square sq, int delta, double baselineLoss) {
-    
-    // File-mirror inside same color
-    const Square floppedSquare = MirrorFile(sq);
-
-    // Map to black by rank-mirroring
-    const Square blackSquare = MirrorRank(sq);
-    const Square blackFlopped = MirrorRank(floppedSquare);
-
-    // Save old packed score (we need separate weights
-    // even though endgame tables are symmetrical,
-    // because midgame tables aren't 
-    const int wOld1 = pst[White][piece][sq];
-    const int wOld2 = pst[White][piece][floppedSquare];
-
-    auto bumpEG = [&](int packed, int d) {
-        return MakeScore(ScoreMG(packed), ScoreEG(packed) + d);
-    };
-
-    // Apply symmetric EG adjustments
-    pst[White][piece][sq] = bumpEG(wOld1, delta);
-    pst[White][piece][floppedSquare] = bumpEG(wOld2, delta);
-    pst[Black][piece][blackSquare] = bumpEG(wOld1, delta);
-    pst[Black][piece][blackFlopped] = bumpEG(wOld2, delta);
-
-    const double newLoss = Tuner.TexelFit(pos);
-
-    if (newLoss + 1e-12 < baselineLoss) {
-        std::cout << "EG success: piece " << piece << " sq " << SquareName(sq)
-                  << " delta " << delta << " -> loss " << newLoss
-                  << " (was " << baselineLoss << ")\n";
-        return newLoss; // keep
-    }
-
-    // Revert all four squares
-    pst[White][piece][sq] = wOld1;
-    pst[White][piece][floppedSquare] = wOld2;
-    pst[Black][piece][blackSquare] = wOld1;
-    pst[Black][piece][blackFlopped] = wOld2;
-
-    std::cout << "EG no-improve: loss " << baselineLoss << "\n";
-    return baselineLoss;
-}
-
-#endif

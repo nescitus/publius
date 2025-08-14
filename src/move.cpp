@@ -7,32 +7,6 @@
 #include "move.h"
 #include "piece.h"
 
-int GetTypeOfMove(const Move move) {
-    return move >> 12;
-}
-
-Square GetFromSquare(const Move move) {
-    return static_cast<Square>(move & 63);
-}
-
-Square GetToSquare(const Move move) {
-    return static_cast<Square>((move >> 6) & 63);
-}
-
-int GetPromotedPiece(const Move move) {
-    return (move >> 12) - 3;
-}
-
-Move CreateMove(const Square fromSquare, 
-               const Square toSquare, 
-               const int flag) {
-    return (flag << 12) | (toSquare << 6) | fromSquare;
-}
-
-bool IsMovePromotion(const Move move) {
-    return move & 0x4000;
-}
-
 // does this move change material balance?
 bool IsMoveNoisy(Position* pos, const Move move) {
 

@@ -5,25 +5,10 @@
 //#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3969 lines
+// 3987 lines
 
 #include <iostream>
 #include <algorithm>
-
-class Parameters {
-public:
-    void Init();
-    int pawnSupport[2][64];
-    int pst[2][6][64];
-#ifdef USE_TUNING
-    double TryChangeMgPst(Position* pos, int piece, Square sq, int delta, double baselineLoss);
-    double TryChangeEgPst(Position* pos, int piece, Square sq, int delta, double baselineLoss);
-    void PrintPst(int piece);
-    double TuneSingleSquare(Position* pos, int piece, Square s, double currentFit);
-#endif
-};
-
-extern Parameters Params;
 
 // list
 
@@ -49,8 +34,6 @@ public:
 
 bool IsBadCapture(Position* pos, Move move);
 int Swap(const Position* pos, const Square fromSquare, const Square toSquare);
-
-void TryInterrupting(void);
 
 int InputAvailable(void);
 void OnNewGame(void);
@@ -78,28 +61,3 @@ static const int castleMask[64] = {
 };
 
 std::tuple<Color, int> PieceFromChar(char c);
-
-#ifdef USE_TUNING
-
-struct Sample {
-    std::string epd;  // full EPD/FEN line
-    double result;    // 1.0 (1-0), 0.0 (0-1), 0.5 (1/2-1/2)
-};
-
-#include <vector>
-#include <cstdint>
-#include <cinttypes>
-#include <string>
-#include <sstream>     // std::getline with std::istringstream
-#include <fstream>     // std::ifstream
-
-class cTuner {
-public:
-    std::vector<Sample> dataset;
-    void Init(int filter);
-    double TexelFit(Position* p);
-};
-
-extern cTuner Tuner;
-
-#endif

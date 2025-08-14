@@ -7,6 +7,7 @@
 #include "bitboard.h"
 #include "bitgen.h"
 #include "score.h"
+#include "params.h"
 #include "publius.h"
 #include "evaldata.h"
 #include "eval.h"
