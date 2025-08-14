@@ -5,7 +5,7 @@
 //#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3973 lines
+// 3969 lines
 
 #include <iostream>
 #include <algorithm>
@@ -54,6 +54,7 @@ void TryInterrupting(void);
 
 int InputAvailable(void);
 void OnNewGame(void);
+std::string SquareName(Square sq);
 
 // diagnostics
 

@@ -77,4 +77,5 @@ constexpr inline Square operator^(Square d1, int d2) {
 enum eMoveType { tNormal, tCastle, tEnPassant, tPawnjump, tPromN, tPromB, tPromR, tPromQ };
 enum eCastleFlag { wShortCastle = 1, wLongCastle = 2, bShortCastle = 4, bLongCastle = 8 };
 
-static const int noPiece = 12; // constant just outside this range to denote no piece
+// constant just outside piece range to denote no piece
+static const int noPiece = 12;

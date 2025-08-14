@@ -9,6 +9,7 @@
 #  include <sys/time.h>
 #endif
 #include "types.h"
+#include "square.h"
 #include "position.h"
 #include "publius.h"
 #include "move.h"
@@ -67,6 +68,14 @@ std::string ToLower(const std::string& str) {
 // Function to compare two strings
 bool IsSameOrLowercase(const std::string& str1, const std::string& str2) {
     return str1 == str2 || ToLower(str1) == ToLower(str2);
+}
+
+std::string SquareName(Square sq) {
+
+    std::string result;
+    result += FileOf(sq) + 'a';
+    result += RankOf(sq) + '1';
+    return result;
 }
 
 #ifdef USE_TUNING

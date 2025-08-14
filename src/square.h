@@ -1,7 +1,11 @@
 // Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
 #pragma once
-#include <iostream>
+
+// given rank and file, define square
+constexpr inline Square MakeSquare(const int rank, int file) {
+    return static_cast<Square>((file << 3) | rank);
+}
 
 // get rank that a square belongs to
 constexpr inline int RankOf(Square square) { return square >> 3; }
@@ -28,7 +32,7 @@ constexpr inline Square RelativeSq(Color c, Square s) {
     return Square(int(s) ^ (int(c) * 56)); // relies on White=0, Black=1
 }
 
-// Same-line predicates
+// Comparing straight ranks
 constexpr inline bool IsSameRank(Square a, Square b) { 
     return RankOf(a) == RankOf(b); 
 }
@@ -37,7 +41,7 @@ constexpr inline bool IsSameFile(Square a, Square b) {
     return FileOf(a) == FileOf(b); 
 }
 
-// Diagonals: up-left/down-right and up-right/down-left
+// Comparing diagonals: up-left/down-right and up-right/down-left
 constexpr inline bool IsSameUpwardsDiag(Square a, Square b) noexcept { // NW-SE
     return (FileOf(a) - RankOf(a)) == (FileOf(b) - RankOf(b));
 }
@@ -45,6 +49,7 @@ constexpr inline bool IsSameDownwardsDiag(Square a, Square b) noexcept { // NE-S
     return (FileOf(a) + RankOf(a)) == (FileOf(b) + RankOf(b));
 }
 
+// Comparing orthogonal/diagonal
 constexpr inline bool IsSameRankOrFile(Square a, Square b) noexcept {
     return IsSameRank(a, b) || IsSameFile(a, b);
 }
@@ -52,6 +57,9 @@ constexpr inline bool IsSameDiagonal(Square a, Square b) noexcept {
     return IsSameUpwardsDiag(a, b) || IsSameDownwardsDiag(a, b);
 }
 
-Square MakeSquare(const int rank, const int file);
-std::string SquareName(Square sq);
-int AbsoluteDelta(Square s1, Square s2);
+// Absolute distance in the linear 0..63 space (use carefully)
+// currently pawnjump and castle detection depends on it,
+// but it might go if we improve this logic
+constexpr inline int AbsoluteDelta(Square a, Square b) noexcept {
+    return (int(a) > int(b)) ? (int(a) - int(b)) : (int(b) - int(a));
+}
