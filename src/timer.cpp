@@ -1,5 +1,6 @@
 // Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
+#include <chrono>
 #include <stdio.h>
 #include "types.h"
 #include "limits.h"
@@ -9,23 +10,16 @@
 
 #define NOMINMAX
 
-#if defined(_WIN32) || defined(_WIN64)
-#  include <windows.h>
-#else
-#  include <unistd.h>
-#  include <sys/time.h>
-#endif
-
 void UCItimer::Clear(void) {
 
     isStopping = false;
     isPondering = false;
     waitingForStop = false;
     SetData(maxDepth, 64);
-    hardTimeLimit = -1;
-    softTimeLimit = -1;
-    SetData(wTime, -1);
-    SetData(bTime, -1);
+    hardTimeLimit = 0;
+    softTimeLimit = 0;
+    SetData(wTime, 0);
+    SetData(bTime, 0);
     SetData(wIncrement, 0);
     SetData(bIncrement, 0);
     SetData(moveTime, 0);
@@ -77,7 +71,7 @@ void UCItimer::SetMoveTiming(void) {
 
         // safeguard for the last move of repeating time control
         if (data[movesToGo] == 1)
-            data[engTime] -= std::min(1000, data[engTime] / 10);
+            data[engTime] -= std::min((size_t)1000, data[engTime] / 10);
 
         // calculate move time
         hardTimeLimit = (data[engTime] + data[engInc] * (data[movesToGo] - 1)) / data[movesToGo];
@@ -105,24 +99,23 @@ void UCItimer::SetMoveTiming(void) {
     }
 }
 
-int UCItimer::Now(void) {
+size_t UCItimer::Now(void) {
 
-#if defined(_WIN32) || defined(_WIN64)
-#if _WIN32_WINNT >= 0x0600 // Windows Vista or later
-    return GetTickCount64();
-#else
-    return GetTickCount();
-#endif
-#else
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec * 1000 + tv.tv_usec / 1000;
-#endif
+    using namespace std::chrono;
+    return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
 }
 
-void UCItimer::TryStopping() {
+void UCItimer::TryStoppingByTimeout() {
     if (IsTimeout())
         isStopping = true;
+}
+
+void UCItimer::TryStoppingByNodecount() {
+
+    if (GetData(maxNodes) != 0 && !IsInfiniteMode()) {
+        if (nodeCount >= GetData(maxNodes))
+            isStopping = true;
+    }
 }
 
 bool UCItimer::IsTimeout() {
@@ -137,7 +130,7 @@ bool UCItimer::TimeHasElapsed(void) {
     return (Elapsed() >= hardTimeLimit);
 }
 
-int UCItimer::Elapsed(void) {
+size_t UCItimer::Elapsed(void) {
     return (Now() - startTime);
 }
 
@@ -154,11 +147,11 @@ bool UCItimer::ShouldFinishIteration(void) {
     return (Elapsed() >= softTimeLimit);
 }
 
-int UCItimer::GetData(const int slot) {
+size_t UCItimer::GetData(const int slot) {
     return data[slot];
 }
 
-void UCItimer::SetData(const int slot, const int val) {
+void UCItimer::SetData(const int slot, const size_t val) {
     data[slot] = val;
 }
 

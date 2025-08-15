@@ -16,7 +16,7 @@ void Think(Position* pos) {
 
     Timer.isStopping = false;
     History.Clear();
-    nodeCount = 0;
+    Timer.nodeCount = 0;
     Timer.SetStartTime();
     Iterate(pos);
 }
@@ -32,7 +32,7 @@ void Iterate(Position* pos) {
         
         int elapsed = Timer.Elapsed();
         if (elapsed)
-            nps = nodeCount * 1000 / elapsed;
+            nps = Timer.nodeCount * 1000 / elapsed;
 
         PrintRootInfo(elapsed, nps);
 
@@ -54,7 +54,7 @@ void PrintRootInfo(int elapsed, int nps) {
 
         std::cout << "info depth " << rootDepth
         << " time " << elapsed
-        << " nodes " << nodeCount
+        << " nodes " << Timer.nodeCount
         << " nps " << nps << std::endl;
 }
 

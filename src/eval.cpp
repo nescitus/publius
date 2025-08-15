@@ -163,10 +163,11 @@ void EvalPawnStructure(const Position* pos, EvalData* e) {
 
 void EvalPawn(const Position* pos, EvalData* e, Color color) {
 
+    Bitboard ownPawns = pos->Map(color, Pawn);
     Bitboard b, frontSpan;
     bool isOpen;
 
-    b = pos->Map(color, Pawn);
+    b = ownPawns;
 
     while (b) {
         // Find the next pawn to evaluate
@@ -180,19 +181,19 @@ void EvalPawn(const Position* pos, EvalData* e, Color color) {
         isOpen = ((frontSpan & pos->Map(~color, Pawn)) == 0);
 
         // Doubled pawn
-        if (frontSpan & pos->Map(color, Pawn))
+        if (frontSpan & ownPawns)
             e->AddPawn(color, doubledPawn);
 
         // Strong pawn (phalanx or defended)
-        if (Mask.strongPawn[color][square] & pos->Map(color, Pawn))
+        if (Mask.strongPawn[color][square] & ownPawns)
             e->AddPawn(color, Params.pawnSupport[color][square]);
 
         // Isolated pawn
-        else if ((Mask.adjacentFiles[FileOf(square)] & pos->Map(color, Pawn)) == 0)
+        else if ((Mask.adjacentFiles[FileOf(square)] & ownPawns) == 0)
             e->AddPawn(color, isolPawn + isOpen * isolOpen);
 
         // Backward pawn
-        else if ((Mask.support[color][square] & pos->Map(color, Pawn)) == 0)
+        else if ((Mask.support[color][square] & ownPawns) == 0)
             e->AddPawn(color, backwardPawn + isOpen * backwardOpen);
     }
 }
@@ -240,7 +241,8 @@ void EvalBishop(const Position* pos, EvalData* e, Color color) {
         EvalBasic(e, color, Bishop, square);
 
         // Bishop mobility
-        mobility = GenerateMoves.Bish(pos->Occupied(), square);
+        occupancy = pos->Occupied();
+        mobility = GenerateMoves.Bish(occupancy, square);
         cnt = PopCnt(mobility);
         e->Add(color, bishMob[cnt]);
 
@@ -249,7 +251,7 @@ void EvalBishop(const Position* pos, EvalData* e, Color color) {
 
         // Bishop attacks on the enemy king zone
         // including attacks through own queen
-        occupancy = pos->Occupied() ^ pos->Map(color, Queen);
+        occupancy ^= pos->Map(color, Queen);
         att = GenerateMoves.Bish(occupancy, square);
         att &= e->enemyKingZone[color];
         e->AddAttacks(color, att, 4, 3);
@@ -259,7 +261,7 @@ void EvalBishop(const Position* pos, EvalData* e, Color color) {
 void EvalRook(const Position* pos, EvalData* e, Color color) {
 
     int cnt;
-    Bitboard b, mobility, transparent, occupancy, att, file;
+    Bitboard b, mobility, occupancy, att, file;
 
     b = pos->Map(color, Rook);
 
@@ -271,7 +273,8 @@ void EvalRook(const Position* pos, EvalData* e, Color color) {
         EvalBasic(e, color, Rook, square);
 
         // Rook mobility
-        mobility = GenerateMoves.Rook(pos->Occupied(), square);
+        occupancy = pos->Occupied();
+        mobility = GenerateMoves.Rook(occupancy, square);
         cnt = PopCnt(mobility);
         e->Add(color, rookMob[cnt]);
 
@@ -280,8 +283,7 @@ void EvalRook(const Position* pos, EvalData* e, Color color) {
 
         // Rook's attacks on the enemy king's zone
         // including attacks through own rook or queen
-        transparent = pos->MapStraightMovers(color);
-        occupancy = pos->Occupied() ^ transparent;
+        occupancy ^= pos->MapStraightMovers(color);
         att = GenerateMoves.Rook(occupancy, square);
         att &= e->enemyKingZone[color];
         e->AddAttacks(color, att, 6, 4);
@@ -401,6 +403,7 @@ void EvalKing(const Position* pos, EvalData* e, Color color) {
 void EvalPasser(const Position* pos, EvalData* e, Color color) {
 
     Bitboard b, stop;
+    Bitboard oppPawns = pos->Map(~color, Pawn);
     Color oppo = ~color;
 
     b = pos->Map(color, Pawn);
@@ -411,7 +414,7 @@ void EvalPasser(const Position* pos, EvalData* e, Color color) {
         stop = ForwardOf(Paint(square), color);
 
         // Passed pawn
-        if (!(Mask.passed[color][square] & pos->Map(~color, Pawn))) {
+        if (!(Mask.passed[color][square] & oppPawns)) {
 
             // Multiplier reflects both blockade
             // and support to a passer

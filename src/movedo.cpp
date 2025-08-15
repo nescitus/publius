@@ -44,7 +44,7 @@ void Position::DoMove(const Move move, UndoData *undo) {
     // Update pawn hash
     if (hunter == Pawn || hunter == King)
         pawnKingHash ^= Key.ForPiece(color, hunter, fromSquare) ^
-                    Key.ForPiece(color, hunter, toSquare);
+                        Key.ForPiece(color, hunter, toSquare);
 
 
     // Update castling rights
@@ -72,8 +72,9 @@ void Position::DoMove(const Move move, UndoData *undo) {
 
     // Remove pawn captured en passant
     if (moveType == tEnPassant) {
-        TakePiece(~color, Pawn, toSquare ^ 8);
-        pawnKingHash ^= Key.ForPiece(~color, Pawn, toSquare ^ 8);
+        int dir = (GetSideToMove() == White ? -8 : 8);
+        TakePiece(~color, Pawn, toSquare + dir);
+        pawnKingHash ^= Key.ForPiece(~color, Pawn, toSquare + dir);
     }
 
     // Set new en passant square

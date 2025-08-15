@@ -13,7 +13,7 @@ constexpr inline int TypeOfPiece(int piece) {
 }
 
 // get unique id of a piece (denoting, say, white knight), range 0-11
-constexpr inline int CreatePiece(Color pieceColor, int pieceType) {
+constexpr inline  int CreatePiece(Color pieceColor, int pieceType) {
     return (pieceType << 1) | pieceColor;
 }
  

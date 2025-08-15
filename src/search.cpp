@@ -22,10 +22,6 @@ const int singularDepth = 7;
 Move dummyMove = CreateMove(A1, B8, 0); // clearly illegal
 Move excludedMove = dummyMove;
 
-// counter of nodes visited during search
-// (for statistic purposes and enforcing nodes limit)
-Bitboard nodeCount;
-
 // eval for each ply, to see if we are improving or not
 int oldEval[PlyLimit];
 
@@ -72,7 +68,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         return Quiesce(pos, ply, 0, alpha, beta);
 
     // Some bookkeeping
-    nodeCount++;
+    Timer.nodeCount++;
     Pv.size[ply] = ply;
 
     // Periodically check for timeout, 
@@ -90,7 +86,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
         // Too many early exits in a row 
         // might cause a timeout, so we safeguard
-        Timer.TryStopping();
+        Timer.TryStoppingByTimeout();
 
         return ScoreDraw;
     }
@@ -553,15 +549,12 @@ void TryInterrupting(void)
 
     // We don't check for timeout in every node,
     // but only every so often, to improve speed
-    if (nodeCount & 4095 || rootDepth == 1)
+    if (Timer.nodeCount & 4095 || rootDepth == 1)
         return;
 
     // Search limited by the nodecount
     // (not entirely precise, see previous comment)
-    if (Timer.GetData(maxNodes) != 0 && !Timer.IsInfiniteMode()) {
-        if (nodeCount >= Timer.GetData(maxNodes))
-            Timer.isStopping = true;
-    }
+    Timer.TryStoppingByNodecount();
 
     // There are some commands
     // that need to be replied to during search
@@ -583,5 +576,5 @@ void TryInterrupting(void)
     }
 
     // check if the time is out
-    Timer.TryStopping();
+    Timer.TryStoppingByTimeout();
 }

@@ -5,7 +5,7 @@
 //#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3992 lines
+// 3985 lines
 
 #include <iostream>
 #include <algorithm>
@@ -47,7 +47,6 @@ Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy);
 void PrintBitboard(Bitboard b);
 
 extern int rootDepth;
-extern Bitboard nodeCount;
 
 static const int castleMask[64] = {
     13, 15, 15, 15, 12, 15, 15, 14,

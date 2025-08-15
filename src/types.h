@@ -69,7 +69,7 @@ constexpr inline Square operator-(Square d1, int d2) {
     return Square(int(d1) - int(d2));
 }
 
-// needed for en passant
+// needed for mirroring
 constexpr inline Square operator^(Square d1, int d2) {
     return Square(int(d1) ^ d2);
 }

@@ -47,7 +47,7 @@ void PvCollector::Display(int score) {
     int elapsed = Timer.Elapsed();
 
     // calculate nodes per second
-    if (elapsed) nps = nodeCount * 1000 / elapsed;
+    if (elapsed) nps = Timer.nodeCount * 1000 / elapsed;
 
     // If we are outside of normal evaluation range,
     // then the engine either gives a checkmate
@@ -65,7 +65,7 @@ void PvCollector::Display(int score) {
     // print statistics
     std::cout << "info depth " << rootDepth
               << " time " << elapsed
-              << " nodes " << nodeCount
+              << " nodes " << Timer.nodeCount
               << " nps " << nps
               << " score "
               << scoreType << " " << score << " pv";

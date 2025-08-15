@@ -31,7 +31,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     const bool isPv = (beta > alpha + 1);
 
     // Statistics
-    nodeCount++;
+    Timer.nodeCount++;
 
     // Check for timeout
     TryInterrupting();
@@ -54,7 +54,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     // in case too many draws detected in succession
     // mess with controlling the time)
     if (pos->IsDraw()) {
-        Timer.TryStopping();
+        Timer.TryStoppingByTimeout();
         return ScoreDraw;
     }
 

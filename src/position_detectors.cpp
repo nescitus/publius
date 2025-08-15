@@ -179,6 +179,7 @@ bool Position::IsBlackShortCastleLegal() {
     return false;
 }
 
+// TODO: one if, not two
 bool Position::IsBlackLongCastleLegal() {
 
     if ((castleFlags & bLongCastle) &&

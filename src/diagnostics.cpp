@@ -38,7 +38,7 @@ std::string test[] = {
 
 void Bench(Position* pos, int depth) {
 
-    nodeCount = 0;
+    Timer.nodeCount = 0;
     Timer.isStopping = false;
     Timer.SetStartTime();
     Timer.SetData(maxDepth, depth);
@@ -55,11 +55,11 @@ void Bench(Position* pos, int depth) {
 
     int elapsed = Timer.Elapsed();
     Bitboard nps = 0;
-    if (elapsed) nps = nodeCount * 1000 / elapsed;
+    if (elapsed) nps = Timer.nodeCount * 1000 / elapsed;
 
     std::cout << "Bench at depth " << depth
               << " took " << elapsed << " milliseconds, searching "
-              << nodeCount << " nodes at " << nps << " nodes per second."
+              << Timer.nodeCount << " nodes at " << nps << " nodes per second."
               << std::endl;
 }
 

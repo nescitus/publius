@@ -64,6 +64,9 @@ bool Position::CanTryNullMove() const {
     return ((CountMinors(sideToMove) + CountMajors(sideToMove)) > 0);
 }
 
+// Is position drawn? NOTE: c++ enforces strict
+// left to right order of evaluating expressions,
+// and we start with cheaper tests.
 bool Position::IsDraw() const {
 
     return (reversibleMoves >= 100) || 
