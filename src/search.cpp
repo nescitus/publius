@@ -1,12 +1,12 @@
 // Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
+#include <iostream>
 #include "types.h"
 #include "bitboard.h"
 #include "bitgen.h"
 #include "limits.h"
 #include "position.h"
 #include "movelist.h"
-#include "publius.h" // cout
 #include "timer.h"
 #include "history.h"
 #include "trans.h"
@@ -17,6 +17,7 @@
 #include "api.h"
 #include "uci.h"
 #include "movepicker.h"
+#include "util.h"
 #include "search.h"
 
 const int singularDepth = 7;
@@ -550,7 +551,7 @@ void TryInterrupting(void)
 
     // We don't check for timeout in every node,
     // but only every so often, to improve speed
-    if (Timer.nodeCount & 4095 || rootDepth == 1)
+    if (Timer.nodeCount & 4095 || Timer.rootDepth == 1)
         return;
 
     // Search limited by the nodecount

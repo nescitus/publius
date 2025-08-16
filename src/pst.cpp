@@ -1,6 +1,7 @@
 // Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
 #include <iomanip> // for std::setw, std::setprecision
+#include <iostream> // cout
 #include "types.h"
 #include "square.h"
 #include "position.h"

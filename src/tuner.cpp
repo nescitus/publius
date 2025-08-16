@@ -1,25 +1,19 @@
 // Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
-#define NOMINMAX
-
-#if defined(_WIN32) || defined(_WIN64)
-#  include <windows.h>
-#else
-#  include <unistd.h>
-#  include <sys/time.h>
-#endif
+#include <iostream> // for cout
 #include "types.h"
 #include "square.h"
 #include "position.h"
-#include "publius.h"
+#include "publius.h" // for USE_TUNING
 #include "move.h"
 #include "timer.h"
 #include "score.h"
 #include "evaldata.h"
 #include "score.h"
 #include "params.h"
-#include "tuner.h"
 #include "api.h"
+#include "util.h" // for SquareName
+#include "tuner.h"
 
 #ifdef USE_TUNING
 

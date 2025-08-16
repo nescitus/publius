@@ -4,7 +4,6 @@
 #include "limits.h"
 #include "position.h"
 #include "movelist.h"
-#include "publius.h" // for list
 #include "move.h"
 #include "pv.h"
 #include "evaldata.h"

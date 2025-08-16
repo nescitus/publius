@@ -4,7 +4,6 @@
 #include "types.h"
 #include "limits.h"
 #include "position.h"
-#include "publius.h"
 #include "move.h"
 #include "pv.h"
 #include "timer.h"
@@ -63,7 +62,7 @@ void PvCollector::Display(int score) {
     else scoreType = "cp";
 
     // print statistics
-    std::cout << "info depth " << rootDepth
+    std::cout << "info depth " << Timer.rootDepth
               << " time " << elapsed
               << " nodes " << Timer.nodeCount
               << " nps " << nps

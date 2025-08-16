@@ -2,8 +2,8 @@
 
 #include "types.h"
 #include "limits.h"
+#include "piece.h"
 #include "position.h"
-#include "publius.h"
 #include "timer.h"
 #include "uci.h"
 #include "mask.h"
@@ -15,7 +15,7 @@
 #include "pv.h"
 #include "score.h"
 #include "params.h"
-#include <stdio.h>
+#include "publius.h"
 
 UCItimer Timer;
 MaskData Mask;

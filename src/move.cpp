@@ -4,9 +4,9 @@
 #include "square.h"
 #include "position.h"
 #include "movelist.h"
-#include "publius.h" // squarename
 #include "move.h"
 #include "piece.h"
+#include "util.h"
 
 // does this move change material balance?
 bool IsMoveNoisy(Position* pos, const Move move) {

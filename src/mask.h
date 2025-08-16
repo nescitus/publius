@@ -10,6 +10,18 @@ private:
     void InitSupportMask();
     void InitStrongPawn();
 public:
+    
+    static constexpr int castle[64] = {
+    13, 15, 15, 15, 12, 15, 15, 14,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    7,  15, 15, 15,  3, 15, 15, 11,
+    };
+
     int kingAttack[256];
     Bitboard rank[8];
     Bitboard file[8];

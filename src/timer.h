@@ -15,6 +15,7 @@ private:
     bool isRepeating;        // repeating TC uses strict mode (does it help?)...
 public:
     size_t nodeCount;      // counter of visited nodes
+    int rootDepth;
     bool waitingForStop;
     bool isStopping;
     bool isPondering;

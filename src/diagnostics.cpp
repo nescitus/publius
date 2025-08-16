@@ -1,11 +1,12 @@
 // Publius - Didactic public domain bitboard chess engine by Pawel Koziol
 
+#include <iostream> // for cout
 #include "types.h"
 #include "square.h" // for MirrorRank
 #include "position.h"
 #include "movelist.h"
-#include "publius.h" // cout
 #include "bitboard.h"
+#include "publius.h" // for OnNewGame
 #include "move.h"
 #include "timer.h"
 #include "movepicker.h"

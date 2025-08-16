@@ -73,7 +73,7 @@ void HistoryData::UpdateTries(Position* pos, const Move move, const int depth) {
 
     // Update tries history
     triesHistory[piece][toSquare] += Inc(depth);
- 
+
     // Keep history scores within range
     if (triesHistory[piece][toSquare] > HistLimit)
         Trim();
@@ -107,7 +107,7 @@ int HistoryData::GetScore(Position* pos, const Move move) {
     if (triesCount == 0)
         return 0;
 
-    // How many times did a move actually cause a cutoff? 
+    // How many times did a move actually cause a cutoff?
     int cutoffsCount = cutoffHistory[piece][toSquare];
 
     // return history score in 0..10000 range

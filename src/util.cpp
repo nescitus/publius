@@ -8,10 +8,11 @@
 #  include <unistd.h>
 #  include <sys/time.h>
 #endif
+#include <algorithm>
 #include "types.h"
 #include "square.h"
 #include "position.h"
-#include "publius.h"
+#include "util.h"
 
 // TODO: model after hakkapeliitta
 

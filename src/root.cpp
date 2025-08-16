@@ -1,16 +1,15 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
 
+#include <iostream>
 #include <stdio.h>
 #include "types.h"
 #include "limits.h"
 #include "position.h"
-#include "publius.h"
 #include "timer.h"
 #include "history.h"
 #include "pv.h"
 #include "search.h"
-
-int rootDepth;
 
 void Think(Position* pos) {
 
@@ -28,7 +27,7 @@ void Iterate(Position* pos) {
 
     Pv.Clear();
 
-    for (rootDepth = 1; rootDepth <= Timer.GetData(maxDepth); rootDepth++) {
+    for (Timer.rootDepth = 1; Timer.rootDepth <= Timer.GetData(maxDepth); Timer.rootDepth++) {
         
         int elapsed = Timer.Elapsed();
         if (elapsed)
@@ -36,7 +35,7 @@ void Iterate(Position* pos) {
 
         PrintRootInfo(elapsed, nps);
 
-        curVal = Widen(pos, rootDepth, curVal);
+        curVal = Widen(pos, Timer.rootDepth, curVal);
 
         // stop searching
         if (Timer.isStopping || Timer.ShouldFinishIteration())
@@ -45,14 +44,14 @@ void Iterate(Position* pos) {
         val = curVal;
 
         // for go infinite
-        if (rootDepth == 64 && Timer.IsInfiniteMode() )
+        if (Timer.rootDepth == 64 && Timer.IsInfiniteMode() )
             Timer.waitingForStop = true;
     }
 }
 
 void PrintRootInfo(int elapsed, int nps) {
 
-        std::cout << "info depth " << rootDepth
+        std::cout << "info depth " << Timer.rootDepth
         << " time " << elapsed
         << " nodes " << Timer.nodeCount
         << " nps " << nps << std::endl;

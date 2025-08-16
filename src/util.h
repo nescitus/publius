@@ -2,4 +2,5 @@
 
 #pragma once
 
-int Evaluate(Position* pos, EvalData* e);
+int InputAvailable(void);
+std::string SquareName(Square sq);

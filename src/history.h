@@ -9,11 +9,11 @@ private:
     int cutoffHistory[12][64];
     int triesHistory[12][64];
     Square lastCaptureSquare[PlyLimit];
-    void Trim(void);
     int Inc(const int depth);
 public:
     HistoryData(); // constructor
     void Clear(void);
+    void Trim(void);
     void Update(Position* pos, const Move move, const int depth, const int ply);
     void UpdateTries(Position* pos, const Move move, const int depth);
     int GetScore(Position* pos, const Move move);

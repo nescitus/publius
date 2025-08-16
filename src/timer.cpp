@@ -5,7 +5,6 @@
 #include "types.h"
 #include "limits.h"
 #include "position.h"
-#include "publius.h"
 #include "timer.h"
 
 #define NOMINMAX

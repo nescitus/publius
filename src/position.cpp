@@ -5,8 +5,8 @@
 #include "types.h"
 #include "piece.h"
 #include "square.h"
+#include "mask.h"
 #include "position.h"
-#include "publius.h"
 #include "bitboard.h"
 #include "bitgen.h"
 #include "hashkeys.h"
@@ -213,7 +213,7 @@ void Position::SetEnPassantSquare(const Color color, Square toSquare) {
 void Position::UpdateCastlingRights(const Square fromSquare, const Square toSquare) {
 
     boardHash ^= Key.castleKey[castleFlags];
-    castleFlags &= castleMask[fromSquare] & castleMask[toSquare];
+    castleFlags &= Mask.castle[fromSquare] & Mask.castle[toSquare];
     boardHash ^= Key.castleKey[castleFlags];
 }
 
