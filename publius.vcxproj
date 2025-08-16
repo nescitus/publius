@@ -159,6 +159,7 @@
     <ClCompile Include="src\util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\badcapture.h" />
     <ClInclude Include="src\bitboard.h" />
     <ClInclude Include="src\bitgen.h" />
     <ClInclude Include="src\eval.h" />
@@ -172,6 +173,7 @@
     <ClInclude Include="src\lmr.h" />
     <ClInclude Include="src\mask.h" />
     <ClInclude Include="src\move.h" />
+    <ClInclude Include="src\movelist.h" />
     <ClInclude Include="src\movepicker.h" />
     <ClInclude Include="src\params.h" />
     <ClInclude Include="src\piece.h" />

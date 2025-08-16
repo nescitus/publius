@@ -1,4 +1,8 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
+
+// This file contains functions that collect and return 
+// information about board position
 
 #include "types.h"
 #include "piece.h"
@@ -7,9 +11,7 @@
 #include "bitgen.h"
 #include "move.h"
 
-// This file contains functions that analyse
-// and return information about board position
-
+// Detect whether a square is attacked by given side
 bool Position::SquareIsAttacked(const Square sq, const Color color) const {
 
     return (Map(color, Pawn) & GenerateMoves.Pawn(~color, sq)) ||
@@ -19,6 +21,8 @@ bool Position::SquareIsAttacked(const Square sq, const Color color) const {
            (Map(color, King) & GenerateMoves.King(sq));
 }
 
+// Return bitboard of attacks to a square (by both sides).
+// Used in static exchange evaluation (badcapture.cpp).
 Bitboard Position::AttacksTo(const Square sq) const {
 
     return (Map(White, Pawn) & GenerateMoves.Pawn(Black, sq)) |
@@ -29,6 +33,7 @@ Bitboard Position::AttacksTo(const Square sq) const {
         (MapPieceType(King) & GenerateMoves.King(sq));
 }
 
+// Return bitboard of attacks from a square
 Bitboard Position::AttacksFrom(const Square sq) const {
 
     switch (PieceTypeOnSq(sq)) {
@@ -48,6 +53,8 @@ Bitboard Position::AttacksFrom(const Square sq) const {
     return 0;
 }
 
+// Detect whether a move gives check
+// without making it on the board
 bool Position::MoveGivesCheck(const Move move) {
 
     Bitboard checks, occ;
@@ -140,54 +147,37 @@ bool Position::MoveGivesCheck(const Move move) {
     return false;
 }
 
+// Detect castle legality (we are not testing
+// for a check on king's destination square
+// because search will handle that case)
 bool Position::IsWhiteShortCastleLegal() {
 
-    if ((castleFlags & wShortCastle) &&
-        !(Occupied() & Paint(F1, G1))) {
-
-        if (!SquareIsAttacked(E1, Black) &&
-            !SquareIsAttacked(F1, Black))
-            return true;
-    }
-
-    return false;
+    return ((castleFlags & wShortCastle) &&
+           !(Occupied() & Paint(F1, G1)) &&
+           !SquareIsAttacked(E1, Black) &&
+           !SquareIsAttacked(F1, Black));
 }
 
 bool Position::IsWhiteLongCastleLegal() {
 
-    if ((castleFlags & wLongCastle) &&
-        !(Occupied() & Paint(B1, C1, D1))) {
-
-        if (!SquareIsAttacked(E1, Black) &&
-            !SquareIsAttacked(D1, Black))
-            return true;
-    }
-
-    return false;
+    return ((castleFlags & wLongCastle) &&
+           !(Occupied() & Paint(B1, C1, D1)) &&
+           !SquareIsAttacked(E1, Black) &&
+           !SquareIsAttacked(D1, Black));
 }
 
 bool Position::IsBlackShortCastleLegal() {
 
-    if ((castleFlags & bShortCastle) &&
-        !(Occupied() & Paint(F8, G8))) {
-
-        if (!SquareIsAttacked(E8, White) &&
-            !SquareIsAttacked(F8, White))
-            return true;
-    }
-
-    return false;
+    return ((castleFlags & bShortCastle) &&
+           !(Occupied() & Paint(F8, G8)) &&
+           !SquareIsAttacked(E8, White) &&
+           !SquareIsAttacked(F8, White));
 }
 
-// TODO: one if, not two
 bool Position::IsBlackLongCastleLegal() {
 
-    if ((castleFlags & bLongCastle) &&
-        !(Occupied() & Paint(B8, C8, D8))) {
-
-        if (!SquareIsAttacked(E8, White) &&
-            !SquareIsAttacked(D8, White))
-            return true;
-    }
-    return false;
+    return ((castleFlags & bLongCastle) &&
+           !(Occupied() & Paint(B8, C8, D8)) &&
+           !SquareIsAttacked(E8, White) &&
+           !SquareIsAttacked(D8, White));
 }

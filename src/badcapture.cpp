@@ -3,16 +3,14 @@
 #include "types.h"
 #include "limits.h"
 #include "position.h"
-#include "publius.h"
 #include "move.h"
 #include "bitboard.h"
 #include "bitgen.h"
-
-const int pieceValue[6] = { 100, 300, 300, 500, 900, 0 };
+#include "badcapture.h"
 
 // IsBadCapture() is used in two places:
 // - in Quiesce() to prune captures that appear to lose material
-// - in ScoreMoves() to sort such captures below the quiet moves
+// - in movepicker.cpp to sort such captures below the quiet moves
 
 bool IsBadCapture(Position* pos, Move move) {
 
@@ -109,5 +107,6 @@ int Swap(const Position* pos, const Square fromSquare, const Square toSquare) {
     // minimax the score stack
     while (--ply)
         score[ply - 1] = -std::max(-score[ply - 1], score[ply]);
+
     return score[0];
 }

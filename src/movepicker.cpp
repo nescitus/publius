@@ -1,11 +1,13 @@
-﻿// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+﻿// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
 
 #include "types.h"
 #include "position.h"
-#include "publius.h"
+#include "movelist.h"
 #include "legality.h"
 #include "move.h"
 #include "gen.h"
+#include "badcapture.h"
 #include "movepicker.h"
 
 void MovePicker::Init(Move ttMove, Move firstKiller, Move secondKiller) {
@@ -55,7 +57,7 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
             case stagePrepareGood:
             {
                 goodNoisyList.ScoreNoisy(pos);
-                goodNoisyLength = goodNoisyList.GetInd();
+                goodNoisyLength = goodNoisyList.GetLength();
                 goodNoisyCnt = 0;
                 stage = stageReturnGoodCapt;
                 currentMoveStage = stageReturnGoodCapt;
@@ -107,7 +109,7 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
                                      : FillQuietList(pos, &quietList);
 
                 quietList.ScoreQuiet(pos);
-                quietLength = quietList.GetInd();
+                quietLength = quietList.GetLength();
                 quietCnt = 0;
                 stage = stageReturnQuiet;
                 currentMoveStage = stageReturnQuiet;
@@ -137,7 +139,7 @@ Move MovePicker::NextMove(Position* pos, int ply, Mode mode) {
                 stage = stageReturnBad;
                 currentMoveStage = stageReturnBad;
                 badNoisyList.ScoreNoisy(pos);
-                badNoisyLength = badNoisyList.GetInd();
+                badNoisyLength = badNoisyList.GetLength();
                 badNoisyCnt = 0;
                 break;
             }

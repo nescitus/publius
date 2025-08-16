@@ -28,7 +28,7 @@ void Parameters::Init(void) {
     }
 
 #ifdef USE_TUNING
-    
+    /**
     Position pos;
     Tuner.Init(1000);
     double currentFit = Tuner.TexelFit(&pos);
@@ -48,6 +48,7 @@ void Parameters::Init(void) {
         currentFit = Tuner.TuneSingleSquare(&pos, this, King, s, delta, currentFit);
 
     PrintAll();
+    /**/
 #endif
 }
 

@@ -5,7 +5,8 @@
 #include "bitgen.h"
 #include "limits.h"
 #include "position.h"
-#include "publius.h"
+#include "movelist.h"
+#include "publius.h" // cout
 #include "timer.h"
 #include "history.h"
 #include "trans.h"

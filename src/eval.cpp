@@ -177,7 +177,7 @@ void EvalPawn(const Position* pos, EvalData* e, Color color) {
         e->AddPawn(color, Params.pst[color][Pawn][square]);
 
         // Asess situation in front of the pawn
-        frontSpan = FrontSpan(Paint(square), color);
+        frontSpan = FillForward(Paint(square), color);
         isOpen = ((frontSpan & pos->Map(~color, Pawn)) == 0);
 
         // Doubled pawn

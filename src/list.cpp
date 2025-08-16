@@ -1,12 +1,14 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
 
 #include "types.h"
 #include "limits.h"
 #include "position.h"
-#include "publius.h"
+#include "movelist.h"
 #include "history.h"
 #include "move.h"
 
+// Swaps moves on the list between slots i and j
 void MoveList::SwapMoves(const int i, const int j) {
 
     Move tmpMove = moves[i];
@@ -17,13 +19,15 @@ void MoveList::SwapMoves(const int i, const int j) {
     values[j] = tmpVal;
 }
 
+// Add a preexisting move to the list
 void MoveList::AddMove(Move move) {
 
     moves[ind] = move;
-    values[ind] = 0;
+    values[ind] = -4 * HistLimit;
     ind++;
 }
 
+// Create a move and add it to the list
 void MoveList::AddMove(Square fromSquare, Square toSquare, int flag) {
 
     moves[ind] = CreateMove(fromSquare, toSquare, flag);
@@ -31,12 +35,15 @@ void MoveList::AddMove(Square fromSquare, Square toSquare, int flag) {
     ind++;
 }
 
+// Use the move list as it if was empty
+// (preexisting data will be overwritten)
 void MoveList::Clear() { 
     ind = 0; 
     get = 0; 
 }
 
-int MoveList::GetInd() {
+// Fet the lat index of the move list
+int MoveList::GetLength() {
     return ind;
 }
 

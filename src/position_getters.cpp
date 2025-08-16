@@ -1,12 +1,15 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
+
+// This file contains functions that return 
+// simple information about board position.
+// Even more basic getters, like Count(), are
+// defined in position.h
 
 #include "types.h"
 #include "piece.h"
 #include "position.h"
 #include "bitboard.h"
-
-// This file contains functions that return 
-// simple information about board position
 
 int Position::CountMinors(const Color color) const {
     return Count(color, Knight) + Count(color, Bishop);
@@ -59,7 +62,9 @@ Bitboard Position::AllStraightMovers() const {
     return MapPieceType(Rook) | MapPieceType(Queen);
 }
 
-// requires side to move to have at least one non-pawn
+// Requires side to move to have at least one non-pawn,
+// reducing the risk of making null move in zugzwang positions.
+// Other conditions for null move are implemented in search
 bool Position::CanTryNullMove() const {
     return ((CountMinors(sideToMove) + CountMajors(sideToMove)) > 0);
 }

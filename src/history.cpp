@@ -20,10 +20,8 @@ void HistoryData::Clear(void) {
             triesHistory[piece][square] = 0;
         }
 
-    for (int ply = 0; ply < PlyLimit; ply++) {
-        killer1[ply] = 0;
-        killer2[ply] = 0;
-    }
+    for (int ply = 0; ply < PlyLimit; ply++)
+        killer1[ply] = killer2[ply] = 0;
 }
 
 // halve history values (used when they grow too high)
@@ -98,18 +96,19 @@ int HistoryData::GetScore(Position* pos, const Move move) {
     // Init square variables
     Square fromSquare = GetFromSquare(move);
     Square toSquare = GetToSquare(move);
+    int piece = pos->GetPiece(fromSquare);
 
     // How many times the move was considered
     // as an alternative to one that actually
     // produced a beta cutoff?
-    int triesCount = triesHistory[pos->GetPiece(fromSquare)][toSquare];
+    int triesCount = triesHistory[piece][toSquare];
 
     // Avoiding division by zero
     if (triesCount == 0)
         return 0;
 
-    // How many times did a move actually cause a cutoff?
-    int cutoffsCount = cutoffHistory[pos->GetPiece(fromSquare)][toSquare];
+    // How many times did a move actually cause a cutoff? 
+    int cutoffsCount = cutoffHistory[piece][toSquare];
 
     // return history score in 0..10000 range
     return (10000 * cutoffsCount) / triesCount;

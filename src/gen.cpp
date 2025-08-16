@@ -2,7 +2,7 @@
 
 #include "types.h"
 #include "position.h"
-#include "publius.h"
+#include "movelist.h"
 #include "bitboard.h"
 #include "mask.h"
 #include "bitgen.h"

@@ -3,6 +3,7 @@
 #include "types.h"
 #include "limits.h"
 #include "position.h"
+#include "movelist.h"
 #include "publius.h" // for list
 #include "move.h"
 #include "pv.h"
@@ -12,6 +13,7 @@
 #include "trans.h"
 #include "timer.h"
 #include "history.h"
+#include "badcapture.h"
 #include "movepicker.h"
 
 int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {

@@ -26,8 +26,8 @@ constexpr inline Square MirrorRank(const Square square) {
 }
 
 // get square relative to the side to move
-// - RelativeSquare(White, C2) is C2,
-// - RelativeSquare(Black, C2) is C7
+// - RelativeSq(White, C2) is C2,
+// - RelativeSq(Black, C2) is C7
 constexpr inline Square RelativeSq(Color c, Square s) {
     return Square(int(s) ^ (int(c) * 56)); // relies on White=0, Black=1
 }

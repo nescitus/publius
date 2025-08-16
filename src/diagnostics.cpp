@@ -3,7 +3,8 @@
 #include "types.h"
 #include "square.h" // for MirrorRank
 #include "position.h"
-#include "publius.h"
+#include "movelist.h"
+#include "publius.h" // cout
 #include "bitboard.h"
 #include "move.h"
 #include "timer.h"
@@ -130,7 +131,7 @@ void PrintBitboard(Bitboard b) {
    
     for (Square square = A1; square < 64; ++square) {
         
-        if (b & RelSqBb(Black, square)) std::cout << "+ ";
+        if (b & RelativeSqBb(Black, square)) std::cout << "+ ";
         else                            std::cout << ". ";
 
         if ((square + 1) % 8 == 0) 

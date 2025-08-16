@@ -1,4 +1,5 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
 
 #include "lmr.h"
 #include "math.h"

@@ -3,7 +3,8 @@
 #include "types.h"
 #include "square.h"
 #include "position.h"
-#include "publius.h"
+#include "movelist.h"
+#include "publius.h" // squarename
 #include "move.h"
 #include "piece.h"
 

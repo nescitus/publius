@@ -4,22 +4,8 @@
 #include "square.h" // for RelativeSq
 #include "bitboard.h"
 
-// convert square(s) to a corresponding bitboard
-
-Bitboard Paint(const Square s) {
-    return (Bitboard)1 << s;
-}
-
-Bitboard Paint(const Square s1, const Square s2) {
-    return Paint(s1) | Paint(s2);
-}
-
-Bitboard Paint(const Square s1, const Square s2, const Square s3) {
-    return Paint(s1,s2) | Paint(s3);
-}
-
 // color-dependent forward fill
-Bitboard FrontSpan(const Bitboard b, const Color color) {
+Bitboard FillForward(const Bitboard b, const Color color) {
 
     return (color == White) ? FillNorth(NorthOf(b)) 
                             : FillSouth(SouthOf(b));
@@ -139,6 +125,6 @@ Bitboard FillOcclNW(Bitboard b, Bitboard o) {
 }
 
 // get bitboard of a relative square
-Bitboard RelSqBb(const Color cl, const Square sq) {
+Bitboard RelativeSqBb(const Color cl, const Square sq) {
     return (Paint(RelativeSq(cl, sq)));
 }
