@@ -93,9 +93,9 @@ void FillNoisyList(Position* pos, MoveList* list) {
         // White en passant capture
         if ((toSquare = pos->EnPassantSq() ) != sqNone) {
             if (NWOf(pieces) & Paint(toSquare))
-            list->AddMove(toSquare - 7, toSquare, tEnPassant);
+                list->AddMove(toSquare - 7, toSquare, tEnPassant);
             if (NEOf(pieces) & Paint(toSquare))
-            list->AddMove(toSquare - 9, toSquare, tEnPassant);
+                list->AddMove(toSquare - 9, toSquare, tEnPassant);
         }
     } else {
 

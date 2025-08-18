@@ -65,8 +65,20 @@ static const Bitboard excludeH = 0x7f7f7f7f7f7f7f7f;
 // Simple fill functions in the most useful directions
 
 [[nodiscard]] Bitboard FillForward(const Bitboard b, const Color color);
-[[nodiscard]] Bitboard FillNorth(Bitboard b);
-[[nodiscard]] Bitboard FillSouth(Bitboard b);
+
+[[nodiscard]] constexpr inline Bitboard FillNorth(Bitboard b) {
+    b |= b << 8;
+    b |= b << 16;
+    b |= b << 32;
+    return b;
+}
+
+[[nodiscard]] constexpr inline Bitboard FillSouth(Bitboard b) {
+    b |= b >> 8;
+    b |= b >> 16;
+    b |= b >> 32;
+    return b;
+}
 
 // Occluded fill functions. Currently we use them
 // only to initialize kindergarten bitboards, but

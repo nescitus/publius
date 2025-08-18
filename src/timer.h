@@ -15,6 +15,8 @@ private:
     bool isRepeating;        // repeating TC uses strict mode (does it help?)...
 public:
     size_t nodeCount;      // counter of visited nodes
+    size_t nps;            // nodes per second
+    size_t timeUsed;       // time used for the current search
     int rootDepth;
     bool waitingForStop;
     bool isStopping;
@@ -34,6 +36,7 @@ public:
     bool IsTimeout(void);
     void TryStoppingByTimeout(void);
     void TryStoppingByNodecount(void);
+    void RefreshStats(void);
 };
 
 extern UCItimer Timer;

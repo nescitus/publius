@@ -1,4 +1,5 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
 
 #include <chrono>
 #include <stdio.h>
@@ -27,6 +28,11 @@ void UCItimer::Clear(void) {
     SetData(isInfinite, 0);
     isStrict = false;
     isRepeating = false;
+}
+
+void UCItimer::RefreshStats() {
+    timeUsed = Elapsed();
+    nps = timeUsed ? (nodeCount * 1000 / timeUsed) : 0;
 }
 
 void UCItimer::SetRepeating() {

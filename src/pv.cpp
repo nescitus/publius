@@ -1,4 +1,9 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
+
+// This class implements triangular pv-table
+// (https://www.chessprogramming.org/Triangular_PV-Table)
+// that remembers the main line calculated by the engine.
 
 #include <iostream>
 #include "types.h"
@@ -8,6 +13,7 @@
 #include "pv.h"
 #include "timer.h"
 
+// Clears pv-array
 void PvCollector::Clear() {
 
     for (int i = 0; i < PlyLimit + 2; i++)
@@ -15,6 +21,7 @@ void PvCollector::Clear() {
             line[i][j] = 0;
 }
 
+// Updates pv-array
 void PvCollector::Update(const int ply, const Move move) {
 
     line[ply][ply] = move;
@@ -25,6 +32,7 @@ void PvCollector::Update(const int ply, const Move move) {
     size[ply] = size[ply + 1];
 }
 
+// Sends best move (and ponder move if present)
 void PvCollector::SendBestMove() {
 
     if (line[0][1]) {
@@ -39,14 +47,12 @@ void PvCollector::SendBestMove() {
     }
 }
 
+// Displays engine's main line
 void PvCollector::Display(int score) {
 
     std::string scoreType;
-    Bitboard nps = 0;
-    int elapsed = Timer.Elapsed();
-
-    // calculate nodes per second
-    if (elapsed) nps = Timer.nodeCount * 1000 / elapsed;
+    
+    Timer.RefreshStats();
 
     // If we are outside of normal evaluation range,
     // then the engine either gives a checkmate
@@ -63,9 +69,9 @@ void PvCollector::Display(int score) {
 
     // print statistics
     std::cout << "info depth " << Timer.rootDepth
-              << " time " << elapsed
+              << " time " << Timer.timeUsed
               << " nodes " << Timer.nodeCount
-              << " nps " << nps
+              << " nps " << Timer.nps
               << " score "
               << scoreType << " " << score << " pv";
 

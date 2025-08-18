@@ -11,23 +11,6 @@ Bitboard FillForward(const Bitboard b, const Color color) {
                             : FillSouth(SouthOf(b));
 }
 
-// Basic fill function (north and south only,
-// as these are the most useful)
-
-Bitboard FillNorth(Bitboard b) {
-    b |= b << 8;
-    b |= b << 16;
-    b |= b << 32;
-    return b;
-}
-
-Bitboard FillSouth(Bitboard b) {
-    b |= b >> 8;
-    b |= b >> 16;
-    b |= b >> 32;
-    return b;
-}
-
 // Occluded fill algorithms are taken from
 // https://www.chessprogramming.org/Kogge-Stone_Algorithm#Occluded_Fill
 // they do multiple shifts, shifting both the bitboard

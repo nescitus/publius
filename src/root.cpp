@@ -23,17 +23,13 @@ void Think(Position* pos) {
 void Iterate(Position* pos) {
 
     int val = 0, curVal = 0;
-    Bitboard nps = 0;
 
     Pv.Clear();
 
     for (Timer.rootDepth = 1; Timer.rootDepth <= Timer.GetData(maxDepth); Timer.rootDepth++) {
-        
-        int elapsed = Timer.Elapsed();
-        if (elapsed)
-            nps = Timer.nodeCount * 1000 / elapsed;
 
-        PrintRootInfo(elapsed, nps);
+        Timer.RefreshStats();
+        PrintRootInfo(Timer.timeUsed, Timer.nps);
 
         curVal = Widen(pos, Timer.rootDepth, curVal);
 

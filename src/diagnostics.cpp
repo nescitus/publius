@@ -55,13 +55,11 @@ void Bench(Position* pos, int depth) {
         Iterate(pos);
     }
 
-    int elapsed = Timer.Elapsed();
-    Bitboard nps = 0;
-    if (elapsed) nps = Timer.nodeCount * 1000 / elapsed;
+    Timer.RefreshStats();
 
     std::cout << "Bench at depth " << depth
-              << " took " << elapsed << " milliseconds, searching "
-              << Timer.nodeCount << " nodes at " << nps << " nodes per second."
+              << " took " << Timer.timeUsed << " milliseconds, searching "
+              << Timer.nodeCount << " nodes at " << Timer.nps << " nodes per second."
               << std::endl;
 }
 
