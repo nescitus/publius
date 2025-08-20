@@ -1,22 +1,23 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine
+// by Pawel Koziol
 
 #include "types.h"
 #include "square.h" // for rank and file
 #include "bitboard.h"
 #include "bitgen.h"
 
-/*
-Pawn, knight and king moves are generated
-by a table lookup.
+// Bitgen class implements move generation.
 
-Sliding pieces' moves are generated using 
-kindergarten bitboards algorithm. It is
-a kind of perfect hashing scheme, where
-board occupancy is masked (so that we care
-only for the relevant rank/file/diagonal)
-and boiled down to the interesting bits only
-(i.e. to bits that influence the move range).
-*/
+// Pawn, knight and king moves are generated
+// by a table lookup.
+
+// Sliding pieces' moves are generated using 
+// kindergarten bitboards algorithm. It is
+// a kind of perfect hashing scheme, where
+// board occupancy is masked (so that we care
+// only for the relevant rank/file/diagonal)
+// and boiled down to the interesting bits only
+// (i.e. to bits that influence the move range).
 
 static constexpr Bitboard bbRank1 = 0x00000000000000FFULL;
 static constexpr Bitboard bbFileA = 0x0101010101010101ULL;

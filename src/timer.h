@@ -12,16 +12,16 @@ private:
     size_t hardTimeLimit;       // basic time allocated for a move
     size_t softTimeLimit;       // but we won't start the next iteration after exceeding this
     bool isStrict;
-    bool isRepeating;        // repeating TC uses strict mode (does it help?)...
+    bool isRepeating;        // repeating TC uses strict mode (does it help?)
 public:
-    size_t nodeCount;      // counter of visited nodes
-    size_t nps;            // nodes per second
-    size_t timeUsed;       // time used for the current search
+    size_t nodeCount;      // stats: counter of visited nodes
+    size_t nps;            // stats: nodes per second
+    size_t timeUsed;       // stats: time used for the current search
     int rootDepth;
     bool waitingForStop;
     bool isStopping;
     bool isPondering;
-    void SetRepeating(void); //...and we won't detect it just by checking movestogo
+    void SetRepeating(void); // set strivt mode
     void Clear(void);
     void SetStartTime();
     void SetMoveTiming(void);

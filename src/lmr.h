@@ -1,4 +1,8 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
+
+// LmrData class initializes and holds the table
+// used for late move reductions.
 
 #pragma once
 

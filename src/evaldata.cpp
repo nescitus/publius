@@ -1,16 +1,24 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
+
+// EvalData is used to save data gathered and used
+// by the evaluation function. The result is that
+// evaluation function does not modify global variables.
+// This might come handy if we ever decide to add
+// multithreading.
 
 #include "types.h"
 #include "bitboard.h"
 #include "evaldata.h"
 
+// Evaluation function needs empty EvalData
 void EvalData::Clear() {
 
     gamePhase = 0;
     
     for (Color color = White; color < colorNone; ++color) {
         
-        // Clean scores
+        // Clear scores
         score[color] = 0;
         pawnScore[color] = 0;
 

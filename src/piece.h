@@ -1,4 +1,7 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
+
+// decoding and encoding piece
 
 #pragma once
 

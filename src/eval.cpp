@@ -1,4 +1,33 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
+
+// This hand-crafted evaluation function is
+// a compromise between size, the need to cover
+// the most important elements, and strength.
+// It would be possible to increase Publius'
+// strength by 100-150 Elo at the cost of doubling
+// its size, but this wouldn't be a good idea
+// for an educational engine ;)
+
+// What is included:
+// - material and piece/square tables (merged into one)
+// - mobility
+// - king safety (using attack units)
+// - passed pawns (considering stop square control)
+// - doubled, isolated and backward pawns
+// - hanging pieces
+// - minor pieces attacking each other
+// - basic drawish endings
+// - poor man's replacement of king's pawn shelter
+
+// Mising stuff includes:
+// 
+// - material imbalances
+// - proper pawn shield evaluation
+// - pawn storm evaluation
+// - outposts
+// - patterns like trapped bishop 
+// - pawn shielding a minor piece
 
 #include <algorithm>
 #include "types.h"
@@ -49,6 +78,8 @@ int Evaluate(Position* pos, EvalData* e) {
 
 #ifndef USE_TUNING
     // Try to retrieve the score from the evaluation hashtable
+    // (which contains scores from stm perspective, so no
+    // additional condition is needed)
     if (EvalHash.Retrieve(pos->boardHash, &score))
         return score;
 #endif
@@ -427,11 +458,15 @@ void EvalPasser(const Position* pos, EvalData* e, Color color) {
             // and pack it again
             int s = passedBonus[color][RankOf(square)];
             e->Add(color, MakeScore((ScoreMG(s) * mul / 100),
-                (ScoreEG(s) * mul / 100)));
+                                    (ScoreEG(s) * mul / 100)));
         }
     }
 }
 
+// Evaluates attacks on hanging pieces
+// (that is pieces that are either attacked
+//  and undefended or attacked by enemy pawn)
+// and attacks of a minor piece on another one.
 void EvalPressure(Position* pos, EvalData* e, Color side) {
 
     Color oppo;
@@ -490,13 +525,13 @@ int Interpolate(EvalData* e) {
 
     // Sum all the eval factors
     int mgScore = ScoreMG(e->score[White])
-        - ScoreMG(e->score[Black]);
+                - ScoreMG(e->score[Black]);
 
     int egScore = ScoreEG(e->score[White])
-        - ScoreEG(e->score[Black]);
+                - ScoreEG(e->score[Black]);
 
     // Score interpolation
-    int mgPhase = std::min(24, e->gamePhase);
-    int egPhase = 24 - mgPhase;
+    int mgPhase = std::min(MaxGamePhase, e->gamePhase);
+    int egPhase = MaxGamePhase - mgPhase;
     return ((mgScore * mgPhase + egScore * egPhase) / MaxGamePhase);
 }

@@ -1,4 +1,11 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
+
+// - Parameters class holds piece/square tables
+//   (as well as a few other values)
+//   and has a rudimentary Texel tuner
+// - later we have initializers for all these values
+// - for S macro see score.h
 
 #pragma once
 
@@ -9,9 +16,15 @@ public:
     int pst[2][6][64];
     void PrintPst(int piece);
     void PrintAll();
+    void TunePst();
 };
 
 extern Parameters Params;
+
+// Game phase is used to interpolate between middlegame
+// and endgame scores. See Interpolate() for details.
+const int phaseTable[6] = { 0,   1,   1,   2,   4,  0 };
+const int MaxGamePhase = 24;
 
 const int pieceValue[6] = {
     S(93, 104), S(402, 345), S(407, 375), S(589, 645), S(1250, 1240), S(0, 0) 
@@ -20,11 +33,6 @@ const int pieceValue[6] = {
 const int pressureBonus[7] = { 
     S(1, 2), S(10, 14), S(10, 14), S(12, 17), S(20,24), 0, 0 
 };
-
-// Game phase is used to interpolate between middlegame
-// and endgame scores. See Interpolate() for details.
-const int phaseTable[6] = { 0,   1,   1,   2,   4,  0 };
-const int MaxGamePhase = 24;
 
 const int passedBonus[2][8] = {
     { S(0, 11), S(10, 11), S(10, 11), S(30, 37), S(50, 62), S(80, 107), S(120, 165), S(0, 0) },
@@ -71,8 +79,6 @@ const int kingOpenFilePenalty = S(-8, 0);
 const int kingNearOpenPenalty = S(-6, 0);
 const int minorOnMinor = S(15, 15);
 const int trappedRook = S(-25, -25);
-
-// 77.213972
 
 const int p_support[64] = {
   0,   0,   0,   0,   0,   0,   0,   0,

@@ -37,7 +37,6 @@ private:
 
     // --- Internal helpers (not for public use) ---
     void Clear();
-    void SwitchSide();
     void ClearEnPassant();
     void MovePiece(Color color, int type, Square from, Square to);
     void MovePieceNoHash(Color color, int type, Square from, Square to);

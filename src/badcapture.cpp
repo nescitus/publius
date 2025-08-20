@@ -1,4 +1,11 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
+
+// This file contains functions to detect captures
+// that are expected to lose material. Only a single
+// square is evaluated, so these functions are blind
+// to overloaded pieces, pins and other tactical
+// considerations.
 
 #include "types.h"
 #include "limits.h"
@@ -9,8 +16,10 @@
 #include "badcapture.h"
 
 // IsBadCapture() is used in two places:
-// - in Quiesce() to prune captures that appear to lose material
-// - in movepicker.cpp to sort such captures below the quiet moves
+// - in Quiesce() to prune captures that appear 
+//   to lose material
+// - in movepicker.cpp to sort such captures 
+//   below the quiet moves
 
 bool IsBadCapture(Position* pos, Move move) {
 
@@ -31,10 +40,11 @@ bool IsBadCapture(Position* pos, Move move) {
     return (Swap(pos, fromSquare, toSquare) < 0);
 }
 
-// Static Exchange Evaluator tries to calculate the value
-// of an exchange on a single square without playing out
-// the moves. It is blind to tactics, such as checks, pins,
-// promotions and overloaded defenders.
+// Static Exchange Evaluator tries to calculate 
+// the valueof an exchange on a single square 
+// without playing out the moves. It is blind 
+// to tactics, such as checks, pins, promotions 
+// and overloaded defenders.
 
 int Swap(const Position* pos, const Square fromSquare, const Square toSquare) {
 
@@ -45,8 +55,8 @@ int Swap(const Position* pos, const Square fromSquare, const Square toSquare) {
     attackers = pos->AttacksTo(toSquare);
     occupancy = pos->Occupied();
 
-    // put the value of the piece we are about to capture
-    // on the stack
+    // put the value of the piece we are about 
+    // to capture on the stack
     score[0] = pieceValue[pos->PieceTypeOnSq(toSquare)];
 
     // identify the capturing piece
@@ -67,7 +77,8 @@ int Swap(const Position* pos, const Square fromSquare, const Square toSquare) {
     // we have completed the capture that is evaluated
     ply = 1;
 
-    // as long as there are the attackers of the right color...
+    // as long as there are the attackers of the right 
+    // color...
     while (attackers & pos->MapColor(color)) {
 
         // special treatment of captures by king
@@ -84,10 +95,11 @@ int Swap(const Position* pos, const Square fromSquare, const Square toSquare) {
             if ((newHunterMap = pos->Map(color, hunter) & attackers))
                 break;
 
-        // remove the new "hunter" from the occupancy map,
-        // one piece at a time (there can be more than one
-        // piece of the same type attacking the toSquare).
-        // This acts as a replacement to a move.
+        // remove the new "hunter" from the occupancy 
+        // map, one piece at a time (there can be more 
+        // than one piece of the same type attacking 
+        // the toSquare). This acts as a replacement 
+        // to making a move.
         occupancy ^= (newHunterMap & -newHunterMap);
         
         // check if there are new captures available,

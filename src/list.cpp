@@ -31,7 +31,7 @@ void MoveList::AddMove(Move move) {
 void MoveList::AddMove(Square fromSquare, Square toSquare, int flag) {
 
     moves[ind] = CreateMove(fromSquare, toSquare, flag);
-    values[ind] = 0;
+    values[ind] = -4 * HistLimit;
     ind++;
 }
 
@@ -81,9 +81,9 @@ Move MoveList::GetBestMove() {
 
 // Score moves that change material balance (captures,
 // including en passant, and promotions). Function
-// relies on being used within staged move generation
-// framework, so that it does not have to compare
-// tactical ("noisy") moves with quiet moves.
+// relies on staged move generation framework, so that 
+// it does not have to compare tactical ("noisy") moves 
+// with quiet moves.
 
 void MoveList::ScoreNoisy(Position* pos) {
 
@@ -103,10 +103,9 @@ void MoveList::ScoreNoisy(Position* pos) {
     }
 }
 
-// Score quiet moves. Function relies on being called
-// within staged move generation framework, so it
-// does not have to compare quiet moves with tactical
-// ("noisy") moves.
+// Score quiet moves. Function relies on staged move 
+// generation framework, so it does not have to compare 
+// quiet moves with tactical ("noisy") moves.
 
 void MoveList::ScoreQuiet(Position* pos) {
 

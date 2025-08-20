@@ -110,12 +110,9 @@ double cTuner::TryChangeMgPst(Position* pos, Parameters* params,
     double newLoss = Tuner.TexelFit(pos);
 
     if (newLoss + 1e-12 < baselineLoss) {
-        std::cout << "MG success: piece " << piece << " sq " << SquareName(sq)
-                  << " delta " << delta << " -> loss " << newLoss
-                  << " (was " << baselineLoss << ")\n";
+        SuccessMessage("MG success: piece ", piece, sq, delta, newLoss, baselineLoss);
         return newLoss; // keep new values
-    }
-    else {
+    } else {
         params->pst[White][piece][sq] = oldWeight;
         params->pst[Black][piece][mirror] = oldWeight;
         std::cout << "MG no-improve: loss " << baselineLoss << "\n";
@@ -134,8 +131,9 @@ double cTuner::TryChangeEgPst(Position* pos, Parameters* params,
     const Square blackFlopped = MirrorRank(floppedSquare);
 
     // Save old packed score (we need separate weights
-    // even though endgame tables are symmetrical,
-    // because midgame tables aren't 
+    // even though endgame tables are symmetric,
+    // because midgame tables aren't, and so isn't
+    // the packed score.
     const int wOld1 = params->pst[White][piece][sq];
     const int wOld2 = params->pst[White][piece][floppedSquare];
 
@@ -152,9 +150,7 @@ double cTuner::TryChangeEgPst(Position* pos, Parameters* params,
     const double newLoss = Tuner.TexelFit(pos);
 
     if (newLoss + 1e-12 < baselineLoss) {
-        std::cout << "EG success: piece " << piece << " sq " << SquareName(sq)
-                  << " delta " << delta << " -> loss " << newLoss
-                  << " (was " << baselineLoss << ")\n";
+        SuccessMessage("EG success: piece ", piece, sq, delta, newLoss, baselineLoss);
         return newLoss; // keep
     }
 
@@ -166,6 +162,13 @@ double cTuner::TryChangeEgPst(Position* pos, Parameters* params,
 
     std::cout << "EG no-improve: loss " << baselineLoss << "\n";
     return baselineLoss;
+}
+
+void cTuner::SuccessMessage(std::string intro, int piece, Square sq, int delta, double newLoss, double baselineLoss) {
+
+    std::cout << intro << piece << " sq " << SquareName(sq)
+              << " delta " << delta << " -> loss " << newLoss
+              << " (was " << baselineLoss << ")\n";
 }
 
 #endif

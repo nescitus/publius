@@ -1,15 +1,16 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
 
 #pragma once
 
 //#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3981 lines
+// 3978 lines
 
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
-inline constexpr const char* engineVersion = "1.0";    // bump on releases
+inline constexpr const char* engineVersion = "0.9.2";    // bump on releases
 
 // entry points
 

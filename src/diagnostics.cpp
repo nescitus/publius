@@ -1,4 +1,7 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
+
+// Collection of functions allowing to test the engine.
 
 #include <iostream> // for cout
 #include "types.h"
@@ -33,10 +36,10 @@ std::string test[] = {
  "8/k7/3p4/p2P1p2/P2P1P2/8/8/K7 w - -",                                   // Fine # 70
 };
 
-// Bench function runs the analysis of several positions
-// to the desired depth. It has two uses:
+// Bench() function runs the analysis of several 
+// positions to the desired depth. It has two uses:
 // - confirming that a change is indeed non-functional
-// - measuring the impact of a change to the engine's speed
+// - measuring how a change affects the engine's speed
 
 void Bench(Position* pos, int depth) {
 
@@ -88,9 +91,10 @@ void PrintBoard(Position* pos) {
     std::cout << "--------------------------------------------" << std::endl;
 }
 
-// Perft can be used to measure move generation and board update
-// speed, but more importantly, to confirm that the move generator
-// works correctly. This version comes with a "divide" enhancement,
+// Perft can be used to measure move generation 
+// and board update speed, but more importantly, 
+// to confirm that the move generator works correctly. 
+// This version comes with a "divide" enhancement,
 // printing out subtotals for each move.
 Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
 
@@ -126,12 +130,13 @@ Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
     return moveCount;
 }
 
+// Print a bitboard (useful debugging tool)
 void PrintBitboard(Bitboard b) {
    
     for (Square square = A1; square < 64; ++square) {
         
         if (b & RelativeSqBb(Black, square)) std::cout << "+ ";
-        else                            std::cout << ". ";
+        else                                 std::cout << ". ";
 
         if ((square + 1) % 8 == 0) 
             std::cout << 9 - ((square + 1) / 8) << std:: endl;

@@ -545,8 +545,8 @@ bool SetImproving(int eval, int ply) {
     return !(ply > 1 && oldEval[ply - 2] > eval);
 }
 
-void TryInterrupting(void)
-{
+void TryInterrupting(void) {
+
     char command[80];
 
     // We don't check for timeout in every node,

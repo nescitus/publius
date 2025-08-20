@@ -90,9 +90,9 @@ void Position::DoMove(const Move move, UndoData *undo) {
         ChangePieceNoHash(Pawn, promoted, color, toSquare);
     }
 
-    // Switch side to move
-    SwitchSide();
-
+    // Switch side to move and update hash key
+    sideToMove = ~sideToMove;
+    boardHash ^= sideRandom;
 }
 
 void Position::DoNull(UndoData* undo) {
@@ -107,5 +107,6 @@ void Position::DoNull(UndoData* undo) {
     reversibleMoves++;
 
     ClearEnPassant();
-    SwitchSide();
+    sideToMove = ~sideToMove;
+    boardHash ^= sideRandom;
 }

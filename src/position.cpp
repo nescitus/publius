@@ -133,12 +133,6 @@ Bitboard Position::CalculatePawnKingKey() {
     return key;
 }
 
-void Position::SwitchSide() {
-
-     sideToMove = ~sideToMove;
-     boardHash ^= sideRandom;
-}
-
 void Position::ClearEnPassant() {
 
      if (enPassantSq != sqNone) {

@@ -16,6 +16,7 @@
 #include "evaldata.h"
 #include "pv.h"
 #include "uci.h"
+#include "params.h"
 #include "tuner.h"
 #include "api.h"
 
@@ -53,12 +54,14 @@ bool ParseCommand(std::istringstream& stream, Position* pos) {
     else if (command == "bench") OnBenchCommand(stream, pos);
     else if (command == "step") OnStepCommand(stream, pos);
     else if (command == "stop") OnStopCommand();
-    else if (command == "fit") {
 #ifdef USE_TUNING
+    else if (command == "fit") {
         Tuner.Init(0);
         printf("info string current fit: %lf\n", Tuner.TexelFit(pos));
-#endif
+    } else if (command == "tune") {
+        Params.TunePst();
     }
+#endif
     else if (command == "quit") { return false; }
     return true;
 }
