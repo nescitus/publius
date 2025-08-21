@@ -1,4 +1,8 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
+
+// Functions filling the move list with different
+// categories of moves
 
 #include "types.h"
 #include "position.h"
@@ -9,51 +13,6 @@
 #include "legality.h"
 #include "gen.h"
 
-// Non-pawn moves are generated on a per-piece basis.
-// Knowing piece location (fromSquare) and bitboard
-// of its move target, we fill the move list one 
-// toSquare at a time.
-
-void SerializeMoves(MoveList* list, const Square fromSquare, Bitboard moves) {
-    
-    while (moves)
-        list->AddMove(fromSquare, PopFirstBit(&moves), 0);
-}
-
-// Pawn move generation is done in bulk: we generate 
-// all the target squares for pawn moves in a specific 
-// direction (straight moves or diagonal captures).
-// Knowing the move direction, we infer fromSquare 
-// from toSquare and move vector.
-
-void SerializePawnMoves(MoveList* list, Bitboard moves, int vector, int flag) {
-    
-    Square fromSquare, toSquare;
-    
-    while (moves) {
-        toSquare = PopFirstBit(&moves);
-        fromSquare = toSquare + vector;
-        list->AddMove(fromSquare, toSquare, flag);
-    }
-}
-
-// Promotions are serialized very much like pawn moves
-
-void SerializePromotions(MoveList* list, Bitboard moves, int vector) {
-
-    Square fromSquare, toSquare;
-
-    while (moves) {
-        toSquare = PopFirstBit(&moves);
-        fromSquare = toSquare + vector;
-
-        list->AddMove(fromSquare, toSquare, tPromQ);
-        list->AddMove(fromSquare, toSquare, tPromR);
-        list->AddMove(fromSquare, toSquare, tPromB);
-        list->AddMove(fromSquare, toSquare, tPromN);
-    }
-}
-
 // Fill move list with moves that change material balance:
 // captures, including en passant, and promotions
 
@@ -61,8 +20,10 @@ void FillNoisyList(Position* pos, MoveList* list) {
 
     Bitboard pieces, moves;
     Square fromSquare, toSquare;
-    Color color = pos->GetSideToMove();
-    Bitboard prey = pos->MapColor(~color);
+    const Color color = pos->GetSideToMove();
+    const Bitboard prey = pos->Pieces(~color);
+    const Bitboard occ = pos->Occupied();
+    const Bitboard empty = ~occ;
 
     if (color == White) {
 
@@ -76,7 +37,7 @@ void FillNoisyList(Position* pos, MoveList* list) {
         SerializePromotions(list, moves, -9);
 
         // White pawn promotions without capture
-        moves = NorthOf(pieces) & pos->Empty();
+        moves = NorthOf(pieces) & empty;
         SerializePromotions(list, moves, -8);
 
         // Map white pawns that cannot promote
@@ -109,8 +70,8 @@ void FillNoisyList(Position* pos, MoveList* list) {
         moves = SEOf(pieces) & prey;
         SerializePromotions(list, moves, 7);
 
-        // Black pawn promotions
-        moves = SouthOf(pieces) & pos->Empty();
+        // Black pawn promotions without capture
+        moves = SouthOf(pieces) & empty;
         SerializePromotions(list, moves, 8);
 
         // Map black pawns that cannot promote
@@ -145,7 +106,7 @@ void FillNoisyList(Position* pos, MoveList* list) {
     pieces = pos->MapDiagonalMovers(color);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);
-        moves = GenerateMoves.Bish(pos->Occupied(), fromSquare) & prey;
+        moves = GenerateMoves.Bish(occ, fromSquare) & prey;
         SerializeMoves(list, fromSquare, moves);
     }
 
@@ -153,7 +114,7 @@ void FillNoisyList(Position* pos, MoveList* list) {
     pieces = pos->MapStraightMovers(color);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);
-        moves = GenerateMoves.Rook(pos->Occupied(), fromSquare) & prey;
+        moves = GenerateMoves.Rook(occ, fromSquare) & prey;
         SerializeMoves(list, fromSquare, moves);
     }
 
@@ -164,9 +125,12 @@ void FillNoisyList(Position* pos, MoveList* list) {
 
 void FillQuietList(Position* pos, MoveList* list) {
 
-    Bitboard pieces, moves;
+    Bitboard pieces, moves, firstStep;
     Square fromSquare, toSquare;
-    Color color = pos->GetSideToMove();
+    const Color color = pos->GetSideToMove();
+    const Bitboard occ = pos->Occupied();
+    const Bitboard empty = ~occ;
+    const Bitboard pawns = pos->Map(color, Pawn);
 
     if (color == White) {
 
@@ -179,11 +143,12 @@ void FillQuietList(Position* pos, MoveList* list) {
             list->AddMove(E1, C1, tCastle);
 
         // White double pawn moves
-        moves = (NorthOf(NorthOf(pos->Map(White, Pawn) & Mask.rank[rank2]) & pos->Empty())) & pos->Empty();
+        firstStep = NorthOf(pawns & Mask.rank[rank2]) & empty;
+        moves = NorthOf(firstStep) & empty;
         SerializePawnMoves(list, moves, -16, tPawnjump);
 
         // White normal pawn moves
-        moves = NorthOf(pos->Map(White, Pawn) & ~Mask.rank[rank7]) & pos->Empty();
+        moves = NorthOf(pawns & ~Mask.rank[rank7]) & empty;
         SerializePawnMoves(list, moves, -8, tNormal);
 
     } else {
@@ -197,11 +162,12 @@ void FillQuietList(Position* pos, MoveList* list) {
            list->AddMove(E8, C8, tCastle);
         
         // Black double pawn moves
-        moves = (SouthOf(SouthOf(pos->Map(Black, Pawn) & Mask.rank[rank7]) & pos->Empty())) & pos->Empty();
+        firstStep = SouthOf(pawns & Mask.rank[rank7]) & empty;
+        moves = SouthOf(firstStep) & empty;
         SerializePawnMoves(list, moves, 16, tPawnjump);
 
         // Black single pawn moves
-        moves = SouthOf(pos->Map(Black, Pawn) & ~Mask.rank[rank2]) & pos->Empty();
+        moves = SouthOf(pawns & ~Mask.rank[rank2]) & empty;
         SerializePawnMoves(list, moves, 8, tNormal);
     }
 
@@ -209,7 +175,7 @@ void FillQuietList(Position* pos, MoveList* list) {
     pieces = pos->Map(color, Knight);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);
-        moves = GenerateMoves.Knight(fromSquare) & pos->Empty();
+        moves = GenerateMoves.Knight(fromSquare) & empty;
         SerializeMoves(list, fromSquare, moves);
     }
 
@@ -217,7 +183,7 @@ void FillQuietList(Position* pos, MoveList* list) {
     pieces = pos->MapDiagonalMovers(color);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);
-        moves = GenerateMoves.Bish(pos->Occupied(), fromSquare) & pos->Empty();
+        moves = GenerateMoves.Bish(occ, fromSquare) & empty;
         SerializeMoves(list, fromSquare, moves);
     }
 
@@ -225,12 +191,12 @@ void FillQuietList(Position* pos, MoveList* list) {
     pieces = pos->MapStraightMovers(color);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);
-        moves = GenerateMoves.Rook(pos->Occupied(), fromSquare) & pos->Empty();
+        moves = GenerateMoves.Rook(pos->Occupied(), fromSquare) & empty;
         SerializeMoves(list, fromSquare, moves);
     }
 
     // King moves
-    moves = GenerateMoves.King(pos->KingSq(color)) & pos->Empty();
+    moves = GenerateMoves.King(pos->KingSq(color)) & empty;
     SerializeMoves(list, pos->KingSq(color), moves);
 }
 
@@ -243,38 +209,43 @@ void FillQuietList(Position* pos, MoveList* list) {
 
 void FillCheckList(Position* pos, MoveList* list) {
 
-    Bitboard pieces, moves;
+    Bitboard pieces, moves, firstStep;
     Square fromSquare;
-    Color color = pos->GetSideToMove();
-    Square kingSquare = pos->KingSq(~color);
+    const Color color = pos->GetSideToMove();
+    const Square kingSquare = pos->KingSq(~color);
+    const Bitboard occ = pos->Occupied();
+    const Bitboard empty = ~occ;
+    const Bitboard pawns = pos->Map(color, Pawn);
     
     // find locations from where the direct checks can be given
     Bitboard pawnChecks = ForwardOf(SidesOf(Paint(kingSquare)), ~color);
     Bitboard knightCheck = GenerateMoves.Knight(kingSquare);
-    Bitboard diagCheck = GenerateMoves.Bish(pos->Occupied(), kingSquare);
-    Bitboard straightCheck = GenerateMoves.Rook(pos->Occupied(), kingSquare);
+    Bitboard diagCheck = GenerateMoves.Bish(occ, kingSquare);
+    Bitboard straightCheck = GenerateMoves.Rook(occ, kingSquare);
     
     if (color == White) {
 
         // White double pawn moves
-        moves = (NorthOf(NorthOf(pos->Map(White, Pawn) & Mask.rank[rank2]) & pos->Empty())) & pos->Empty();
+        firstStep = NorthOf(pos->Map(White, Pawn) & Mask.rank[rank2]) & empty;
+        moves = NorthOf(firstStep) & empty;
         moves &= pawnChecks;
         SerializePawnMoves(list, moves, -16, tPawnjump);
 
         // White single pawn moves
-        moves = NorthOf(pos->Map(White, Pawn) & ~Mask.rank[rank7]) & pos->Empty();
+        moves = NorthOf(pos->Map(White, Pawn) & ~Mask.rank[rank7]) & empty;
         moves &= pawnChecks;
         SerializePawnMoves(list, moves, -8, tNormal);
     }
     else {
 
         // Black double pawn moves
-        moves = (SouthOf(SouthOf(pos->Map(Black, Pawn) & Mask.rank[rank7]) & pos->Empty())) & pos->Empty();
+        firstStep = SouthOf(pawns & Mask.rank[rank7]) & empty;
+        moves = SouthOf(firstStep) & empty;
         moves &= pawnChecks;
         SerializePawnMoves(list, moves, 16, tPawnjump);
 
         // Black single pawn moves
-        moves = SouthOf(pos->Map(Black, Pawn) & ~Mask.rank[rank2]) & pos->Empty();
+        moves = SouthOf(pos->Map(Black, Pawn) & ~Mask.rank[rank2]) & empty;
         moves &= pawnChecks;
         SerializePawnMoves(list, moves, 8, tNormal);
     }
@@ -283,7 +254,7 @@ void FillCheckList(Position* pos, MoveList* list) {
     pieces = pos->Map(color, Knight);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);
-        moves = GenerateMoves.Knight(fromSquare) & pos->Empty();
+        moves = GenerateMoves.Knight(fromSquare) & empty;
         moves &= knightCheck;
         SerializeMoves(list, fromSquare, moves);
     }
@@ -292,7 +263,7 @@ void FillCheckList(Position* pos, MoveList* list) {
     pieces = pos->MapDiagonalMovers(color);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);
-        moves = GenerateMoves.Bish(pos->Occupied(), fromSquare) & pos->Empty();
+        moves = GenerateMoves.Bish(occ, fromSquare) & empty;
         moves &= diagCheck;
         SerializeMoves(list, fromSquare, moves);
     }
@@ -301,16 +272,53 @@ void FillCheckList(Position* pos, MoveList* list) {
     pieces = pos->MapStraightMovers(color);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);
-        moves = GenerateMoves.Rook(pos->Occupied(), fromSquare) & pos->Empty();
+        moves = GenerateMoves.Rook(occ, fromSquare) & empty;
         moves &= straightCheck;
         SerializeMoves(list, fromSquare, moves);
     }
+}
 
-    // King moves
-    /*
-    moves = GenerateMoves.King(pos->KingSq(color)) & pos->Empty();
+// Non-pawn moves are generated on a per-piece basis.
+// Knowing piece location (fromSquare) and bitboard
+// of its move target, we fill the move list one 
+// toSquare at a time.
+
+void SerializeMoves(MoveList* list, const Square fromSquare, Bitboard moves) {
+
+    while (moves)
+        list->AddMove(fromSquare, PopFirstBit(&moves), 0);
+}
+
+// Pawn move generation is done in bulk: we generate 
+// all the target squares for pawn moves in a specific 
+// direction (straight moves or diagonal captures).
+// Knowing the move direction, we infer fromSquare 
+// from toSquare and move vector.
+
+void SerializePawnMoves(MoveList* list, Bitboard moves, int vector, int flag) {
+
+    Square fromSquare, toSquare;
+
     while (moves) {
-        list->AddMove(pos->KingSq(color), PopFirstBit(&moves), 0);
+        toSquare = PopFirstBit(&moves);
+        fromSquare = toSquare + vector;
+        list->AddMove(fromSquare, toSquare, flag);
     }
-    */
+}
+
+// Promotions are serialized very much like pawn moves
+
+void SerializePromotions(MoveList* list, Bitboard moves, int vector) {
+
+    Square fromSquare, toSquare;
+
+    while (moves) {
+        toSquare = PopFirstBit(&moves);
+        fromSquare = toSquare + vector;
+
+        list->AddMove(fromSquare, toSquare, tPromQ);
+        list->AddMove(fromSquare, toSquare, tPromR);
+        list->AddMove(fromSquare, toSquare, tPromB);
+        list->AddMove(fromSquare, toSquare, tPromN);
+    }
 }

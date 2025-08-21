@@ -10,7 +10,7 @@
 
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
-inline constexpr const char* engineVersion = "0.9.2";    // bump on releases
+inline constexpr const char* engineVersion = "0.9.3";    // bump on releases
 
 // entry points
 

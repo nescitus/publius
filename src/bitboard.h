@@ -47,6 +47,7 @@ static const Bitboard excludeH = 0x7f7f7f7f7f7f7f7f;
 [[nodiscard]] constexpr inline Bitboard ForwardOf(Bitboard b, Color color) {
     return (color == White) ? NorthOf(b) : SouthOf(b);
 }
+
 // shift the bitboard to both sides
 [[nodiscard]] constexpr inline Bitboard SidesOf(Bitboard b) {
     return (WestOf(b) | EastOf(b));

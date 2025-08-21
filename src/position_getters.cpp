@@ -11,23 +11,8 @@
 #include "position.h"
 #include "bitboard.h"
 
-// Count minor pieces of a given color
-int Position::CountMinors(const Color color) const {
-    return Count(color, Knight) + Count(color, Bishop);
-}
-
-// Count major pieces of a given color
-int Position::CountMajors(const Color color) const {
-    return Count(color, Rook) + Count(color, Queen);
-}
-
-// Count both side's pawns
-int Position::CountAllPawns() const {
-    return Count(White, Pawn) + Count(Black, Pawn);
-}
-
 // Map squares occupied by pieces of a given color
-Bitboard Position::MapColor(const Color color) const {
+Bitboard Position::Pieces(const Color color) const {
 
     return Map(color, Pawn) | Map(color, Knight) | Map(color, Bishop)
          | Map(color, Rook) | Map(color, Queen) | Map(color, King);
@@ -35,7 +20,7 @@ Bitboard Position::MapColor(const Color color) const {
 
 // Map occupied squares
 Bitboard Position::Occupied() const {
-    return MapColor(White) | MapColor(Black);
+    return Pieces(White) | Pieces(Black);
 }
 
 // Map empty squares
@@ -59,12 +44,6 @@ int Position::PieceTypeOnSq(const Square square) const {
     return TypeOfPiece(pieceLocation[square]);
 }
 
-// Map pieces of the same type (both colors)
-Bitboard Position::MapPieceType(const int pieceType) const {
-    return pieceBitboard[White][pieceType] |
-           pieceBitboard[Black][pieceType];
-}
-
 // Map pieces that move diagonally (both colors)
 Bitboard Position::AllDiagMovers() const {
     return MapPieceType(Bishop) | MapPieceType(Queen);
@@ -83,9 +62,9 @@ bool Position::CanTryNullMove() const {
     return ((CountMinors(sideToMove) + CountMajors(sideToMove)) > 0);
 }
 
-// Is position drawn? NOTE: C++ enforces strict
-// left to right order of evaluating expressions,
-// and we start with cheaper tests.
+// Is position drawn? NOTE: C++ guarantees left-to-right 
+// evaluation and short-circuit for ||, so we put cheaper 
+// checks first.
 bool Position::IsDraw() const {
 
     return (reversibleMoves >= 100) || 
@@ -118,11 +97,11 @@ bool Position::IsDrawByInsufficientMaterial() const {
 
 // Is side to move in check?
 bool Position::IsInCheck() const {
-    return (SquareIsAttacked(KingSq(sideToMove), ~sideToMove) != 0);
+    return SquareIsAttacked(KingSq(sideToMove), ~sideToMove);
 }
 
 // Is king of the side not to move in check?
 // If so, we have made an illegal move.
 bool Position::IsOwnKingInCheck() const {
-    return (SquareIsAttacked(KingSq(~sideToMove), sideToMove) != 0);
+    return SquareIsAttacked(KingSq(~sideToMove), sideToMove);
 }

@@ -15,8 +15,9 @@ typedef struct {
     Bitboard pawnHash;
 } UndoData;
 
-// Position class: stores the board state, allows move execution,
-// and provides information about the current position.
+// Position class: stores the board state, makes 
+// and unmakes moves, provides information about 
+// the current position.
 
 // [[nodiscard]] is a compiler hint (C++17+) meaning:
 // "Warn if the return value of this function is ignored."
@@ -76,9 +77,19 @@ public:
     [[nodiscard]] bool IsBlackLongCastleLegal();
 
     // --- Piece counting ---
-    [[nodiscard]] int CountAllPawns() const;
-    [[nodiscard]] int CountMinors(Color color) const;
-    [[nodiscard]] int CountMajors(Color color) const;
+
+    [[nodiscard]] int Position::CountMinors(const Color color) const {
+        return Count(color, Knight) + Count(color, Bishop);
+    }
+
+    [[nodiscard]] int Position::CountMajors(const Color color) const {
+        return Count(color, Rook) + Count(color, Queen);
+    }
+
+    [[nodiscard]] int Position::CountAllPawns() const {
+        return Count(White, Pawn) + Count(Black, Pawn);
+    }
+
     [[nodiscard]] int Count(Color color, int type) const {
         return pieceCount[color][type];
     }
@@ -87,14 +98,17 @@ public:
     [[nodiscard]] Bitboard Map(Color color, int piece) const {
         return pieceBitboard[color][piece];
     }
-    [[nodiscard]] Bitboard MapColor(Color color) const;
-    [[nodiscard]] Bitboard MapPieceType(int type) const;
+    [[nodiscard]] Bitboard Pieces(Color color) const;
     [[nodiscard]] Bitboard MapDiagonalMovers(Color color) const;
     [[nodiscard]] Bitboard MapStraightMovers(Color color) const;
     [[nodiscard]] Bitboard AllDiagMovers() const;
     [[nodiscard]] Bitboard AllStraightMovers() const;
     [[nodiscard]] Bitboard Occupied() const;
     [[nodiscard]] Bitboard Empty() const;
+    [[nodiscard]] Bitboard MapPieceType(const int pieceType) const {
+        return pieceBitboard[White][pieceType] |
+               pieceBitboard[Black][pieceType];
+    }
 
     // --- Attack detection ---
     [[nodiscard]] bool SquareIsAttacked(Square sq, Color byColor) const;

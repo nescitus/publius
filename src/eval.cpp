@@ -476,7 +476,7 @@ void EvalPressure(Position* pos, EvalData* e, Color side) {
 
     pressure = 0;
     oppo = ~side;
-    enemyPieces = pos->MapColor(oppo);
+    enemyPieces = pos->Pieces(oppo);
 
     // bishop on knight attacks
     if (pos->Map(oppo, Bishop) & e->control[side][Knight])

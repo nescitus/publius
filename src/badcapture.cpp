@@ -79,7 +79,7 @@ int Swap(const Position* pos, const Square fromSquare, const Square toSquare) {
 
     // as long as there are the attackers of the right 
     // color...
-    while (attackers & pos->MapColor(color)) {
+    while (attackers & pos->Pieces(color)) {
 
         // special treatment of captures by king
         if (hunter == King) {
