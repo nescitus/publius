@@ -61,7 +61,7 @@ int GetDrawMul(Position* pos, const Color strong, const Color weak) {
             return drawishMultiplier;
 
         // No pawns of either side
-        if (pos->Count(weak, Pawn) == 0) {
+        if (wP == 0) {
 
             // No minors of either color
             if (sMi + wMi == 0) {

@@ -216,7 +216,7 @@ void OnPerftCommand(std::istringstream& stream, Position* pos) {
     stream >> depth;
     std::cout << "Running perft test at depth " << depth << std::endl;
 
-    Timer.SetStartTime();
+    Timer.Start();
     moveCount = Perft(pos, 0, depth, true);
 
     std::cout << "Perft " << depth 

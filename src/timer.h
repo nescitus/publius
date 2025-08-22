@@ -9,10 +9,11 @@ struct UCItimer {
 private:
     size_t data[timerDataSize]; // various data used to set actual time per move (see eTimeData)
     size_t startTime;           // when we have begun searching
-    size_t hardTimeLimit;       // basic time allocated for a move
-    size_t softTimeLimit;       // but we won't start the next iteration after exceeding this
+    size_t hardLimit;       // basic time allocated for a move
+    size_t softLimit;       // but we won't start the next iteration after exceeding this
     bool isStrict;
     bool isRepeating;        // repeating TC uses strict mode (does it help?)
+    bool ShouldCalculateTimeControl(void);
 public:
     size_t nodeCount;      // stats: counter of visited nodes
     size_t nps;            // stats: nodes per second
@@ -23,7 +24,7 @@ public:
     bool isPondering;
     void SetRepeating(void); // set strivt mode
     void Clear(void);
-    void SetStartTime();
+    void Start();
     void SetMoveTiming(void);
     size_t Now(void);
     size_t Elapsed(void);

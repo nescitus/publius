@@ -43,9 +43,7 @@ std::string test[] = {
 
 void Bench(Position* pos, int depth) {
 
-    Timer.nodeCount = 0;
-    Timer.isStopping = false;
-    Timer.SetStartTime();
+    Timer.Start();
     Timer.SetData(maxDepth, depth);
     Timer.SetData(moveTime, 3600000); // more than one hour of benchmark would be useless ;)
     Timer.SetData(isInfinite, 1);

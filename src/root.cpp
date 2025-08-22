@@ -2,7 +2,6 @@
 // by Pawel Koziol
 
 #include <iostream>
-#include <stdio.h>
 #include "types.h"
 #include "limits.h"
 #include "position.h"
@@ -13,10 +12,8 @@
 
 void Think(Position* pos) {
 
-    Timer.isStopping = false;
+    Timer.Start();
     History.Clear();
-    Timer.nodeCount = 0;
-    Timer.SetStartTime();
     Iterate(pos);
 }
 
