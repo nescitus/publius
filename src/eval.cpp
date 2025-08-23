@@ -65,7 +65,7 @@ const Square kingRoot[64] = {
 
 // eval hashtables
 EvalHashTable EvalHash(16384);
-sPawnHashEntry PawnTT[PAWN_HASH_SIZE];
+EvalHashTable PawnHash(16384);
 
 Bitboard trappedRookKs[2] = { Paint(G1, H1, H2), Paint(G8, H8, H7) };
 Bitboard trappedRookQs[2] = { Paint(B1, A1, A2), Paint(B8, A8, A7) };
@@ -165,32 +165,37 @@ int Evaluate(Position* pos, EvalData* e) {
 
 void EvalPawnStructure(const Position* pos, EvalData* e) {
 
-    // Find appropriate slot in the pawn hashtable
-    int addr = pos->pawnKingHash % PAWN_HASH_SIZE;
+    int sc;
 
 #ifndef USE_TUNING
     // Try reading score from the pawn hashtable
-    if (PawnTT[addr].key == pos->pawnKingHash) {
-        for (Color color = White; color < colorNone; ++color)
-            e->AddPawn(color, PawnTT[addr].val[color]);
-        // If not possible, evaluate pawns, saving result in the pawn hashtable
+    if (PawnHash.Retrieve(pos->pawnKingHash, &sc)) {
+        // We add previously saved score differential
+        // to the White slot. Remember it if yoo want
+        // to implement some per-category score scaling
+        // or a detailed score display;
+        e->AddPawn(White, sc);
     }
     else
 #endif
+        // If not possible, evaluate pawns, saving result in the pawn hashtable
     {
-        PawnTT[addr].key = pos->pawnKingHash;
-
         for (Color color = White; color < colorNone; ++color) {
             EvalPawn(pos, e, color);
             EvalKing(pos, e, color);
-            PawnTT[addr].val[color] = e->pawnScore[color];
         }
+
+        // We save the score differential asymmetrically,
+        // in White slot. 
+        PawnHash.Save(pos->pawnKingHash, e->pawnScore[White] - e->pawnScore[Black]);
     }
 
     // Merge pawn eval with total eval
     for (Color color = White; color < colorNone; ++color)
         e->Add(color, e->pawnScore[color]);
 }
+
+// Bench at depth 15 took 27663 milliseconds, searching 46809615 nodes at 1692138 nodes per second.
 
 void EvalPawn(const Position* pos, EvalData* e, Color color) {
 

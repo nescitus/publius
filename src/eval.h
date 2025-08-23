@@ -4,22 +4,11 @@
 
 #include <cstdint>
 
-// Define the pawn hash entry
-
-struct sPawnHashEntry {
-    Bitboard key;
-    int val[2];
-};
-
 // Define the eval hash entry
 struct EvalTTEntry {
     Bitboard key;
     int val;
 };
-
-const int PAWN_HASH_SIZE = 16384;
-
-extern sPawnHashEntry PawnTT[PAWN_HASH_SIZE];
 
 class EvalHashTable {
 public:
@@ -29,12 +18,13 @@ public:
     bool Retrieve(Bitboard key, int* score) const;
 
 private:
-    size_t Hash(Bitboard key) const;
+    size_t Address(Bitboard key) const;
     EvalTTEntry* EvalTT;    // Dynamically allocated array
     const size_t tableSize; // Size of the hash table (must be a power of two)
 };
 
-extern EvalHashTable EvalHash;
+extern EvalHashTable EvalHash; // full evaluation hashtable
+extern EvalHashTable PawnHash; // pawn structure eval hashtable
 
 void EvalBasic(EvalData* e, const Color color, const int piece, const int sq);
 void EvalPawnStructure(const Position* pos, EvalData* e);
