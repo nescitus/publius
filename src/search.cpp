@@ -287,13 +287,14 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // we are going to search the transposition table
     // move first; in root node we start searching
     // from the best move from the previous iteration.
-    movePicker.Init(isRoot ? Pv.line[0][0] : ttMove, 
+    movePicker.Init(modeAll,
+                    isRoot ? Pv.line[0][0] : ttMove,
                     History.GetKiller1(ply), 
                     History.GetKiller2(ply));
 
     // Main loop
 
-    while ((move = movePicker.NextMove(pos, ply, modeAll)) != 0) {
+    while ((move = movePicker.NextMove(pos, ply)) != 0) {
 
         // In singular search we omit the best move
         // checking whether there are viable alternatives

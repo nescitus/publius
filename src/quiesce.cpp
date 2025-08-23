@@ -97,9 +97,11 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
         saveInTT = false;
     }
 
-    movePicker.Init(ttMove, History.GetKiller1(ply), History.GetKiller2(ply) );
+    movePicker.Init(movegenMode, ttMove,
+                    History.GetKiller1(ply), 
+                    History.GetKiller2(ply));
 
-    while ((move = movePicker.NextMove(pos, ply, movegenMode)) != 0) {
+    while ((move = movePicker.NextMove(pos, ply)) != 0) {
 
         // Make move, unless illegal
         pos->DoMove(move, &undo);

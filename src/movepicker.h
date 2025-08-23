@@ -47,10 +47,11 @@ private:
     Move killer1;
     Move killer2;
     bool IsAcceptableKiller(Position* pos, Move killer);
+    Mode movegenMode;
 public:
     Move moveFromTT;
     int stage;
     int currentMoveStage;
-    void Init(Move ttMove, Move firstKiller, Move secondKiller);
-    Move NextMove(Position* pos, int ply, Mode mode);
+    void Init(Mode mode, Move ttMove, Move firstKiller, Move secondKiller);
+    Move NextMove(Position* pos, int ply);
 };
