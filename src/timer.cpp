@@ -137,6 +137,9 @@ bool UCItimer::ShouldCalculateTimeControl(void) {
 // a new iteration (soft limit)
 bool UCItimer::ShouldFinishIteration(void) {
 
+    // hard limit reached
+    if (isStopping) return true;
+
     // faster timeout not applicable
     if (isStrict || IsInfiniteMode())
         return false;

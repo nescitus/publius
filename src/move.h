@@ -14,8 +14,8 @@
     return static_cast<Square>((move >> 6) & 63);
 }
 
-[[nodiscard]] constexpr int GetPromotedPiece(const Move move) {
-    return (move >> 12) - 3;
+[[nodiscard]] constexpr PieceType GetPromotedPiece(const Move move) {
+    return (PieceType)((move >> 12) - 3);
 }
 
 [[nodiscard]] constexpr Move CreateMove(const Square fromSquare,

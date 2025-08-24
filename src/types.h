@@ -1,4 +1,5 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
 
 #pragma once
 
@@ -31,6 +32,11 @@ constexpr inline Color operator++(Color& d) {
 }
 
 enum PieceType { Pawn, Knight, Bishop, Rook, Queen, King, noPieceType };
+
+// increment PieceType in a "for" loop
+constexpr inline PieceType operator++(PieceType& d) {
+    return d = PieceType(int(d) + 1);
+}
 
 enum eFile { fileA, fileB, fileC, fileD, fileE, fileF, fileG, fileH };
 enum eRank { rank1, rank2, rank3, rank4, rank5, rank6, rank7, rank8 };

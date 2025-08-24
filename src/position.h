@@ -7,7 +7,7 @@
 
 typedef struct {
     Move move;
-    int prey;
+    PieceType prey;
     int castleFlags;
     Square enPassantSq;
     int reversibleMoves;
@@ -39,12 +39,12 @@ private:
     // --- Internal helpers (not for public use) ---
     void Clear();
     void ClearEnPassant();
-    void MovePiece(Color color, int type, Square from, Square to);
-    void MovePieceNoHash(Color color, int type, Square from, Square to);
-    void AddPieceNoHash(Color color, int type, Square sq);
-    void TakePiece(Color color, int type, Square sq);
+    void MovePiece(Color color, PieceType hunter, Square from, Square to);
+    void MovePieceNoHash(Color color, PieceType hunter, Square from, Square to);
+    void AddPieceNoHash(Color color, PieceType type, Square sq);
+    void TakePiece(Color color, PieceType type, Square sq);
     void TakePieceNoHash(Color color, int type, Square sq);
-    void ChangePieceNoHash(int oldType, int newType, Color color, Square sq);
+    void ChangePieceNoHash(PieceType oldType, PieceType newType, Color color, Square sq);
     void SetEnPassantSquare(Color color, Square to);
     void UpdateCastlingRights(Square from, Square to);
     Bitboard CalculateHashKey();
@@ -105,7 +105,7 @@ public:
     [[nodiscard]] Bitboard AllStraightMovers() const;
     [[nodiscard]] Bitboard Occupied() const;
     [[nodiscard]] Bitboard Empty() const;
-    [[nodiscard]] Bitboard MapPieceType(const int pieceType) const {
+    [[nodiscard]] Bitboard MapPieceType(const PieceType pieceType) const {
         return pieceBitboard[White][pieceType] |
                pieceBitboard[Black][pieceType];
     }
@@ -122,8 +122,8 @@ public:
     [[nodiscard]] bool IsOccupied(Square sq) const { return pieceLocation[sq] != noPiece; }
     [[nodiscard]] Square KingSq(Color color) const { return kingSq[color]; }
     [[nodiscard]] Square EnPassantSq() const { return enPassantSq; }
-    [[nodiscard]] int PieceTypeOnSq(Square sq) const;
+    [[nodiscard]] PieceType PieceTypeOnSq(Square sq) const;
 };
 
 // this helps keeping Position::Set() more concise
-std::tuple<Color, int> PieceFromChar(char c);
+std::tuple<Color, PieceType> PieceFromChar(char c);

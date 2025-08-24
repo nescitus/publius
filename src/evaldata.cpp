@@ -29,7 +29,7 @@ void EvalData::Clear() {
         allAtt[color] = 0;
         
         // Clear control maps
-        for (int pieceType = 0; pieceType < 6; pieceType++)
+        for (PieceType pieceType = Pawn; pieceType < noPieceType; ++pieceType)
             control[color][pieceType] = 0;
     }
 }

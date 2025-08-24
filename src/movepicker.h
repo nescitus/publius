@@ -41,13 +41,14 @@ enum Mode { modeAll,        // main search or check evasion in qs
 
 class MovePicker {
 private:
+    Mode movegenMode;
     int goodNoisyLength, badNoisyLength, quietLength;
     int goodNoisyCnt, badNoisyCnt, quietCnt;
     MoveList allNoisyList, goodNoisyList, badNoisyList, quietList;
     Move killer1;
     Move killer2;
     bool IsAcceptableKiller(Position* pos, Move killer);
-    Mode movegenMode;
+    bool IsOkForMode(Position* pos, Move move);  
 public:
     Move moveFromTT;
     int stage;

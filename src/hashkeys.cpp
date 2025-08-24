@@ -29,6 +29,6 @@ Bitboard HashKeys::Random64(void) {
     return dist(e2);
 }
 
-Bitboard HashKeys::ForPiece(Color color, int pieceType, Square square) {
+Bitboard HashKeys::ForPiece(Color color, PieceType pieceType, Square square) {
     return pieceKey[CreatePiece(color, pieceType)][square];
 }

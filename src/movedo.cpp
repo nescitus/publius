@@ -14,8 +14,8 @@ void Position::DoMove(const Move move, UndoData *undo) {
     const Color color = sideToMove;
     const Square fromSquare = GetFromSquare(move);
     const Square toSquare = GetToSquare(move);
-    const int hunter = TypeOfPiece(pieceLocation[fromSquare]);
-    const int prey = TypeOfPiece(pieceLocation[toSquare]);
+    const PieceType hunter = TypeOfPiece(pieceLocation[fromSquare]);
+    const PieceType prey = TypeOfPiece(pieceLocation[toSquare]);
     const int moveType = GetTypeOfMove(move);
 
     // Save data needed for undoing a move
@@ -83,7 +83,7 @@ void Position::DoMove(const Move move, UndoData *undo) {
 
     // Promotion
     if (IsMovePromotion(move)) {
-        const int promoted = GetPromotedPiece(move);
+        const PieceType promoted = GetPromotedPiece(move);
         boardHash ^= Key.ForPiece(color, Pawn, toSquare) ^
                      Key.ForPiece(color, promoted, toSquare);
         pawnKingHash ^= Key.ForPiece(color, Pawn, toSquare);

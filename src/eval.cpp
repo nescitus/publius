@@ -476,7 +476,8 @@ void EvalPressure(Position* pos, EvalData* e, Color side) {
 
     Color oppo;
     Square sq;
-    int pieceType, pressure;
+    PieceType pieceType;
+    int pressure;
     Bitboard enemyPieces, ctrl, hang;
 
     pressure = 0;

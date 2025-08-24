@@ -63,18 +63,18 @@ bool Position::MoveGivesCheck(const Move move) {
     Color color = GetSideToMove();
     Square fromSquare = GetFromSquare(move);
     Square toSquare = GetToSquare(move);
-    int hunter = PieceTypeOnSq(fromSquare);
-    int prey = PieceTypeOnSq(toSquare);
+    PieceType hunterType = PieceTypeOnSq(fromSquare);
+    PieceType preyType = PieceTypeOnSq(toSquare);
 
     // Handle promotion
     if (IsMovePromotion(move))
-        hunter = GetPromotedPiece(move);
+        hunterType = GetPromotedPiece(move);
 
     // Locate enemy king
     Square kingSquare = KingSq(~color);
 
     // Direct checks by a pawn
-    if (hunter == Pawn) {
+    if (hunterType == Pawn) {
         checks = ForwardOf(SidesOf(Paint(kingSquare)), ~color);
         if (checks & Paint(toSquare)) return true;
     }
@@ -89,19 +89,19 @@ bool Position::MoveGivesCheck(const Move move) {
         occ ^= Paint(fromSquare);
 
     // Direct checks by a knight
-    if (hunter == Knight) {
+    if (hunterType == Knight) {
         checks = GenerateMoves.Knight(kingSquare);
         if (checks & Paint(toSquare)) return true;
     }
 
     // Direct diagonal checks
-    if (hunter == Bishop || hunter == Queen) {
+    if (hunterType == Bishop || hunterType == Queen) {
         checks = GenerateMoves.Bish(occ, kingSquare);
         if (checks & Paint(toSquare)) return true;
     }
 
     // Direct orthogonal checks
-    if (hunter == Rook || hunter == Queen) {
+    if (hunterType == Rook || hunterType == Queen) {
         checks = GenerateMoves.Rook(occ, kingSquare);
         if (checks & Paint(toSquare)) return true;
     }
@@ -110,7 +110,7 @@ bool Position::MoveGivesCheck(const Move move) {
     occ = Occupied() ^ (Paint(fromSquare) | Paint(toSquare));
 
     // ...remembering to take captures into account
-    if (prey != noPieceType)
+    if (preyType != noPieceType)
         occ ^= Paint(toSquare);
 
     // Diagonal discovered checks

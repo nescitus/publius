@@ -11,8 +11,8 @@ void Position::UndoMove(const Move move, UndoData* undo) {
     const Color color = ~sideToMove;
     const Square fromSquare = GetFromSquare(move);
     const Square toSquare = GetToSquare(move);
-    const int hunter = TypeOfPiece(pieceLocation[toSquare]);
-    const int prey = undo->prey;
+    const PieceType hunterType = TypeOfPiece(pieceLocation[toSquare]);
+    const PieceType preyType = undo->prey;
     const int moveType = GetTypeOfMove(move);
 
     // Copy stuff needed to undo the move
@@ -24,15 +24,15 @@ void Position::UndoMove(const Move move, UndoData* undo) {
     repetitionIndex--;
 
     // Move piece
-    MovePieceNoHash(color, hunter, toSquare, fromSquare);
+    MovePieceNoHash(color, hunterType, toSquare, fromSquare);
 
     // Update king location
-    if (hunter == King)
+    if (hunterType == King)
         kingSq[color] = fromSquare;
 
     // Undo capture
-    if (prey != noPieceType)
-        AddPieceNoHash(~color, prey, toSquare);
+    if (preyType != noPieceType)
+        AddPieceNoHash(~color, preyType, toSquare);
 
     // Undo complementary rook move in case of castling
     if (moveType == tCastle) {
@@ -50,7 +50,7 @@ void Position::UndoMove(const Move move, UndoData* undo) {
 
     // Change promoted piece back to pawn
     if (IsMovePromotion(move))
-        ChangePieceNoHash(hunter, Pawn, color, fromSquare);
+        ChangePieceNoHash(hunterType, Pawn, color, fromSquare);
 
     // Switch side (we don't use SwitchSide() function,
     // as it would modify the hash key)

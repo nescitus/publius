@@ -40,7 +40,7 @@ Bitboard Position::MapStraightMovers(const Color color) const {
 }
 
 // Get type of the piece occupying given square
-int Position::PieceTypeOnSq(const Square square) const {
+PieceType Position::PieceTypeOnSq(const Square square) const {
     return TypeOfPiece(pieceLocation[square]);
 }
 

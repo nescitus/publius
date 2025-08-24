@@ -26,7 +26,7 @@ void Position::Clear() {
         kingSq[color] = sqNone;
     
         // Clear bitboards and piece counts
-        for (int pieceType = 0; pieceType < 6; pieceType++) {
+        for (PieceType pieceType = Pawn; pieceType < noPieceType; ++pieceType) {
             pieceBitboard[color][pieceType] = 0ULL;
             pieceCount[color][pieceType] = 0;
         }
@@ -62,7 +62,7 @@ void Position::Set(const std::string& str) {
             } else {
                 auto tuple = PieceFromChar(letter);
                 Color color = std::get<0>(tuple);
-                int pieceType = std::get<1>(tuple);
+                PieceType pieceType = std::get<1>(tuple);
                 if (color != colorNone) {
                     AddPieceNoHash(color, pieceType, MirrorRank(square));
                     if (pieceType == King)
@@ -141,7 +141,7 @@ void Position::ClearEnPassant() {
      }
 }
 
-void Position::MovePiece(const Color color, const int hunter, 
+void Position::MovePiece(const Color color, const PieceType hunter, 
                          const Square fromSquare, const Square toSquare) {
 
     MovePieceNoHash(color, hunter, fromSquare, toSquare);
@@ -149,7 +149,7 @@ void Position::MovePiece(const Color color, const int hunter,
                  Key.ForPiece(color, hunter, toSquare);
 }
 
-void Position::MovePieceNoHash(const Color color, const int hunter, 
+void Position::MovePieceNoHash(const Color color, const PieceType hunter, 
                                const Square fromSquare, Square toSquare) {
 
      pieceLocation[fromSquare] = noPiece;
@@ -158,7 +158,7 @@ void Position::MovePieceNoHash(const Color color, const int hunter,
 }
 
 void Position::TakePiece(const Color color, 
-                         const int typeOfPiece, 
+                         const PieceType typeOfPiece, 
                          const Square square) {
 
     TakePieceNoHash(color, typeOfPiece, square);
@@ -175,7 +175,7 @@ void Position::TakePieceNoHash(const Color color,
 }
 
 void Position::AddPieceNoHash(const Color color, 
-                              const int typeOfPiece, 
+                              const PieceType typeOfPiece, 
                               const Square square) {
 
      pieceLocation[square] = CreatePiece(color,typeOfPiece);
@@ -183,8 +183,8 @@ void Position::AddPieceNoHash(const Color color,
      pieceCount[color][typeOfPiece]++;
 }
 
-void Position::ChangePieceNoHash(const int oldType, 
-                                 const int newType, 
+void Position::ChangePieceNoHash(const PieceType oldType, 
+                                 const PieceType newType, 
                                  const Color color, 
                                  const Square square) {
 
@@ -217,7 +217,7 @@ void Position::TryMarkingIrreversible() {
         repetitionIndex = 0;
 }
 
-std::tuple<Color, int> PieceFromChar(char c) {
+std::tuple<Color, PieceType> PieceFromChar(char c) {
     switch (c) {
     case 'P': return { White, Pawn };   case 'p': return { Black, Pawn };
     case 'N': return { White, Knight }; case 'n': return { Black, Knight };

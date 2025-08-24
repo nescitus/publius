@@ -25,11 +25,11 @@ bool IsBadCapture(Position* pos, Move move) {
 
     const Square fromSquare = GetFromSquare(move);
     const Square toSquare = GetToSquare(move);
-    const int hunter = pos->PieceTypeOnSq(fromSquare);
-    const int prey = pos->PieceTypeOnSq(toSquare);
+    const PieceType hunterType = pos->PieceTypeOnSq(fromSquare);
+    const PieceType preyType = pos->PieceTypeOnSq(toSquare);
 
     // good or equal capture, based on simple piece values
-    if (pieceValue[prey] >= pieceValue[hunter])
+    if (pieceValue[preyType] >= pieceValue[hunterType])
         return false;
 
     // en passant is an equal capture
@@ -49,7 +49,8 @@ bool IsBadCapture(Position* pos, Move move) {
 int Swap(const Position* pos, const Square fromSquare, const Square toSquare) {
 
     Color color;
-    int ply, hunter, score[32];
+    int ply, score[32];
+    PieceType hunterType;
     Bitboard attackers, occupancy, newHunterMap;
 
     attackers = pos->AttacksTo(toSquare);
@@ -60,7 +61,7 @@ int Swap(const Position* pos, const Square fromSquare, const Square toSquare) {
     score[0] = pieceValue[pos->PieceTypeOnSq(toSquare)];
 
     // identify the capturing piece
-    hunter = pos->PieceTypeOnSq(fromSquare);
+    hunterType = pos->PieceTypeOnSq(fromSquare);
 
     // update occupancy map, removing the first capturer
     occupancy ^= Paint(fromSquare);
@@ -82,17 +83,17 @@ int Swap(const Position* pos, const Square fromSquare, const Square toSquare) {
     while (attackers & pos->Pieces(color)) {
 
         // special treatment of captures by king
-        if (hunter == King) {
+        if (hunterType == King) {
             score[ply++] = Infinity;
             break;
         }
         
         // update the score
-        score[ply] = -score[ply - 1] + pieceValue[hunter];
+        score[ply] = -score[ply - 1] + pieceValue[hunterType];
         
         // find the lowest attacker type
-        for (hunter = Pawn; hunter <= King; hunter++)
-            if ((newHunterMap = pos->Map(color, hunter) & attackers))
+        for (hunterType = Pawn; hunterType <= King; ++hunterType)
+            if ((newHunterMap = pos->Map(color, hunterType) & attackers))
                 break;
 
         // remove the new "hunter" from the occupancy 
@@ -104,10 +105,10 @@ int Swap(const Position* pos, const Square fromSquare, const Square toSquare) {
         
         // check if there are new captures available,
         // looking for pieces aligned with the "hunter"
-        if (hunter == Pawn || hunter == Bishop || hunter == Queen)
+        if (hunterType == Pawn || hunterType == Bishop || hunterType == Queen)
             attackers |= (GenerateMoves.Bish(occupancy, toSquare) & pos->AllDiagMovers());
         
-        if (hunter == Rook || hunter == Queen)
+        if (hunterType == Rook || hunterType == Queen)
             attackers |= (GenerateMoves.Rook(occupancy, toSquare) & pos->AllStraightMovers());
         
         // proceed to the next ply

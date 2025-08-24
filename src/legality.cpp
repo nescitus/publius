@@ -1,4 +1,8 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
+
+// This file contains functions detecting
+// whether a move is pseudo-legal
 
 #include "types.h"
 #include "piece.h"
@@ -13,18 +17,18 @@ bool IsPseudoLegal(Position* pos, int move) {
     if (move == 0) 
         return false;
 
-    Color side = pos->GetSideToMove();
-    Square fromSquare = GetFromSquare(move);
-    Square toSquare = GetToSquare(move);
-    int hunter = pos->PieceTypeOnSq(fromSquare);
-    int prey = pos->PieceTypeOnSq(toSquare);
+    const Color side = pos->GetSideToMove();
+    const Square fromSquare = GetFromSquare(move);
+    const Square toSquare = GetToSquare(move);
+    const PieceType hunterType = pos->PieceTypeOnSq(fromSquare);
+    const PieceType preyType = pos->PieceTypeOnSq(toSquare);
 
     // from square empty or enemy piece on it
-    if (hunter == noPieceType || ColorOfPiece(pos->GetPiece(fromSquare)) != side)
+    if (hunterType == noPieceType || ColorOfPiece(pos->GetPiece(fromSquare)) != side)
         return false;
 
     // to square empty or own piece on it
-    if (prey != noPieceType && ColorOfPiece(pos->GetPiece(toSquare)) == side)
+    if (preyType != noPieceType && ColorOfPiece(pos->GetPiece(toSquare)) == side)
         return false;
 
     // castling
@@ -33,15 +37,15 @@ bool IsPseudoLegal(Position* pos, int move) {
 
     // en passant capture
     if (GetTypeOfMove(move) == tEnPassant)
-        return (hunter == Pawn && toSquare == pos->EnPassantSq());
+        return (hunterType == Pawn && toSquare == pos->EnPassantSq());
 
     // double pawn move
     if (GetTypeOfMove(move) == tPawnjump)
-        return IsPawnJumpLegal(pos, side, hunter, prey, fromSquare, toSquare);
+        return IsPawnJumpLegal(pos, side, hunterType, preyType, fromSquare, toSquare);
 
     // single pawn move, including promotion
-    if (hunter == Pawn)
-        return IsPawnMoveLegal(side, fromSquare, toSquare, move, hunter, prey);
+    if (hunterType == Pawn)
+        return IsPawnMoveLegal(side, fromSquare, toSquare, move, hunterType, preyType);
 
     // real promotion would be accepted earlier
     if (IsMovePromotion(move))
@@ -74,7 +78,7 @@ bool IsCastlingLegal(Position *pos, Color side, Square fromSquare, Square toSqua
     return false;
 }
 
-bool IsPawnJumpLegal(Position* pos, Color side, int hunter, int prey,
+bool IsPawnJumpLegal(Position* pos, Color side, PieceType hunter, PieceType prey,
                      Square fromSquare, Square toSquare) {
     if (hunter == Pawn &&
         prey == noPieceType &&
@@ -86,7 +90,8 @@ bool IsPawnJumpLegal(Position* pos, Color side, int hunter, int prey,
     return false;
 }
 
-bool IsPawnMoveLegal(Color side, Square fromSquare, Square toSquare, Move move, int hunter, int prey) {
+bool IsPawnMoveLegal(Color side, Square fromSquare, Square toSquare, 
+                     Move move, PieceType hunter, PieceType prey) {
 
     if (side == White) {
 

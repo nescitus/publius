@@ -26,28 +26,29 @@ void Iterate(Position* pos) {
     for (Timer.rootDepth = 1; Timer.rootDepth <= Timer.GetData(maxDepth); Timer.rootDepth++) {
 
         Timer.RefreshStats();
-        PrintRootInfo(Timer.timeUsed, Timer.nps);
+        PrintRootInfo(); // uses timer stats
 
         curVal = Widen(pos, Timer.rootDepth, curVal);
 
-        // stop searching
-        if (Timer.isStopping || Timer.ShouldFinishIteration())
+        // Stop searching
+        if (Timer.ShouldFinishIteration())
             break;
 
         val = curVal;
 
-        // for go infinite
+        // For go infinite, where we have to wait
+        // for stop command before emitting a move
         if (Timer.rootDepth == 64 && Timer.IsInfiniteMode() )
             Timer.waitingForStop = true;
     }
 }
 
-void PrintRootInfo(int elapsed, int nps) {
+void PrintRootInfo() {
 
         std::cout << "info depth " << Timer.rootDepth
-        << " time " << elapsed
+        << " time " << Timer.timeUsed
         << " nodes " << Timer.nodeCount
-        << " nps " << nps << std::endl;
+        << " nps " << Timer.nps << std::endl;
 }
 
 int Widen(Position* pos, int depth, int lastScore) {
