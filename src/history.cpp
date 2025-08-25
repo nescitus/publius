@@ -14,7 +14,7 @@ HistoryData::HistoryData() {
 // clear all values
 void HistoryData::Clear(void) {
 
-    for (int piece = 0; piece < 12; piece++)
+    for (ColoredPiece piece = WhitePawn; piece < noPiece; ++piece)
         for (Square square = A1; square < sqNone; ++square) {
             cutoffHistory[piece][square] = 0;
             triesHistory[piece][square] = 0;
@@ -27,7 +27,7 @@ void HistoryData::Clear(void) {
 // halve history values (used when they grow too high)
 void HistoryData::Trim(void) {
 
-    for (int piece = 0; piece < 12; piece++)
+    for (ColoredPiece piece = WhitePawn; piece < noPiece; ++piece)
         for (Square square = A1; square < sqNone; ++square) {
             cutoffHistory[piece][square] /= 2;
             triesHistory[piece][square] /= 2;
@@ -50,7 +50,7 @@ void HistoryData::Update(Position* pos, const Move move, const int depth, const 
     // Gather data for updating history score
     Square fromSquare = GetFromSquare(move);
     Square toSquare = GetToSquare(move);
-    int piece = pos->GetPiece(fromSquare);
+    ColoredPiece piece = pos->GetPiece(fromSquare);
 
     // Update history score
     cutoffHistory[piece][toSquare] += Inc(depth);
@@ -69,7 +69,7 @@ void HistoryData::UpdateTries(Position* pos, const Move move, const int depth) {
     // Init
     Square fromSquare = GetFromSquare(move);
     Square toSquare = GetToSquare(move);
-    int piece = pos->GetPiece(fromSquare);
+    ColoredPiece piece = pos->GetPiece(fromSquare);
 
     // Update tries history
     triesHistory[piece][toSquare] += Inc(depth);
@@ -96,7 +96,7 @@ int HistoryData::GetScore(Position* pos, const Move move) {
     // Init square variables
     Square fromSquare = GetFromSquare(move);
     Square toSquare = GetToSquare(move);
-    int piece = pos->GetPiece(fromSquare);
+    ColoredPiece piece = pos->GetPiece(fromSquare);
 
     // How many times the move was considered
     // as an alternative to one that actually

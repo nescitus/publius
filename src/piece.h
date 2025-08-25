@@ -6,17 +6,17 @@
 #pragma once
 
 // given a piece, return its color
-constexpr inline Color ColorOfPiece(int piece) {
+constexpr inline Color ColorOfPiece(ColoredPiece piece) {
     return (Color)(piece & 1);
 }
 
 // given a piece, return its type
-constexpr inline PieceType TypeOfPiece(int piece) {
+constexpr inline PieceType TypeOfPiece(ColoredPiece piece) {
     return (PieceType)(piece >> 1);
 }
 
 // get unique id of a piece (denoting, say, white knight), range 0-11
-constexpr inline int CreatePiece(Color pieceColor, PieceType pieceType) {
-    return (pieceType << 1) | pieceColor;
+constexpr inline ColoredPiece CreatePiece(Color pieceColor, PieceType pieceType) {
+    return (ColoredPiece)((pieceType << 1) | pieceColor);
 }
  

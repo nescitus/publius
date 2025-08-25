@@ -1,4 +1,5 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
 
 #pragma once
 #include <string>
@@ -31,7 +32,7 @@ private:
     Square enPassantSq;
     int castleFlags;
     int pieceCount[2][6];
-    int pieceLocation[64];
+    ColoredPiece pieceLocation[64];
     int reversibleMoves;
     int repetitionIndex;
     Bitboard repetitionList[256];
@@ -95,7 +96,7 @@ public:
     }
 
     // --- Board maps ---
-    [[nodiscard]] Bitboard Map(Color color, int piece) const {
+    [[nodiscard]] Bitboard Map(Color color, PieceType piece) const {
         return pieceBitboard[color][piece];
     }
     [[nodiscard]] Bitboard Pieces(Color color) const;
@@ -118,7 +119,7 @@ public:
 
     // --- Basic getters (fast, inline) ---
     [[nodiscard]] Color GetSideToMove() const { return sideToMove; }
-    [[nodiscard]] int GetPiece(Square sq) const { return pieceLocation[sq]; }
+    [[nodiscard]] ColoredPiece GetPiece(Square sq) const { return pieceLocation[sq]; }
     [[nodiscard]] bool IsOccupied(Square sq) const { return pieceLocation[sq] != noPiece; }
     [[nodiscard]] Square KingSq(Color color) const { return kingSq[color]; }
     [[nodiscard]] Square EnPassantSq() const { return enPassantSq; }

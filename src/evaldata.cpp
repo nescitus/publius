@@ -46,7 +46,7 @@ void EvalData::AddPawn(Color color, int val) {
 }
 
 // Add attacks to enemy king. We divide them
-// into two cathegories: weak attacks on
+// into two categories: weak attacks on
 // squares controlled by enemy pawns and strong
 // attacks if it is not the case.
 void EvalData::AddAttacks(Color color, Bitboard att, int strong, int weak) {

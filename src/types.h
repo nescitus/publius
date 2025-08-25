@@ -6,17 +6,19 @@
 typedef unsigned long long Bitboard;
 typedef int Move;
 
-/* Define Color enum and what can be done with it.
+// Define Color enum and what can be done with it.
 
-The engine would work just fine using int instead 
-of Color, but it is better to introduce some type-safety.
-You will get a compiler error when attempting to use Color
-instead of Square or trying to add two Color variables
-together. In fact, there are only two things you can do
-with Color: flip it so that White becomes Black
-or another way round using ~operator or use ++ operator
-to traverse the loop and do something both with white
-and black pieces. */
+// The engine would work just fine using int 
+// instead  of Color, but it is better to 
+// introduce some type-safety. You will get 
+// a compiler error when attempting to use 
+// Color instead of Square or trying to add 
+// two Color variables together. In fact, 
+// there are only two things you can do with 
+// Color: flip it so that White becomes Black
+// or another way round using ~operator or use 
+// ++ operator to traverse the loop and do 
+// something both with white and black pieces.
 
 enum Color { White = 0, Black = 1, colorNone = 2 };
 static_assert(White == 0 && Black == 1, "Color encoding required by ~ operator");
@@ -29,6 +31,16 @@ constexpr inline Color operator~(Color c) {
 // increment color in a "for" loop
 constexpr inline Color operator++(Color& d) {
     return d = Color(int(d) + 1);
+}
+
+enum ColoredPiece { WhitePawn, BlackPawn, WhiteKnight, BlackKnight, 
+                    WhiteBishop, BlackBishop, WhiteRook, BlackRook, 
+                    WhiteQueen, BlackQueen, WhiteKing, BlackKing, 
+                    noPiece };
+
+// increment ColoredPiece in a "for" loop
+constexpr inline ColoredPiece operator++(ColoredPiece& d) {
+    return d = ColoredPiece(int(d) + 1);
 }
 
 enum PieceType { Pawn, Knight, Bishop, Rook, Queen, King, noPieceType };
@@ -80,8 +92,8 @@ constexpr inline Square operator^(Square d1, int d2) {
     return Square(int(d1) ^ d2);
 }
 
+// types of moves
 enum eMoveType { tNormal, tCastle, tEnPassant, tPawnjump, tPromN, tPromB, tPromR, tPromQ };
-enum eCastleFlag { wShortCastle = 1, wLongCastle = 2, bShortCastle = 4, bLongCastle = 8 };
 
-// constant just outside piece range to denote no piece
-static const int noPiece = 12;
+// castle flags
+enum eCastleFlag { wShortCastle = 1, wLongCastle = 2, bShortCastle = 4, bLongCastle = 8 };

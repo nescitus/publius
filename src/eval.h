@@ -26,7 +26,7 @@ private:
 extern EvalHashTable EvalHash; // full evaluation hashtable
 extern EvalHashTable PawnHash; // pawn structure eval hashtable
 
-void EvalBasic(EvalData* e, const Color color, const int piece, const int sq);
+void EvalBasic(EvalData* e, const Color color, const PieceType piece, const int sq);
 void EvalPawnStructure(const Position* pos, EvalData* e);
 void EvalPawn(const Position* pos, EvalData* e, Color color);
 void EvalKnight(const Position* pos, EvalData* e, Color color);

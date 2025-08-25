@@ -124,7 +124,7 @@ int Evaluate(Position* pos, EvalData* e) {
 
         // Precalculate board control bitboards
         // for passer and pressure eval
-        for (int piece = Pawn; piece <= King; piece++)
+        for (PieceType piece = Pawn; piece <= King; ++piece)
             e->allAtt[color] |= e->control[color][piece];
     }
 
@@ -510,7 +510,7 @@ void EvalPressure(Position* pos, EvalData* e, Color side) {
 // Operations repeated while evaluating any piece:
 // adding material value, piece/square tables score
 // and calculating the game phase.
-void EvalBasic(EvalData* e, const Color color, const int piece, const int sq) {
+void EvalBasic(EvalData* e, const Color color, const PieceType piece, const int sq) {
 
     e->gamePhase += phaseTable[piece];
     //e->Add(color, mgPieceValue[piece], egPieceValue[piece]); // merged with pst
