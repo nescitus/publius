@@ -195,8 +195,6 @@ void EvalPawnStructure(const Position* pos, EvalData* e) {
         e->Add(color, e->pawnScore[color]);
 }
 
-// Bench at depth 15 took 27663 milliseconds, searching 46809615 nodes at 1692138 nodes per second.
-
 void EvalPawn(const Position* pos, EvalData* e, Color color) {
 
     Bitboard ownPawns = pos->Map(color, Pawn);
@@ -474,15 +472,15 @@ void EvalPasser(const Position* pos, EvalData* e, Color color) {
 // and attacks of a minor piece on another one.
 void EvalPressure(Position* pos, EvalData* e, Color side) {
 
-    Color oppo;
+    const Color oppo = ~side;
+    const Bitboard enemyPieces = pos->Pieces(oppo);
+
     Square sq;
     PieceType pieceType;
     int pressure;
-    Bitboard enemyPieces, ctrl, hang;
+    Bitboard ctrl, hang;
 
     pressure = 0;
-    oppo = ~side;
-    enemyPieces = pos->Pieces(oppo);
 
     // bishop on knight attacks
     if (pos->Map(oppo, Bishop) & e->control[side][Knight])

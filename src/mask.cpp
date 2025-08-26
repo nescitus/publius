@@ -1,4 +1,7 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
+
+// MaskData class contains various bitmasks used by the engine.
 
 #include "types.h"
 #include "bitboard.h"
@@ -9,8 +12,7 @@ MaskData::MaskData() {
     InitRanks();
     InitPassedMask();
     InitAdjacentMask();
-    InitStrongPawn();
-    InitSupportMask();
+    InitPawnSupport();
 
     // Init king attack table
     for (int i = 0; i < 255; i++)
@@ -62,23 +64,16 @@ void MaskData::InitAdjacentMask() {
         adjacentFiles[f] = WestOf(file[f]) | EastOf(file[f]);
 }
 
-void MaskData::InitSupportMask() {
+void MaskData::InitPawnSupport() {
 
     for (Square square = A1; square < 64; ++square) {
-        support[White][square] = SidesOf(Paint(square));
-        support[White][square] |= FillSouth(support[White][square]);
 
-        support[Black][square] = SidesOf(Paint(square));
-        support[Black][square] |= FillNorth(support[Black][square]);
-    }
-}
+        Bitboard base = SidesOf(Paint(square));
 
-void MaskData::InitStrongPawn() {
+        support[White][square] = base | FillSouth(base);
+        support[Black][square] = base | FillNorth(base);
 
-    for (Square square = A1; square < 64; ++square) {
-        strongPawn[White][square] = SidesOf(Paint(square));
-        strongPawn[Black][square] = SidesOf(Paint(square));
-        strongPawn[White][square] |= ForwardOf(strongPawn[White][square], Black);
-        strongPawn[Black][square] |= ForwardOf(strongPawn[Black][square], White);
+        strongPawn[White][square] = base | SouthOf(base);
+        strongPawn[Black][square] = base | NorthOf(base);
     }
 }

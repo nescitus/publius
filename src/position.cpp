@@ -54,7 +54,7 @@ void Position::Set(const std::string& str) {
     for (int i = 0; i < length; i++) {
         char letter = str.at(i);
 
-        // The first loop sets up the pieves
+        // The first loop sets up the pieces
         if (square < 64) {
 
             if (std::isdigit(letter)) {
@@ -188,11 +188,9 @@ void Position::ChangePieceNoHash(const PieceType oldType,
                                  const Color color, 
                                  const Square square) {
 
-     pieceLocation[square] = CreatePiece(color, newType);
      pieceBitboard[color][oldType] ^= Paint(square);
-     pieceBitboard[color][newType] ^= Paint(square);
-     pieceCount[color][newType]++;
      pieceCount[color][oldType]--;
+     AddPieceNoHash(color, newType, square);
 }
 
 void Position::SetEnPassantSquare(const Color color, Square toSquare) {

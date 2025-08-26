@@ -7,8 +7,7 @@ private:
     void InitRanks();
     void InitPassedMask();
     void InitAdjacentMask();
-    void InitSupportMask();
-    void InitStrongPawn();
+    void InitPawnSupport();
 public:
     
     static constexpr int castle[64] = {

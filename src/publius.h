@@ -6,7 +6,7 @@
 //#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 3990 lines
+// 3971 lines
 
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";

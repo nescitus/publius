@@ -121,12 +121,11 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
         foundTTrecord = true;
 
-        // Remember that pv-nodes don't use some 
-        // pruning/reduction techniques. Because 
-        // of  that, we cannot reuse scores from
-        // the zero window nodes. Despite the same
-        // nominal  depth,  they  represent  more
-        // shallow and less precise search.
+        // Because pv-nodes don't use some pruning
+        // or reduction techniques, we cannot always
+        // reuse scores from the zero window nodes. 
+        // Despite  the  same nominal  depth,  they
+        // represent more shallow, less precise search.
         if (!isPv || (score > alpha && score < beta)) {
             if (!isExcluded)
                 return score;
@@ -258,9 +257,9 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         }   // end of null move code
     } // end of node pruning block
 
-    // SET FUTILITY PRUNING FLAG. We are going to bet
-    // that if the static evaluation of a node is bad,
-    // then quiet moves will lead to no improvement.
+    // SET FUTILITY PRUNING FLAG. If the static 
+    // evaluation of a node is bad, we bet that
+    // quiet moves will lead to no improvement.
     // Score margin is increased with depth. Please
     // note that our implementation does not prune 
     // moves that give check, which is slightly unusual.

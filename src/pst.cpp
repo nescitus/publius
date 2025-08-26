@@ -17,12 +17,8 @@ void Parameters::Init(void) {
 
             pawnSupport[color][RelativeSq(color, square)] = S(p_support[square],0);
 
-            pst[color][Pawn][RelativeSq(color, square)] = pieceValue[Pawn] + pawnPst[square];
-            pst[color][Knight][RelativeSq(color, square)] = pieceValue[Knight] + knightPst[square];
-            pst[color][Bishop][RelativeSq(color, square)] = pieceValue[Bishop] + bishopPst[square];
-            pst[color][Rook][RelativeSq(color, square)] = pieceValue[Rook] + rookPst[square];
-            pst[color][Queen][RelativeSq(color, square)] = pieceValue[Queen] + queenPst[square];
-            pst[color][King][RelativeSq(color, square)] = kingPst[square];
+            for (PieceType piece = Pawn; piece < noPieceType; ++piece)
+                pst[color][piece][RelativeSq(color, square)] = pieceValue[piece] + allPst[piece][square];
         }
     }
 }
@@ -44,7 +40,6 @@ void Parameters::TunePst() {
     double currentFit = Tuner.TexelFit(&pos);
 
     int delta = 1;
-    //start: 10:30, end: ??:??
     // possible improvement: randomize order
     for (Square s = A1; s <= H8; ++s) {
         currentFit = Tuner.TuneSingleSquare(&pos, this, Pawn, s, delta, currentFit);
@@ -72,15 +67,16 @@ void Parameters::TunePst() {
 // they can be pasted directly into the code
 void Parameters::PrintAll() {
 
-    std::cout << "const int pawnPst[64] = "; PrintPst(Pawn);
-    std::cout << std::endl << "const int knightPst[64] = "; PrintPst(Knight);
-    std::cout << std::endl << "const int bishopPst[64] = "; PrintPst(Bishop);
-    std::cout << std::endl << "const int rookPst[64] = "; PrintPst(Rook);
-    std::cout << std::endl << "const int queenPst[64] = "; PrintPst(Queen);
-    std::cout << std::endl << "const int kingPst[64] = "; PrintPst(King);
+    std::cout << "const int allPst[6][64] = {" << std::endl;
+    for (PieceType piece = Pawn; piece < noPieceType; ++piece) {
+        PrintPst(piece);
+        if (piece != King) std::cout << ",";
+    }
+    std::cout << "};" << std::endl;
 }
 
-// Prints a single piece/square table
+// Prints a single piece/square table 
+// (which is a part of a larger table)
 void Parameters::PrintPst(int piece) {
 
     std::cout << "{\n";
@@ -98,5 +94,5 @@ void Parameters::PrintPst(int piece) {
         }
         std::cout << "\n";
     }
-    std::cout << "};";
+    std::cout << "}";
 }
