@@ -18,6 +18,8 @@
 #include "params.h"
 #include "publius.h"
 #include "nn.h"
+#include "evaldata.h"
+#include "api.h"
 
 UCItimer Timer;
 MaskData Mask;
