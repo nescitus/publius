@@ -36,10 +36,7 @@ bool hasNNUE;
 int main() {
 
     Params.Init();
-    hasNNUE = NN.LoadFromFile(network);
-    if (!hasNNUE)
-        std::cout << "info string NNUE file " << network 
-                  << " not found. Reverting to HCE eval." << std::endl;
+    TryLoadingNNUE("publius_net.bin");
     GenerateMoves.Init();
     UciLoop();
     TT.Exit();

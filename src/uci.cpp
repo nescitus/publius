@@ -19,6 +19,7 @@
 #include "params.h"
 #include "tuner.h"
 #include "api.h"
+#include "nn.h"
 
 #ifdef USE_TUNING
    cTuner Tuner;
@@ -72,6 +73,7 @@ void OnUciCommand() {
     std::cout << "id author " << engineAuthor << std::endl;
     std::cout << "option name Hash type spin default 16 min 1 max 4096" << std::endl;
     std::cout << "option name Clear Hash type button" << std::endl;
+    std::cout << "option name NNUEfile type string default publius_net.bin" << std::endl;
     std::cout << "uciok" << std::endl;
 }
 
@@ -199,6 +201,11 @@ void OnSetOptionCommand(std::istringstream& stream) {
         int val = std::stoi(value);
         TT.Allocate(val);
     }
+
+    if (IsSameOrLowercase(name, "NNUEfile")) {
+        
+        TryLoadingNNUE(value.c_str());
+    }
 }
 
 void OnBenchCommand(std::istringstream& stream, Position* pos) {
@@ -243,4 +250,12 @@ void OnStopCommand() {
         Timer.waitingForStop = false;
         Pv.SendBestMove();
     }
+}
+
+void TryLoadingNNUE(const char * path) {
+
+    hasNNUE = NN.LoadFromFile(path);
+    if (!hasNNUE)
+        std::cout << "info string NNUE file " << path
+        << " not found. Reverting to HCE eval." << std::endl;;
 }

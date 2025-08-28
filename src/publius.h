@@ -11,7 +11,6 @@
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
 inline constexpr const char* engineVersion = "1.0rc"; // bump on releases
-inline constexpr const char* network = "publius_net_02.bin";
 extern bool hasNNUE;
 
 // entry points
