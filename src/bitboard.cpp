@@ -2,7 +2,6 @@
 // by Pawel Koziol
 
 #include "types.h"
-#include "square.h" // for RelativeSq
 #include "bitboard.h"
 
 // color-dependent forward fill
@@ -106,9 +105,4 @@ Bitboard FillOcclNW(Bitboard b, Bitboard o) {
     o &= (o << 14);
     b |= o & (b << 28);
     return b;
-}
-
-// get bitboard of a relative square
-Bitboard RelativeSqBb(const Color cl, const Square sq) {
-    return (Paint(RelativeSq(cl, sq)));
 }

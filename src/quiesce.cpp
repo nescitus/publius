@@ -105,6 +105,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
 
         // Make move, unless illegal
         pos->DoMove(move, &undo);
+
         if (pos->IsOwnKingInCheck()) {
             pos->UndoMove(move, &undo);
                 continue;

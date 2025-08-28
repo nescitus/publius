@@ -1,4 +1,5 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+//by Pawel Koziol
 
 #include "types.h"
 #include "limits.h"
@@ -16,6 +17,7 @@
 #include "score.h"
 #include "params.h"
 #include "publius.h"
+#include "nn.h"
 
 UCItimer Timer;
 MaskData Mask;
@@ -26,12 +28,17 @@ HistoryData History;
 TransTable TT;
 LmrData Lmr;
 PvCollector Pv;
+Net NN;
+bool hasNNUE;
 
-int main()
-{
+int main() {
+
     Params.Init();
+    hasNNUE = NN.LoadFromFile(network);
+    if (!hasNNUE)
+        std::cout << "info string NNUE file " << network 
+                  << " not found. Reverting to HCE eval." << std::endl;
     GenerateMoves.Init();
-    Timer.Clear(); // clears also search statis flags
     UciLoop();
     TT.Exit();
     return 0;

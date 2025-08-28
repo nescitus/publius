@@ -1,4 +1,5 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
 
 #pragma once
 
@@ -26,6 +27,11 @@ private:
 extern EvalHashTable EvalHash; // full evaluation hashtable
 extern EvalHashTable PawnHash; // pawn structure eval hashtable
 
+// Main evaluation functions
+int EvalNN(Position* pos);
+int EvalHCE(Position* pos, EvalData* e);
+
+// Handcrafted evaluation helpers
 void EvalBasic(EvalData* e, const Color color, const PieceType piece, const int sq);
 void EvalPawnStructure(const Position* pos, EvalData* e);
 void EvalPawn(const Position* pos, EvalData* e, Color color);

@@ -12,9 +12,8 @@ HashKeys::HashKeys() {
 
     // init piece.square keys
     for (ColoredPiece piece = WhitePawn; piece < noPiece; ++piece)
-        for (Square square = A1; square < sqNone; ++square) {
+        for (Square square = A1; square < sqNone; ++square)
             pieceKey[piece][square] = Random64();
-        }
 
     // init castle keys
     for (int i = 0; i < 16; i++)

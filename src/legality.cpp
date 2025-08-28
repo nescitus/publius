@@ -24,11 +24,13 @@ bool IsPseudoLegal(Position* pos, int move) {
     const PieceType preyType = pos->PieceTypeOnSq(toSquare);
 
     // from square empty or enemy piece on it
-    if (hunterType == noPieceType || ColorOfPiece(pos->GetPiece(fromSquare)) != side)
+    if (hunterType == noPieceType || 
+        ColorOfPiece(pos->GetPiece(fromSquare)) != side)
         return false;
 
     // to square empty or own piece on it
-    if (preyType != noPieceType && ColorOfPiece(pos->GetPiece(toSquare)) == side)
+    if (preyType != noPieceType && 
+        ColorOfPiece(pos->GetPiece(toSquare)) == side)
         return false;
 
     // castling

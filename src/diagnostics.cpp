@@ -133,8 +133,8 @@ void PrintBitboard(Bitboard b) {
    
     for (Square square = A1; square < 64; ++square) {
         
-        if (b & RelativeSqBb(Black, square)) std::cout << "+ ";
-        else                                 std::cout << ". ";
+        if (b & Paint(square^56)) std::cout << "+ ";
+        else                      std::cout << ". ";
 
         if ((square + 1) % 8 == 0) 
             std::cout << 9 - ((square + 1) / 8) << std:: endl;

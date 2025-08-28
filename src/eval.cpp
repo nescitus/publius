@@ -1,7 +1,7 @@
 // Publius - Didactic public domain bitboard chess engine 
 // by Pawel Koziol
 
-// This hand-crafted evaluation function is
+// Hand-crafted evaluation function is
 // a compromise between size, the need to cover
 // the most important elements, and strength.
 // It would be possible to increase Publius'
@@ -42,6 +42,8 @@
 #include "eval.h"
 #include "api.h"
 #include "mask.h"
+#include "nn.h"
+#include "publius.h" // for hasNNUE
 
 // "Fake" king location, used to initialize
 // king attack zone. This has two benefits:
@@ -83,6 +85,24 @@ int Evaluate(Position* pos, EvalData* e) {
     if (EvalHash.Retrieve(pos->boardHash, &score))
         return score;
 #endif
+
+    if (hasNNUE) score = EvalNN(pos);
+    else         score = EvalHCE(pos, e);
+
+    // Save the score in the evaluation hashtable
+    EvalHash.Save(pos->boardHash, score);
+
+    return score;
+}
+
+int EvalNN(Position* pos) {
+    return NN.GetScore(pos->GetSideToMove());
+}
+
+// Hand-crafted evaluation function
+int EvalHCE(Position* pos, EvalData* e) {
+
+    int score = 0;
 
     // Init eval data
     e->Clear();
@@ -156,9 +176,6 @@ int Evaluate(Position* pos, EvalData* e) {
     // Make score relative to the side to move
     if (pos->GetSideToMove() == Black)
         score = -score;
-
-    // Save the score in the evaluation hashtable
-    EvalHash.Save(pos->boardHash, score);
 
     return score;
 }

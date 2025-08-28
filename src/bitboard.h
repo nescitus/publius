@@ -94,8 +94,3 @@ static const Bitboard excludeH = 0x7f7f7f7f7f7f7f7f;
 [[nodiscard]] Bitboard FillOcclWest(Bitboard b, Bitboard o);
 [[nodiscard]] Bitboard FillOcclNW(Bitboard b, Bitboard o);
 [[nodiscard]] Bitboard FillOcclSW(Bitboard b, Bitboard o);
-
-// Bitboard of a relative square
-// - RelativeSq(White, C2) is C2,
-// - RelativeSq(Black, C2) is C7
-[[nodiscard]] Bitboard RelativeSqBb(const Color cl, const Square sq);
