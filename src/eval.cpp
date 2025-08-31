@@ -86,7 +86,7 @@ int Evaluate(Position* pos, EvalData* e) {
         return score;
 #endif
 
-    if (hasNNUE) score = EvalNN(pos);
+    if (isNNUEloaded) score = EvalNN(pos);
     else         score = EvalHCE(pos, e);
 
     // Save the score in the evaluation hashtable

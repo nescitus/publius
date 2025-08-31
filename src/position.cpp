@@ -162,7 +162,7 @@ void Position::MovePieceNoHash(const Color color, const PieceType pieceType,
     pieceLocation[toSquare] = CreatePiece(color, pieceType);
     pieceBitboard[color][pieceType] ^= Paint(fromSquare, toSquare);
 
-    if (hasNNUE) {
+    if (isNNUEloaded) {
         NN.Del(color, pieceType, fromSquare);
         NN.Add(color, pieceType, toSquare);
     }
@@ -184,7 +184,7 @@ void Position::TakePieceNoHash(const Color color,
     pieceBitboard[color][pieceType] ^= Paint(square);
     pieceCount[color][pieceType]--;
 
-    if (hasNNUE)
+    if (isNNUEloaded)
         NN.Del(color, pieceType, square);
 }
 
@@ -196,7 +196,7 @@ void Position::AddPieceNoHash(const Color color,
     pieceBitboard[color][pieceType] ^= Paint(square);
     pieceCount[color][pieceType]++;
 
-    if (hasNNUE)
+    if (isNNUEloaded)
         NN.Add(color, pieceType, square);
 }
 
@@ -211,7 +211,7 @@ void Position::ChangePieceNoHash(const PieceType oldType,
     pieceCount[color][newType]++;
     pieceCount[color][oldType]--;
 
-    if (hasNNUE) {
+    if (isNNUEloaded) {
         NN.Del(color, oldType, square);
         NN.Add(color, newType, square);
     }

@@ -225,32 +225,32 @@ void FillCheckList(Position* pos, MoveList* list) {
     
     if (color == White) {
 
-        // White double pawn moves
+        // White double pawn moves witch check
         firstStep = NorthOf(pos->Map(White, Pawn) & Mask.rank[rank2]) & empty;
         moves = NorthOf(firstStep) & empty;
         moves &= pawnChecks;
         SerializePawnMoves(list, moves, -16, tPawnjump);
 
-        // White single pawn moves
+        // White single pawn moves with check, excluding promotions
         moves = NorthOf(pos->Map(White, Pawn) & ~Mask.rank[rank7]) & empty;
         moves &= pawnChecks;
         SerializePawnMoves(list, moves, -8, tNormal);
     }
     else {
 
-        // Black double pawn moves
+        // Black double pawn moves with check
         firstStep = SouthOf(pawns & Mask.rank[rank7]) & empty;
         moves = SouthOf(firstStep) & empty;
         moves &= pawnChecks;
         SerializePawnMoves(list, moves, 16, tPawnjump);
 
-        // Black single pawn moves
+        // Black single pawn moves with check, excluding promotions
         moves = SouthOf(pos->Map(Black, Pawn) & ~Mask.rank[rank2]) & empty;
         moves &= pawnChecks;
         SerializePawnMoves(list, moves, 8, tNormal);
     }
 
-    // Knight moves
+    // Knight checks
     pieces = pos->Map(color, Knight);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);
@@ -259,7 +259,7 @@ void FillCheckList(Position* pos, MoveList* list) {
         SerializeMoves(list, fromSquare, moves);
     }
 
-    // Diagonal moves
+    // Diagonal checks
     pieces = pos->MapDiagonalMovers(color);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);
@@ -268,7 +268,7 @@ void FillCheckList(Position* pos, MoveList* list) {
         SerializeMoves(list, fromSquare, moves);
     }
 
-    // Straight moves
+    // Straight checks
     pieces = pos->MapStraightMovers(color);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);

@@ -11,7 +11,7 @@
 
 class Parameters {
 public:
-    void Init();
+    void Init(); // TODO: replace with  constructor
     int pawnSupport[2][64];
     int pst[2][6][64];
     void PrintPst(int piece);

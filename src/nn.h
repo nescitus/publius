@@ -45,7 +45,7 @@ using u64 = uint64_t;
 // equivalence, change it to 128
 
     constexpr size_t INPUT_SIZE = 768;
-    constexpr size_t HIDDEN_SIZE = 16;
+    constexpr size_t HIDDEN_SIZE = 32;
 
     constexpr i32 EVAL_SCALE = 400;
     constexpr i32 L0_SCALE = 255;

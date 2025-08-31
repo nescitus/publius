@@ -254,8 +254,8 @@ void OnStopCommand() {
 
 void TryLoadingNNUE(const char * path) {
 
-    hasNNUE = NN.LoadFromFile(path);
-    if (!hasNNUE)
+    isNNUEloaded = NN.LoadFromFile(path);
+    if (!isNNUEloaded)
         std::cout << "info string NNUE file " << path
         << " not found. Reverting to HCE eval." << std::endl;;
 }
