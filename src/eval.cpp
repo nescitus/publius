@@ -91,7 +91,7 @@ int Evaluate(Position* pos, EvalData* e) {
         if (nnueWeight > 0)
             score += EvalNN(pos) * nnueWeight / 100;
         if (hceWeight > 0)
-            score += EvalHCE(pos, e) * nnueWeight / 100;
+            score += EvalHCE(pos, e) * hceWeight / 100;
     }
     else {
         score = EvalHCE(pos, e);
@@ -104,7 +104,7 @@ int Evaluate(Position* pos, EvalData* e) {
 }
 
 int EvalNN(Position* pos) {
-    return NN.GetScore(pos->GetSideToMove()) * 4 / 5;
+    return NN.GetScore(pos->GetSideToMove());
 }
 
 // Hand-crafted evaluation function
