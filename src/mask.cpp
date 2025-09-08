@@ -70,9 +70,12 @@ void MaskData::InitPawnSupport() {
 
         Bitboard base = SidesOf(Paint(square));
 
+        // supported pawn has own pawn on a neighbourig rank
+        // that is not more advanced than apawn in question
         support[White][square] = base | FillSouth(base);
         support[Black][square] = base | FillNorth(base);
 
+        // strong pawn has a neighbour side by side or is defended
         strongPawn[White][square] = base | SouthOf(base);
         strongPawn[Black][square] = base | NorthOf(base);
     }

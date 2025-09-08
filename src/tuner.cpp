@@ -41,7 +41,7 @@ void cTuner::Init(int filter) {
 
         // detect result; most EPD sets put it at end
         double res;
-        if (line.find("1/2-1/2") != std::string::npos) res = 0.5; // fallback
+        if (line.find("1/2-1/2") != std::string::npos) res = 0.5;
         else if (line.find("1-0") != std::string::npos) res = 1.0;
         else if (line.find("0-1") != std::string::npos) res = 0.0;
         else continue; // skip lines without a result tag

@@ -60,10 +60,11 @@ void Position::Set(const std::string& str) {
         // The first loop sets up the pieves
         if (square < 64) {
 
+            // on finding a number, update square
             if (std::isdigit(letter)) {
                 square = square + (int)(letter - '0');
-            }
-            else {
+            // if it's a letter, it denotes a piece
+            } else {
                 auto tuple = PieceFromChar(letter);
                 Color color = std::get<0>(tuple);
                 PieceType pieceType = std::get<1>(tuple);
@@ -75,9 +76,8 @@ void Position::Set(const std::string& str) {
                 }
             }
 
-            // the second loop sets flags
-        }
-        else {
+        // The second loop sets flags
+        } else {
 
             switch (letter) {
             case 'w': sideToMove = White; break;

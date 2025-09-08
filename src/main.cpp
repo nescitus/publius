@@ -29,11 +29,15 @@ LmrData Lmr;
 PvCollector Pv;
 Net NN;
 bool isNNUEloaded;
+int nnueWeight;
+int hceWeight;
 
 int main() {
 
     Params.Init();
-    TryLoadingNNUE("publius_net32_1.bin");
+    nnueWeight = 80;
+    hceWeight = 0;
+    TryLoadingNNUE("publius_net32_3.bin");
     GenerateMoves.Init();
     UciLoop();
     TT.Exit();

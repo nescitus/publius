@@ -74,6 +74,8 @@ void OnUciCommand() {
     std::cout << "option name Hash type spin default 16 min 1 max 4096" << std::endl;
     std::cout << "option name Clear Hash type button" << std::endl;
     std::cout << "option name NNUEfile type string default publius_net.bin" << std::endl;
+    std::cout << "option name nnueWeight type spin default "<<  nnueWeight << " min 0 max 200" << std::endl;
+    std::cout << "option name hceWeight type spin default " << hceWeight << " min 0 max 200" << std::endl;
     std::cout << "uciok" << std::endl;
 }
 
@@ -200,6 +202,14 @@ void OnSetOptionCommand(std::istringstream& stream) {
     if (IsSameOrLowercase(name, "Hash")) {
         int val = std::stoi(value);
         TT.Allocate(val);
+    }
+
+    if (IsSameOrLowercase(name, "nnueWeight")) {
+        nnueWeight = std::stoi(value);
+    }
+
+    if (IsSameOrLowercase(name, "hceWeight")) {
+        hceWeight = std::stoi(value);
     }
 
     if (IsSameOrLowercase(name, "NNUEfile")) {

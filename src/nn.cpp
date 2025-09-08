@@ -5,7 +5,7 @@
 // equivalent to the simple example provided by the bullet trainer:
 // https://github.com/jw1912/bullet/blob/main/examples/simple.rs
 // The architecture is (768 -> HIDDEN_SIZE)x2 -> 1 and the only
-// difference is that the number of hidden neurons is reduced to 16.
+// difference is that the number of hidden neurons is reduced to 32.
 
 // This code draws some inspiration from Iris chess engine
 // (https://github.com/citrus610/iris):

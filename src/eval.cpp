@@ -86,8 +86,16 @@ int Evaluate(Position* pos, EvalData* e) {
         return score;
 #endif
 
-    if (isNNUEloaded) score = EvalNN(pos);
-    else         score = EvalHCE(pos, e);
+    if (isNNUEloaded) {
+        score = 0;
+        if (nnueWeight > 0)
+            score += EvalNN(pos) * nnueWeight / 100;
+        if (hceWeight > 0)
+            score += EvalHCE(pos, e) * nnueWeight / 100;
+    }
+    else {
+        score = EvalHCE(pos, e);
+    }
 
     // Save the score in the evaluation hashtable
     EvalHash.Save(pos->boardHash, score);
@@ -96,7 +104,7 @@ int Evaluate(Position* pos, EvalData* e) {
 }
 
 int EvalNN(Position* pos) {
-    return NN.GetScore(pos->GetSideToMove());
+    return NN.GetScore(pos->GetSideToMove()) * 4 / 5;
 }
 
 // Hand-crafted evaluation function
