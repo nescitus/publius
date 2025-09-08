@@ -2,7 +2,7 @@ Publius is a simple public domain bitboard chess engine created for didactic pur
 
 The current rating estimatea are 
 - 2874 on the CCRL scale for the HCE version, based on the score against Fruit 2.1: 738.0/1000 at 30s+0.16s
-- 2950 on the CCRL scale fo the NNUE version (and this can change quickly)
+- 3060 on the CCRL scale fo4 the NNUE version, based on a 1000 game match against Stash 27
 
 "Simple" and "teaching engine" are vague concepts, so explanation of constraints is in order:
 
@@ -41,7 +41,7 @@ SEARCH:
 - internal iterative reduction (slightly unusual form)
 - singular extension
 
-EVAL
+HANDCRAFTED EVAL
 
 - piece/square tables
 - mobility evaluation
@@ -56,6 +56,12 @@ EVAL
 - rook blocked by an uncastled king
 - very primitive evaluation of king's pawn shield
 - very basic evaluation of non-winnable positions
+
+NNUE
+
+768->32->1 net with perspective, trained using bullet trainer (https://github.com/jw1912/bullet), 
+Ethereal data and lichess-big3-resoed epd, rescored with Publius handcrafted eval. Changing
+the hidden layer size, you can plug any network trained by bullet simple.rs
 
 ADDITIONAL COMMANDS
 
