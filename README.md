@@ -60,7 +60,7 @@ HANDCRAFTED EVAL
 NNUE
 
 768->32->1 net with perspective, trained using bullet trainer (https://github.com/jw1912/bullet), 
-Ethereal data and lichess-big3-resoed epd, rescored with Publius handcrafted eval. Changing
+Ethereal data and lichess-big3-resolved epd, rescored with Publius handcrafted eval. Changing
 the hidden layer size, you can plug any network trained by bullet simple.rs
 
 ADDITIONAL COMMANDS
