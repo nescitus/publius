@@ -21,7 +21,7 @@ void Iterate(Position* pos) {
 
     int val = 0, curVal = 0;
 
-    Pv.Clear();
+    //Pv.Clear();
 
     for (Timer.rootDepth = 1; Timer.rootDepth <= Timer.GetData(maxDepth); Timer.rootDepth++) {
 

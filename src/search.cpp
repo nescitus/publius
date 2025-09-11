@@ -1,4 +1,5 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
 
 #include <iostream>
 #include "types.h"
@@ -41,7 +42,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // Init
     move = 0;
     ttMove = 0;
-    bestMove = 0;
+    bestMove = dummyMove;
     movesTried = 0;
     quietMovesTried = 0;
     singularExtension = false;

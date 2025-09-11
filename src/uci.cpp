@@ -1,4 +1,5 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -73,7 +74,7 @@ void OnUciCommand() {
     std::cout << "id author " << engineAuthor << std::endl;
     std::cout << "option name Hash type spin default 16 min 1 max 4096" << std::endl;
     std::cout << "option name Clear Hash type button" << std::endl;
-    std::cout << "option name NNUEfile type string default publius_net.bin" << std::endl;
+    std::cout << "option name NNUEfile type string default " << netPath << std::endl;
     std::cout << "option name nnueWeight type spin default "<<  nnueWeight << " min 0 max 200" << std::endl;
     std::cout << "option name hceWeight type spin default " << hceWeight << " min 0 max 200" << std::endl;
     std::cout << "uciok" << std::endl;
@@ -181,7 +182,11 @@ void OnGoCommand(std::istringstream& stream, Position* pos) {
     
     // How much time do we want to spend searching?
     Timer.SetMoveTiming();
-    Pv.Clear(); // to reset bestmove and ponder move
+    
+    Move move; int unused;
+    TT.Retrieve(pos->boardHash, &move, &unused, &unused, -Infinity, Infinity, 0, 0);
+    Pv.Clear(move); // to reset ponder move and load possible best move from hash
+    
     Think(pos);
     if (!Timer.IsInfiniteMode())
         Pv.SendBestMove();

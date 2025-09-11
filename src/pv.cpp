@@ -14,11 +14,13 @@
 #include "timer.h"
 
 // Clears pv-array
-void PvCollector::Clear() {
+void PvCollector::Clear(const Move ttMove) {
 
     for (int i = 0; i < PlyLimit + 2; i++)
         for (int j = 0; j < PlyLimit + 2; j++)
             line[i][j] = 0;
+
+    line[0][0] = ttMove;
 }
 
 // Updates pv-array

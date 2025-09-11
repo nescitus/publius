@@ -37,7 +37,7 @@ int main() {
     Params.Init();
     nnueWeight = 80;
     hceWeight = 0;
-    TryLoadingNNUE("publius_net32_4.bin");
+    TryLoadingNNUE(netPath);
     GenerateMoves.Init();
     UciLoop();
     TT.Exit();
