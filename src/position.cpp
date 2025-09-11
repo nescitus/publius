@@ -162,10 +162,8 @@ void Position::MovePieceNoHash(const Color color, const PieceType pieceType,
     pieceLocation[toSquare] = CreatePiece(color, pieceType);
     pieceBitboard[color][pieceType] ^= Paint(fromSquare, toSquare);
 
-    if (isNNUEloaded) {
-        NN.Del(color, pieceType, fromSquare);
-        NN.Add(color, pieceType, toSquare);
-    }
+    if (isNNUEloaded)
+        NN.Move(color, pieceType, toSquare, fromSquare);
 }
 
 void Position::TakePiece(const Color color,

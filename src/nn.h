@@ -45,7 +45,7 @@ using u64 = uint64_t;
 // equivalence, change it to 128
 
     constexpr size_t INPUT_SIZE = 768;
-    constexpr size_t HIDDEN_SIZE = 32;
+    constexpr size_t HIDDEN_SIZE = 32; // must be a multiple of 16
 
     constexpr i32 EVAL_SCALE = 400;
     constexpr i32 L0_SCALE = 255;
@@ -54,7 +54,7 @@ using u64 = uint64_t;
     // All the NNUE values in one struct
     // - that helps to read them from a file
 
-    struct NNUEparameters
+    struct alignas(64) NNUEparameters
     {
         i16 inputWeights[INPUT_SIZE][HIDDEN_SIZE];
         i16 inputBiases[HIDDEN_SIZE];
@@ -69,12 +69,13 @@ using u64 = uint64_t;
     class Net
     {
     private:
-        i16 accumulator[2][HIDDEN_SIZE];
+        alignas(64) i16 accumulator[2][HIDDEN_SIZE];
     public:
         Net();
         i32 GetScore(i8 color);
         void Add(i8 color, i8 type, i8 square);
         void Del(i8 color, i8 type, i8 square);
+        void Move(i8 color, i8 type, i8 addSq, i8 subSq);
         void Clear();
         void Refresh(Position& board);
         bool LoadFromFile(const char* path);

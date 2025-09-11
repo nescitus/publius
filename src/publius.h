@@ -1,16 +1,16 @@
-// Publius - Didactic public domain bitboard chess engine 
+// Publius - Didactic public domain bitbo ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$ard chess engine 
 // by Pawel Koziol
 
 #pragma once
 
-//#define USE_TUNING
+#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 4153 lines
+// 4234 lines
 
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
-inline constexpr const char* engineVersion = "net3"; // bump on releases
+inline constexpr const char* engineVersion = "net4"; // bump on releases
 extern bool isNNUEloaded;
 extern int nnueWeight;
 extern int hceWeight;

@@ -104,7 +104,12 @@ int Evaluate(Position* pos, EvalData* e) {
 }
 
 int EvalNN(Position* pos) {
-    return NN.GetScore(pos->GetSideToMove());
+
+    // Get score from the neural network
+    int score = NN.GetScore(pos->GetSideToMove());
+
+    // Make sure eval doesn't exceed mate score
+    return std::clamp(score, -EvalLimit, EvalLimit);
 }
 
 // Hand-crafted evaluation function
