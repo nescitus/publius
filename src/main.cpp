@@ -34,6 +34,11 @@ int hceWeight;
 
 int main() {
 
+#ifdef USE_TUNING
+    std::cout << "This version uses tuning and can win by memory hogging\n"
+              << "Comment out "#USE_TUNING" in publius.h and recompile\n"
+#endif
+
     Params.Init();
     nnueWeight = 80;
     hceWeight = 0;
