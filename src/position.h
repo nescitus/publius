@@ -79,15 +79,15 @@ public:
 
     // --- Piece counting ---
 
-    [[nodiscard]] int Position::CountMinors(const Color color) const {
+    [[nodiscard]] int CountMinors(const Color color) const {
         return Count(color, Knight) + Count(color, Bishop);
     }
 
-    [[nodiscard]] int Position::CountMajors(const Color color) const {
+    [[nodiscard]] int CountMajors(const Color color) const {
         return Count(color, Rook) + Count(color, Queen);
     }
 
-    [[nodiscard]] int Position::CountAllPawns() const {
+    [[nodiscard]] int CountAllPawns() const {
         return Count(White, Pawn) + Count(Black, Pawn);
     }
 
