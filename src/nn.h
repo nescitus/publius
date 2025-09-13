@@ -45,11 +45,12 @@ using u64 = uint64_t;
 // equivalence, change it to 128
 
     constexpr size_t INPUT_SIZE = 768;
-    constexpr size_t HIDDEN_SIZE = 32; // must be a multiple of 16
+    constexpr size_t HIDDEN_SIZE = 64; // must be a multiple of 16
 
     constexpr i32 EVAL_SCALE = 400;
     constexpr i32 L0_SCALE = 255;
     constexpr i32 L1_SCALE = 64;
+    const i32 MUL_SCALE = L0_SCALE * L1_SCALE;
 
     // All the NNUE values in one struct
     // - that helps to read them from a file

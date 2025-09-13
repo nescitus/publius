@@ -57,7 +57,7 @@
         score += SumHalfAccumulator(this->accumulator[color], PARAMS.outputWeights[0]);
         score += SumHalfAccumulator(this->accumulator[!color], PARAMS.outputWeights[1]);
 
-        return (score / L0_SCALE + PARAMS.outputBias) * EVAL_SCALE / (L0_SCALE * L1_SCALE);
+        return (score / L0_SCALE + PARAMS.outputBias) * EVAL_SCALE / MUL_SCALE;
     }
 
     // Adds "a feature" (a piece on a square) to the accumulator
