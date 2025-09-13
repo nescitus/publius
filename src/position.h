@@ -128,3 +128,6 @@ public:
 
 // this helps keeping Position::Set() more concise
 std::tuple<Color, PieceType> PieceFromChar(char c);
+
+// helper for en passant 
+constexpr bool Is3or6(char ch) { return ch == '3' || ch == '6'; }

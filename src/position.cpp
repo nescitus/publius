@@ -90,14 +90,14 @@ void Position::Set(const std::string& str) {
             case 'K': castleFlags |= wShortCastle; break;
             case 'q': castleFlags |= bLongCastle; break;
             case 'Q': castleFlags |= wLongCastle; break;
-            case 'a': enPassantSq = (str[i + 1] == '3') ? A3 : A6; break;
-                // b is handled separately, as it doubles as side t move
-            case 'c': enPassantSq = (str[i + 1] == '3') ? C3 : C6; break;
-            case 'd': enPassantSq = (str[i + 1] == '3') ? D3 : D6; break;
-            case 'e': enPassantSq = (str[i + 1] == '3') ? E3 : E6; break;
-            case 'f': enPassantSq = (str[i + 1] == '3') ? F3 : F6; break;
-            case 'g': enPassantSq = (str[i + 1] == '3') ? G3 : G6; break;
-            case 'h': enPassantSq = (str[i + 1] == '3') ? H3 : H6; break;
+            case 'a': if (Is3or6(str[i + 1])) enPassantSq = (str[i + 1] == '3') ? A3 : A6; break;
+            // b is handled separately, since it doubles as side t move
+            case 'c': if (Is3or6(str[i + 1])) enPassantSq = (str[i + 1] == '3') ? C3 : C6; break;
+            case 'd': if (Is3or6(str[i + 1])) enPassantSq = (str[i + 1] == '3') ? D3 : D6; break;
+            case 'e': if (Is3or6(str[i + 1])) enPassantSq = (str[i + 1] == '3') ? E3 : E6; break;
+            case 'f': if (Is3or6(str[i + 1])) enPassantSq = (str[i + 1] == '3') ? F3 : F6; break;
+            case 'g': if (Is3or6(str[i + 1])) enPassantSq = (str[i + 1] == '3') ? G3 : G6; break;
+            case 'h': if (Is3or6(str[i + 1])) enPassantSq = (str[i + 1] == '3') ? H3 : H6; break;
             }
         }
     }
