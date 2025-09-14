@@ -26,11 +26,11 @@ void Iterate(Position* pos) {
         Timer.RefreshStats();
         PrintRootInfo(); // uses timer stats
 
-        curVal = Widen(pos, Timer.rootDepth, curVal);
-
         // Stop searching because of soft time limit
-        if (Timer.ShouldFinishIteration())
+        if (Timer.ShouldNotStartIteration())
             break;
+
+        curVal = Widen(pos, Timer.rootDepth, curVal);
 
         // Stop searching when we are sure of a checkmate score
         // (the engine is given some depth to confirm that it

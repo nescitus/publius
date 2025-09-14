@@ -135,15 +135,19 @@ bool UCItimer::ShouldCalculateTimeControl(void) {
 
 // detects whether it makes sense to start
 // a new iteration (soft limit)
-bool UCItimer::ShouldFinishIteration(void) {
+bool UCItimer::ShouldNotStartIteration(void) {
 
-    // hard limit reached
-    if (isStopping) return true;
+    // We need to search depth 1
+    if (rootDepth < 2) return false;
 
-    // faster timeout not applicable
+    // Hard time limit reached
+    if (Elapsed() >= hardLimit) return true;
+
+    // We are in the mode without faster timeout
     if (isStrict || IsInfiniteMode())
         return false;
 
+    // Do we avoid starting the next iteration?
     return (Elapsed() >= softLimit);
 }
 

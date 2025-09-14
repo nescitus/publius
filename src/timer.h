@@ -29,7 +29,7 @@ public:
     size_t Now(void);
     size_t Elapsed(void);
     int IsInfiniteMode(void);
-    bool ShouldFinishIteration(void);
+    bool ShouldNotStartIteration(void);
     bool TimeHasElapsed(void);
     size_t GetData(const int slot);
     void SetData(const int slot, const size_t val);

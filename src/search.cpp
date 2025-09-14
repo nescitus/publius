@@ -553,7 +553,7 @@ void TryInterrupting(void) {
 
     // We don't check for timeout in every node,
     // but only every so often, to improve speed
-    if (Timer.nodeCount & 4095 || Timer.rootDepth == 1)
+    if (Timer.nodeCount & 1023 || Timer.rootDepth == 1)
         return;
 
     // Search limited by the nodecount

@@ -2,5 +2,6 @@
 
 #pragma once
 
+void InitInput(void);
 int InputAvailable(void);
 std::string SquareName(Square sq);
