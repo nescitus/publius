@@ -10,6 +10,7 @@
 // but more importantly simplifies the code.
 
 #pragma once
+#include <cstdint>
 
 constexpr int MakeScore(int mg, int eg) {
     return ((unsigned int)(eg) << 16) + mg;
