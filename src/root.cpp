@@ -21,8 +21,6 @@ void Iterate(Position* pos) {
 
     int val = 0, curVal = 0;
 
-    //Pv.Clear();
-
     for (Timer.rootDepth = 1; Timer.rootDepth <= Timer.GetData(maxDepth); Timer.rootDepth++) {
 
         Timer.RefreshStats();
@@ -30,9 +28,18 @@ void Iterate(Position* pos) {
 
         curVal = Widen(pos, Timer.rootDepth, curVal);
 
-        // Stop searching
+        // Stop searching because of soft time limit
         if (Timer.ShouldFinishIteration())
             break;
+
+        // Stop searching when we are sure of a checkmate score
+        // (the engine is given some depth to confirm that it
+        //  cannot find a shorter checkmate)
+        if (curVal > EvalLimit || curVal < -EvalLimit) {
+            int expectedMateDepth = (MateScore - std::abs(curVal) + 1) + 1;
+            if (2 * expectedMateDepth <= Timer.rootDepth)
+                break;
+        }
 
         val = curVal;
 
