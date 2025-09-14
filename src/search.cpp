@@ -1,6 +1,7 @@
 // Publius - Didactic public domain bitboard chess engine 
 // by Pawel Koziol
 
+#include <cstring>
 #include <iostream>
 #include "types.h"
 #include "bitboard.h"
