@@ -75,7 +75,7 @@
         const i16* __restrict w0 = &PARAMS.inputWeights[indexWhite][0];
         const i16* __restrict w1 = &PARAMS.inputWeights[indexBlack][0];
 
-        int i = 0;
+        size_t i = 0;
         // 16 int16 lanes per __m256i
         for (; i + 16 <= HIDDEN_SIZE; i += 16) {
             __m256i A0 = _mm256_loadu_si256((const __m256i*)(a0 + i));
@@ -91,7 +91,7 @@
         }
 #else
         // Update the accumulator
-        for (int i = 0; i < HIDDEN_SIZE; ++i) {
+        for (size_t i = 0; i < HIDDEN_SIZE; ++i) {
             this->accumulator[0][i] += PARAMS.inputWeights[indexWhite][i];
             this->accumulator[1][i] += PARAMS.inputWeights[indexBlack][i];
         }
@@ -111,7 +111,7 @@
         const i16* __restrict w0 = &PARAMS.inputWeights[indexWhite][0];
         const i16* __restrict w1 = &PARAMS.inputWeights[indexBlack][0];
 
-        int i = 0;
+        size_t i = 0;
         for (; i + 16 <= HIDDEN_SIZE; i += 16) {
             __m256i A0 = _mm256_loadu_si256((const __m256i*)(a0 + i));
             __m256i W0 = _mm256_loadu_si256((const __m256i*)(w0 + i));
@@ -126,7 +126,7 @@
         }
 #else
 
-        for (int i = 0; i < HIDDEN_SIZE; ++i) {
+        for (size_t i = 0; i < HIDDEN_SIZE; ++i) {
             this->accumulator[0][i] -= PARAMS.inputWeights[indexWhite][i];
             this->accumulator[1][i] -= PARAMS.inputWeights[indexBlack][i];
         }
@@ -155,7 +155,7 @@
         const i16* __restrict wSub0 = &PARAMS.inputWeights[subW][0];
         const i16* __restrict wSub1 = &PARAMS.inputWeights[subB][0];
 
-        int i = 0;
+        size_t i = 0;
         for (; i + 16 <= HIDDEN_SIZE; i += 16) {
             __m256i A0 = _mm256_loadu_si256((const __m256i*)(a0 + i));
             __m256i A1 = _mm256_loadu_si256((const __m256i*)(a1 + i));
@@ -174,7 +174,7 @@
         }
 
 #else
-        for (int i = 0; i < HIDDEN_SIZE; ++i) {
+        for (size_t i = 0; i < HIDDEN_SIZE; ++i) {
             this->accumulator[0][i] += PARAMS.inputWeights[addW][i];
             this->accumulator[1][i] += PARAMS.inputWeights[addB][i];
             this->accumulator[0][i] -= PARAMS.inputWeights[subW][i];
@@ -187,7 +187,7 @@
     void Net::Clear() {
 
         for (i8 color = 0; color < 2; ++color) {
-            for (int i = 0; i < HIDDEN_SIZE; ++i) {
+            for (size_t i = 0; i < HIDDEN_SIZE; ++i) {
                 this->accumulator[color][i] = PARAMS.inputBiases[i];
             }
         }

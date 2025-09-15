@@ -126,7 +126,7 @@ void FillNoisyList(Position* pos, MoveList* list) {
 void FillQuietList(Position* pos, MoveList* list) {
 
     Bitboard pieces, moves, firstStep;
-    Square fromSquare, toSquare;
+    Square fromSquare;
     const Color color = pos->GetSideToMove();
     const Bitboard occ = pos->Occupied();
     const Bitboard empty = ~occ;

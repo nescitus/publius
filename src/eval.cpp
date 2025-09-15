@@ -468,7 +468,6 @@ void EvalPasser(const Position* pos, EvalData* e, Color color) {
 
     Bitboard b, stop;
     Bitboard oppPawns = pos->Map(~color, Pawn);
-    Color oppo = ~color;
 
     b = pos->Map(color, Pawn);
 
