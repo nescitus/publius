@@ -31,7 +31,7 @@ int oldEval[PlyLimit];
 
 int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded) {
 
-    int bestScore, newDepth, eval, moveListLength, movesTried, quietMovesTried;
+    int bestScore, newDepth, eval, movesTried, quietMovesTried;
     int hashFlag, reduction, score, singularScore;
     Move move, ttMove, bestMove, singularMove;
     EvalData e;

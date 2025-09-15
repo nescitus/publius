@@ -48,7 +48,7 @@ void Bench(Position* pos, int depth) {
     Timer.SetData(moveTime, 3600000); // more than one hour of benchmark would be useless ;)
     Timer.SetData(isInfinite, 1);
 
-    for (int i = 0; i < std::size(test); ++i) {
+    for (size_t i = 0; i < std::size(test); ++i) {
 
         std::cout << test[i] << std::endl;
         OnNewGame();

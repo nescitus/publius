@@ -41,6 +41,7 @@ void Position::UndoMove(const Move move, UndoData* undo) {
         case G1: { MovePieceNoHash(color, Rook, F1, H1); break; }
         case C8: { MovePieceNoHash(color, Rook, D8, A8); break; }
         case G8: { MovePieceNoHash(color, Rook, F8, H8); break; }
+        default: break;
         }
     }
 

@@ -67,6 +67,7 @@ void Position::DoMove(const Move move, UndoData *undo) {
             case G1: { MovePiece(color, Rook, H1, F1); break; }
             case C8: { MovePiece(color, Rook, A8, D8); break; }
             case G8: { MovePiece(color, Rook, H8, F8); break; }
+            default: break;
         }
     }
 

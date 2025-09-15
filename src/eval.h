@@ -20,8 +20,8 @@ public:
 
 private:
     size_t Address(Bitboard key) const;
-    EvalTTEntry* EvalTT;    // Dynamically allocated array
     const size_t tableSize; // Size of the hash table (must be a power of two)
+    EvalTTEntry* EvalTT;    // Dynamically allocated array
 };
 
 extern EvalHashTable EvalHash; // full evaluation hashtable
