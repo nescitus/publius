@@ -45,7 +45,6 @@ int main() {
     hceWeight = 0;
     TryLoadingNNUE(netPath);
     GenerateMoves.Init();
-    InitInput();
     UciLoop();
     TT.Exit();
     return 0;
