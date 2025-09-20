@@ -105,8 +105,13 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     if (!isRoot) {
         alpha = std::max(alpha, -MateScore + ply);
         beta = std::min(beta, MateScore - ply + 1);
-        if (alpha >= beta)
+        if (alpha >= beta) {
+            // Too many early exits in a row 
+            // might cause a timeout, so we safeguard
+            Timer.TryStoppingByTimeout();
+            
             return alpha;
+        }
     }
 
     //  READ THE TRANSPOSITION TABLE. If we have 
@@ -128,8 +133,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // reuse scores from the zero window nodes. 
         // Despite  the  same nominal  depth,  they
         // represent more shallow, less precise search.
-        if (!isPv || (score > alpha && score < beta)) {
-            if (!isExcluded)
+        if (!isPv || (score > alpha && score < beta) ) {
+            if (!isRoot && !isExcluded)
                 return score;
         }
     }
