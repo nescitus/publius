@@ -12,7 +12,7 @@
 
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
-inline constexpr const char* engineVersion = "net3"; // bump on releases
+inline constexpr const char* engineVersion = "nocheckext"; // bump on releases
 inline constexpr const char* netPath = "publius_net64_3.bin"; 
 extern bool isNNUEloaded;
 extern int nnueWeight;

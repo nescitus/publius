@@ -22,6 +22,7 @@
 #include "util.h"
 #include "search.h"
 
+int lastCaptureTarget[64];
 const int singularDepth = 7;
 Move dummyMove = CreateMove(A1, B8, 0); // clearly illegal
 Move excludedMove = dummyMove;
@@ -307,12 +308,26 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         if (move == excludedMove && isExcluded)
             continue;
 
+        // Remember destination square if move has been
+        // a capture, preparing for the recapture extension.
+        if (IsMoveNoisy(pos, move))
+            lastCaptureTarget[ply] = GetToSquare(move);
+        else
+            lastCaptureTarget[ply] = -1;
+
         // Detect if a move gives check (without playing it).
         // This is not a popular idea, but Koivisto does it.
         bool moveGivesCheck = pos->MoveGivesCheck(move);
 
         // Check extension
         bool doExtension = moveGivesCheck && (isPv || depth < 4);
+
+        // Recapture extension (pv node or low depth)
+        if (ply && !doExtension) {
+            if (lastCaptureTarget[ply - 1] == GetToSquare(move) &&
+               (isPv || depth < 7))
+                doExtension = true;;
+        }
 
         // Singular extension: tried once per search
         if (depth > singularDepth &&

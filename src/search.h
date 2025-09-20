@@ -2,6 +2,8 @@
 
 #pragma once
 
+extern int lastCaptureTarget[64];
+
 void Iterate(Position* pos);
 int Widen(Position* pos, int depth, int lastScore);
 int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded);
