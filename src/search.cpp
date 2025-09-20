@@ -551,8 +551,15 @@ void TryInterrupting(void) {
 
     char command[80];
 
+    // Periodically tell the user that the engine
+    // is working.
+    if (Timer.nodeCount % 5000000 == 0) {
+        Timer.RefreshStats();
+        PrintRootInfo();
+    }
+
     // We don't check for timeout in every node,
-    // but only every so often, to improve speed
+    // but only every so often, to improve speed.
     if (Timer.nodeCount & 1023 || Timer.rootDepth == 1)
         return;
 
