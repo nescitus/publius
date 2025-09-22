@@ -43,33 +43,45 @@ void TransTable::Exit(void) {
 
 void TransTable::Clear(void) {
     std::fill(table, table + tableSize, hashRecord{});
+    tt_date = 0;
+}
+
+void TransTable::Age(void) {
+    tt_date = (tt_date + 1) & 255;
 }
 
 bool TransTable::Retrieve(Bitboard key, Move* move, int* score, int* flag, int alpha, int beta, int depth, int ply) {
 
     hashRecord *slot;
 
-    // Find slot
-    slot = FindSlot(key);
+    // Find the first slot eligible for holding relevant data
+    slot = FindFirstSlot(key);
 
-    // Make sure hash entry describes current board position
-    if (slot->key == key) {
+    // Look at a couple of slots where information
+    // related to the current position might be saved
+    for (int i = 0; i < numberOfBuckets; i++) {
+       
+        // Make sure hash entry describes current board position
+        if (slot->key == key) {
 
-        // We don't know yet if score can be reused,
-        // but move can come handy for sorting purposes
-        *move = slot->move;
-        *flag = slot->flags;
+            // We don't know yet if score can be reused,
+            // but move can come handy for sorting purposes
+            *move = slot->move;
+            *flag = slot->flags;
 
-        if (slot->depth >= depth) {
+            if (slot->depth >= depth) {
 
-            // Return score, adjusting it for checkmate
-            *score = ScoreFromTT(slot->score, ply);
+                // Return score, adjusting it for checkmate
+                *score = ScoreFromTT(slot->score, ply);
 
-            // Score from the transposition table can be used in search
-            if ((slot->flags & upperBound && *score <= alpha) ||
-                (slot->flags & lowerBound && *score >= beta))
-                return true;
+                // Score from the transposition table can be used in search
+                if ((slot->flags & upperBound && *score <= alpha) ||
+                    (slot->flags & lowerBound && *score >= beta))
+                    return true;
+            }
+            break;
         }
+        slot++;
     }
     return false;
 }
@@ -77,29 +89,58 @@ bool TransTable::Retrieve(Bitboard key, Move* move, int* score, int* flag, int a
 void TransTable::Store(Bitboard key, Move move, int score, int flags, int depth, int ply) {
 
     hashRecord *slot;
+    hashRecord* replace = NULL;
+    int oldest, age;
 
     // Adjust checkmate score for root distance
     score = ScoreToTT(score, ply);
 
-    // Find a slot
-    slot = FindSlot(key);
+    // Find the first slot eligible for saving data
+    slot = FindFirstSlot(key);
+    oldest = -1;
 
+    // Look at a couple of neighbouring slots,
+    // deciding which one holds the least valuable
+    // information and can be overwritten.
+    for (int i = 0; i < numberOfBuckets; i++) {
+
+        if (slot->key == key) {
+            if (!move) move = slot->move;
+            replace = slot;
+            break; // TODO: test, together with more robust replacement formula
+        }
+        
+        // Currently we replace the oldest of tested entries,
+        // but it is possible to get smarter here, for example
+        // using depth and entry type as tie-breaks
+        age = ((tt_date - slot->date) & 255) * 256 + 255 - slot->depth;
+        
+        if (age > oldest) {
+            oldest = age;
+            replace = slot;
+        }
+        
+        slot++;
+    }
+
+    // TODO: retest
     // Don't overwrite better entries
-    if (slot->key == key && slot->depth > depth)
-        return;
+    // if (replace->key == key && replace->depth > depth)
+    //    return;
 
     // Save the data
-    slot->key = key;
-    slot->move = move;
-    slot->score = score;
-    slot->flags = flags;
-    slot->depth = depth;
+    replace->key = key;
+    replace->date = tt_date;
+    replace->move = move;
+    replace->score = score;
+    replace->flags = flags;
+    replace->depth = depth;
 }
 
 // Calculate the slot index using a bitwise AND operation.
 // Note that it relies on tableSize being a power of 2.
-hashRecord* TransTable::FindSlot(Bitboard key) {
-    return table + (key & (tableSize - 4));
+hashRecord* TransTable::FindFirstSlot(Bitboard key) {
+    return table + (key & (tableSize - numberOfBuckets));
 }
 
 // ADJUST CHECKMATE SCORE. We must be careful 

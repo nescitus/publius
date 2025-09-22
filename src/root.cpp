@@ -9,11 +9,13 @@
 #include "history.h"
 #include "pv.h"
 #include "search.h"
+#include "trans.h"
 
 void Think(Position* pos) {
 
     Timer.Start();
     History.Clear();
+    TT.Age();
     Iterate(pos);
 }
 

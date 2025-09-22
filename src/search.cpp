@@ -239,7 +239,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         if (eval > beta && depth > 1) {
 
             // Set null move reduction
-            reduction = 3 + depth / 6 + (eval - beta > 200);
+            reduction = 3 + depth / 6 +(eval - beta > 200);
 
             // Do null move search, giving the opponent
             // two moves in a row
@@ -322,7 +322,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // Check extension
         bool doExtension = moveGivesCheck && (isPv || depth < 4);
 
-        // Recapture extension (pv node or low depth)
+        // Recapture extension - pv node or low depth (~28 Elo)
         if (ply && !doExtension) {
             if (lastCaptureTarget[ply - 1] == GetToSquare(move) &&
                (isPv || depth < 7))
@@ -573,7 +573,7 @@ void TryInterrupting(void) {
 
     // Periodically tell the user that the engine
     // is working.
-    if (Timer.nodeCount % 5000000 == 0) {
+    if (Timer.nodeCount % 5'000'000 == 0) {
         Timer.RefreshStats();
         PrintRootInfo();
     }
