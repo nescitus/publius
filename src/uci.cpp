@@ -27,26 +27,29 @@
    cTuner Tuner;
 #endif
 
-void UciLoop(void) {
+   void UciLoop() {
+       std::ios::sync_with_stdio(false);
+       std::cin.tie(nullptr);
+       // std::cout.setf(std::ios::unitbuf); // optional auto-flush for every <<
 
-    Position pos[1];
-    pos->Set(startFen);
-    TT.Allocate(16);
+       Position pos[1];
+       pos->Set(startFen);
+       TT.Allocate(16);
 
-    std::string line;
-    while (getline(std::cin, line)) {
-        std::istringstream ss(line);
-        if (!ParseCommand(ss, pos)) 
-            break;
-    }
-}
+       std::string line;
+       while (std::getline(std::cin, line)) {
+           if (line.empty()) continue;            // ignore blank lines
+           std::istringstream ss(line);
+           if (!ParseCommand(ss, pos)) break;
+       }
+   }
 
 bool ParseCommand(std::istringstream& stream, Position* pos) {
 
     std::string command;
     stream >> command;
 
-    if (command == "isready") std::cout << "readyok" << std::endl;
+    if (command == "isready") std::cout << "readyok\n" << std::flush;
     else if (command == "ucinewgame") OnNewGame();
     else if (command == "uci") OnUciCommand();
     else if (command == "position") OnPositionCommand(stream, pos);
@@ -71,14 +74,14 @@ bool ParseCommand(std::istringstream& stream, Position* pos) {
 
 void OnUciCommand() {
 
-    std::cout << "id name " << engineName << " " << engineVersion << std::endl;
-    std::cout << "id author " << engineAuthor << std::endl;
-    std::cout << "option name Hash type spin default 16 min 1 max 4096" << std::endl;
-    std::cout << "option name Clear Hash type button" << std::endl;
-    std::cout << "option name NNUEfile type string default " << netPath << std::endl;
-    std::cout << "option name nnueWeight type spin default "<<  nnueWeight << " min 0 max 200" << std::endl;
-    std::cout << "option name hceWeight type spin default " << hceWeight << " min 0 max 200" << std::endl;
-    std::cout << "uciok" << std::endl;
+    std::cout << "id name " << engineName << " " << engineVersion << "\n";
+    std::cout << "id author " << engineAuthor << "\n";
+    std::cout << "option name Hash type spin default 16 min 1 max 4096" << "\n";
+    std::cout << "option name Clear Hash type button" << "\n";
+    std::cout << "option name NNUEfile type string default " << netPath << "\n";
+    std::cout << "option name nnueWeight type spin default "<<  nnueWeight << " min 0 max 200" << "\n";
+    std::cout << "option name hceWeight type spin default " << hceWeight << " min 0 max 200" << "\n";
+    std::cout << "uciok\n" << std::flush;
 }
 
 void OnPositionCommand(std::istringstream& stream, Position* pos) {
@@ -210,6 +213,11 @@ void OnSetOptionCommand(std::istringstream& stream) {
         TT.Allocate(val);
     }
 
+    if (IsSameOrLowercase(name, "Clear Hash")) {
+        std::cout << "info string hash cleared\n";
+        TT.Clear();
+    }
+
     if (IsSameOrLowercase(name, "nnueWeight")) {
         nnueWeight = std::stoi(value);
     }
@@ -228,7 +236,7 @@ void OnBenchCommand(std::istringstream& stream, Position* pos) {
 
     int depth = 4; // default
     stream >> depth;
-    std::cout << "Running perft test at depth " << depth << std::endl;
+    std::cout << "Running perft test at depth " << depth << "\n";
     Bench(pos, depth);
 }
 
@@ -237,7 +245,7 @@ void OnPerftCommand(std::istringstream& stream, Position* pos) {
     int moveCount;
     int depth = 4; // default
     stream >> depth;
-    std::cout << "Running perft test at depth " << depth << std::endl;
+    std::cout << "Running perft test at depth " << depth << "\n";
 
     Timer.Start();
     moveCount = Perft(pos, 0, depth, true);
@@ -245,7 +253,7 @@ void OnPerftCommand(std::istringstream& stream, Position* pos) {
     std::cout << "Perft " << depth 
               << " completed in " << Timer.Elapsed() 
               << " milliseconds, visiting " << moveCount 
-              << " positions" << std::endl;
+              << " positions" << "\n";
 }
 
 void OnNewGame(void) {
@@ -257,7 +265,6 @@ void OnNewGame(void) {
 void OnStopCommand() {
 
     Timer.isStopping = true;
-    Timer.SetData(isInfinite, 0);
 
     // UCI protocol requires us to wait
     // after finishing "go infinite" run
@@ -273,5 +280,5 @@ void TryLoadingNNUE(const char * path) {
     isNNUEloaded = NN.LoadFromFile(path);
     if (!isNNUEloaded)
         std::cout << "info string NNUE file " << path
-        << " not found. Reverting to HCE eval." << std::endl;;
+        << " not found. Reverting to HCE eval." << "\n" << std::flush;
 }

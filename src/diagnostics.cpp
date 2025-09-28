@@ -50,7 +50,7 @@ void Bench(Position* pos, int depth) {
 
     for (size_t i = 0; i < std::size(test); ++i) {
 
-        std::cout << test[i] << std::endl;
+        std::cout << test[i] << "\n";
         OnNewGame();
         pos->Set(test[i]);
         Iterate(pos);
@@ -60,8 +60,8 @@ void Bench(Position* pos, int depth) {
 
     std::cout << "Bench at depth " << depth
               << " took " << Timer.timeUsed << " milliseconds, searching "
-              << Timer.nodeCount << " nodes at " << Timer.nps << " nodes per second."
-              << std::endl;
+              << Timer.nodeCount << " nodes at " << Timer.nps << " nodes per second.\n"
+              << std::flush;
 }
 
 // print board
@@ -70,7 +70,7 @@ void PrintBoard(Position* pos) {
     const std::string piece_name[] = { "P ", "p ", "N ", "n ", "B ", "b ", "R ", "r ", "Q ", "q ", "K ", "k ", ". " };
 
     // print horizontal line (and spaces before the first square)
-    std::cout << "--------------------------------------------" << std::endl << "  ";
+    std::cout << "--------------------------------------------\n  ";
 
     for (Square square = A1; square < 64; ++square) {
 
@@ -80,13 +80,13 @@ void PrintBoard(Position* pos) {
 
         // print numbers and start new line with spaces
         if ((square + 1) % 8 == 0)
-            std::cout << "  " << 9 - ((square + 1) / 8) << std::endl << "  ";
+            std::cout << "  " << 9 - ((square + 1) / 8) << "\n  ";
     }
     // print letters
-    std::cout << std::endl << "  a b c d e f g h" << std::endl << std::endl;
+    std::cout << "\n  a b c d e f g h\n\n";
     
     // print horizontal line
-    std::cout << "--------------------------------------------" << std::endl;
+    std::cout << "--------------------------------------------\n" << std::flush;
 }
 
 // Perft can be used to measure move generation 
@@ -122,7 +122,7 @@ Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
         pos->UndoMove(move, &undo);
 
         if (ply == 0 && isNoisy)
-            std::cout << MoveToString(move) << ": " << localCount << std::endl;
+            std::cout << MoveToString(move) << ": " << localCount << "\n";
     }
     
     return moveCount;
@@ -137,8 +137,8 @@ void PrintBitboard(Bitboard b) {
                                : std::cout << ". ";
 
         if ((square + 1) % 8 == 0) 
-            std::cout << 9 - ((square + 1) / 8) << std:: endl;
+            std::cout << 9 - ((square + 1) / 8) << "\n";
     }
 
-    std::cout  << "\na b c d e f g h" << std::endl;
+    std::cout  << "\na b c d e f g h\n";
 }

@@ -41,11 +41,11 @@ void PvCollector::SendBestMove() {
         // print best move and ponder move
         std::cout << "bestmove " << MoveToString(line[0][0])
                   << " ponder " << MoveToString(line[0][1])
-                  << std::endl;
+                  << "\n" << std::flush;
     } else {
         // print just best move
         std::cout << "bestmove " << MoveToString(line[0][0])
-                  << std::endl;
+                  << "\n" << std::flush;
     }
 }
 
@@ -80,5 +80,5 @@ void PvCollector::Display(int score) {
     for (int j = 0; j < size[0]; ++j)
         std::cout << " " << MoveToString(line[0][j]);
 
-    std::cout << std::endl;
+    std::cout << "\n" << std::flush;
 }

@@ -141,8 +141,7 @@ bool UCItimer::ShouldNotStartIteration(void) {
     if (rootDepth < 2) return false;
 
     // We are in the mode without faster timeout
-    if (isStrict || IsInfiniteMode())
-        return false;
+    if (isStrict || IsInfiniteMode()) return false;
 
     // Hard time limit reached
     if (isStopping || Elapsed() >= hardLimit) return true;

@@ -67,12 +67,12 @@ void Parameters::TunePst() {
 // they can be pasted directly into the code
 void Parameters::PrintAll() {
 
-    std::cout << "const int allPst[6][64] = {" << std::endl;
+    std::cout << "const int allPst[6][64] = {\n";
     for (PieceType piece = Pawn; piece < noPieceType; ++piece) {
         PrintPst(piece);
         if (piece != King) std::cout << ",";
     }
-    std::cout << "};" << std::endl;
+    std::cout << "};\n";
 }
 
 // Prints a single piece/square table 

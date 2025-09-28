@@ -209,7 +209,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // can accept that loss, then we prune (~14 Elo).
 
         if (depth <= 6) {
-            score = eval - 135 * depth;
+            score = eval - 135 * depth; // TODO: test 125
             if (score > beta)
                 return score;
         }
@@ -569,7 +569,7 @@ bool SetImproving(int eval, int ply) {
 
 void TryInterrupting(void) {
 
-    char command[80];
+    static std::string line;
 
     // Periodically tell the user that the engine
     // is working.
@@ -591,19 +591,19 @@ void TryInterrupting(void) {
     // that need to be replied to during search
     if (InputAvailable()) {
 
-        std::cin.getline(command, 4096);
+        std::getline(std::cin, line);
 
         // user ordered us to stop
-        if (!strcmp(command, "stop"))
+        if (line == "stop") 
             OnStopCommand();
-
+        
         // transition from pondering to normal search
-        else if (!strcmp(command, "ponderhit"))
+        else if (line == "ponderhit") 
             Timer.isPondering = false;
-
+        
         // ping equivalent in the UCI protocol
-        else if (!strcmp(command, "isready"))
-            std::cout << "readyok" << std::endl;
+        else if (line == "isready") 
+            std::cout << "readyok\n" << std::flush;
     }
 
     // check if the time is out

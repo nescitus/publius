@@ -6,15 +6,15 @@
 //#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 4259 lines
+// 4306 lines
 
-// r5k1/pQp2qpp/8/4pbN1/3P4/6P1/PPr4P/1K1R3R b - - 0 1 stops progressing at D21
+// r5k1/pQp2qpp/8/4pbN1/3P4/6P1/PPr4P/1K1R3R b - - 0 1 search explosion
 
 // // r2q1r2/1b2bpkp/p3p1p1/2ppP1P1/7R/1PN1BQR1/1PP2P1P/4K3 w - - 0 1
 
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
-inline constexpr const char* engineVersion = "tt_buckets"; // bump on releases
+inline constexpr const char* engineVersion = "massive"; // bump on releases
 inline constexpr const char* netPath = "publius_net64_3.bin"; 
 extern bool isNNUEloaded;
 extern int nnueWeight;

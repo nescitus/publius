@@ -29,7 +29,7 @@ void Iterate(Position* pos) {
         PrintRootInfo(); // uses timer stats
 
         // Stop searching because of soft time limit
-        if (Timer.ShouldNotStartIteration())
+        if (Timer.ShouldNotStartIteration() || Timer.isStopping)
             break;
 
         curVal = Widen(pos, Timer.rootDepth, curVal);
