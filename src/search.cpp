@@ -554,7 +554,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // This is a common source of bugs. If you 
     // wish, add an explicit test for that.
     if (!isExcluded) {
-        if (bestMove)
+        if (bestMove && bestMove != dummyMove)
             TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, depth, ply);
         else
             TT.Store(pos->boardHash, 0, bestScore, upperBound, depth, ply);
