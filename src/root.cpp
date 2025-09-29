@@ -90,6 +90,9 @@ int Widen(Position* pos, int depth, int lastScore) {
         }
     }
 
-    // full window search
-    return Search(pos, 0, -Infinity, Infinity, depth, false, false);  
+    // full window search, unless we broke out of the loop due to timeout
+    if (Timer.isStopping) 
+        return lastScore;
+    else
+        return Search(pos, 0, -Infinity, Infinity, depth, false, false);  
 }
