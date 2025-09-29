@@ -6,6 +6,7 @@
 #include <iostream> // for cout
 #include "types.h"
 #include "square.h" // for MirrorRank
+#include "limits.h"
 #include "position.h"
 #include "movelist.h"
 #include "bitboard.h"
@@ -43,6 +44,9 @@ std::string test[] = {
 
 void Bench(Position* pos, int depth) {
 
+    SearchContext sc;
+    ClearSearchContext(sc);
+
     Timer.Start();
     Timer.SetData(maxDepth, depth);
     Timer.SetData(moveTime, 3600000); // more than one hour of benchmark would be useless ;)
@@ -53,7 +57,7 @@ void Bench(Position* pos, int depth) {
         std::cout << test[i] << "\n";
         OnNewGame();
         pos->Set(test[i]);
-        Iterate(pos);
+        Iterate(pos, &sc);
     }
 
     Timer.RefreshStats();

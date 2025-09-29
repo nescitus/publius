@@ -1,13 +1,27 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
 
 #pragma once
 
-extern int lastCaptureTarget[64];
+#include "move.h"
 
-void Iterate(Position* pos);
-int Widen(Position* pos, int depth, int lastScore);
-int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded);
+constexpr Move dummyMove = CreateMove(A1, B8, 0); // clearly illegal
+
+struct Stack {
+	int previousCaptureTo; // target square or previous capture if applicable, else -1
+	int previousEval; // eval for each ply, to see if we are improving or not
+};
+
+struct SearchContext {
+	Stack stack[PlyLimit];
+	Move excludedMove;
+};
+
+void ClearSearchContext(SearchContext& sc);
+void Iterate(Position* pos, SearchContext* sc);
+int Widen(Position* pos, SearchContext* sc, int depth, int lastScore);
+int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded);
 int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta);
-bool SetImproving(int eval, int ply);
+bool SetImproving(const Stack &ppst, int eval, int ply);
 void PrintRootInfo();
 void TryInterrupting(void);

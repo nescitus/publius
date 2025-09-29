@@ -22,15 +22,10 @@
 #include "util.h"
 #include "search.h"
 
-int lastCaptureTarget[64];
 const int singularDepth = 7;
-Move dummyMove = CreateMove(A1, B8, 0); // clearly illegal
-Move excludedMove = dummyMove;
+static const Stack rootSentinel{ /*eval=*/0, /*last capture target=*/-1 };
 
-// eval for each ply, to see if we are improving or not
-int oldEval[PlyLimit];
-
-int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded) {
+int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded) {
 
     int bestScore, newDepth, eval, movesTried, quietMovesTried;
     int hashFlag, reduction, score, singularScore;
@@ -50,6 +45,11 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     singularExtension = false;
     singularScore = -Infinity;
     singularMove = 0;
+
+    // Init stack pointers for shorter code
+    Stack& st = sc->stack[ply];
+    const Stack& pst  = (ply     ? sc->stack[ply - 1] : rootSentinel);
+    const Stack& ppst = (ply > 1 ? sc->stack[ply - 2] : rootSentinel);
 
     // Root node is different because
     // we need to record the best move
@@ -146,7 +146,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // Prepare for singular extension
     if (!isRoot &&                  // we are not at the root
         depth > singularDepth &&   // sufficient remaining depth
-        excludedMove == dummyMove) // we are not in the singular search
+        sc->excludedMove == dummyMove) // we are not in the singular search
     {
 
         if (TT.Retrieve(pos->boardHash, &singularMove, &singularScore, &hashFlag, alpha, beta, depth - 4, ply)) {
@@ -179,12 +179,12 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     }
 
     // Save eval for the current ply.
-    oldEval[ply] = eval;
+    st.previousEval = eval;
 
     // We check whether the eval has improved from 
     // two plies ago. As of now, it affects late move 
     // pruning only, but some more uses will be tested.
-    const bool improving = SetImproving(eval, ply);
+    const bool improving = SetImproving(ppst, eval, ply);
 
     // NODE-LEVEL PRUNING. We try to avoid searching
     // the current node. All the techniques used for it
@@ -243,7 +243,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // Do null move search, giving the opponent
             // two moves in a row
             pos->DoNull(&undo);
-            score = -Search(pos, ply + 1, -beta, -beta + 1, depth - reduction, true, false);
+            score = -Search(pos, sc, ply + 1, -beta, -beta + 1, depth - reduction, true, false);
             pos->UndoNull(&undo);
 
             if (Timer.isStopping)
@@ -254,7 +254,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // depth. The idea is to have some safeguard
             // against zugzwangs (~10 Elo)
             if (depth - reduction > 5 && score >= beta)
-                score = Search(pos, ply, alpha, beta, depth - reduction - 4, true, false);
+                score = Search(pos, sc, ply, alpha, beta, depth - reduction - 4, true, false);
 
             if (Timer.isStopping)
                 return 0;
@@ -304,15 +304,15 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
         // In singular search we omit the best move
         // checking whether there are viable alternatives
-        if (move == excludedMove && isExcluded)
+        if (move == sc->excludedMove && isExcluded)
             continue;
 
         // Remember destination square if move has been
         // a capture, preparing for the recapture extension.
         if (IsMoveNoisy(pos, move))
-            lastCaptureTarget[ply] = GetToSquare(move);
+            st.previousCaptureTo = GetToSquare(move);
         else
-            lastCaptureTarget[ply] = -1;
+            st.previousCaptureTo = -1;
 
         // Detect if a move gives check (without playing it).
         // This is not a popular idea, but Koivisto does it.
@@ -323,7 +323,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
         // Recapture extension - pv node or low depth (~28 Elo)
         if (ply && !doExtension) {
-            if (lastCaptureTarget[ply - 1] == GetToSquare(move) &&
+            if (pst.previousCaptureTo == GetToSquare(move) &&
                (isPv || depth < 7))
                 doExtension = true;;
         }
@@ -334,7 +334,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             singularMove &&
             move == singularMove && // we are about to search the best move from tt
             singularExtension &&    // conditions for the singular search are met
-            excludedMove == dummyMove) {
+            sc->excludedMove == dummyMove) {
 
             // Move from the transposition table
             // might be a singular move. We are
@@ -346,7 +346,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // We are checking for decent alternatives,
             // so we do not test the singular move
             // candidate.
-            excludedMove = move;
+            sc->excludedMove = move;
 
             // The only instance when we search with
             // isExcluded flag set to "true". The flag
@@ -358,8 +358,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // from saving the result of this search
             // in the transposition table, because
             // it actively avoids searching the best move.
-            int sc = Search(pos, ply + 1, newAlpha, newAlpha + 1, (depth - 1) / 2, false, true);
-            excludedMove = dummyMove;
+            int exclusionSearchScore = Search(pos, sc, ply + 1, newAlpha, newAlpha + 1, (depth - 1) / 2, false, true);
+            sc->excludedMove = dummyMove;
 
             if (Timer.isStopping)
                 return 0;
@@ -369,7 +369,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
             // relies on a single move - it would be
             // a shame if a deeper search revealed
             // a refutation.
-            if (sc <= newAlpha)
+            if (exclusionSearchScore <= newAlpha)
                 doExtension = true;
         } // end of singular extension code
 
@@ -454,7 +454,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
 
             // do a reduced depth search
             if (reduction > 0) {
-                score = -Search(pos, ply + 1, -alpha - 1, -alpha, newDepth - reduction, false, false);
+                score = -Search(pos, sc, ply + 1, -alpha - 1, -alpha, newDepth - reduction, false, false);
 
                 // If  the reduced search score falls  below
                 // alpha, don't bother with full depth search
@@ -477,11 +477,11 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         // still conducted with a zero window.
 
         if (bestScore == -Infinity)
-            score = -Search(pos, ply + 1, -beta, -alpha, newDepth, false, false);
+            score = -Search(pos, sc, ply + 1, -beta, -alpha, newDepth, false, false);
         else {
-            score = -Search(pos, ply + 1, -alpha - 1, -alpha, newDepth, false, false);
+            score = -Search(pos, sc, ply + 1, -alpha - 1, -alpha, newDepth, false, false);
             if (!Timer.isStopping && score > alpha)
-                score = -Search(pos, ply + 1, -beta, -alpha, newDepth, false, false);
+                score = -Search(pos, sc, ply + 1, -beta, -alpha, newDepth, false, false);
         }
 
         // Undo move
@@ -562,8 +562,8 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     return bestScore;
 }
 
-bool SetImproving(int eval, int ply) {
-    return !(ply > 1 && oldEval[ply - 2] > eval);
+bool SetImproving(const Stack &ppst, int eval, int ply) {
+    return !(ply > 1 && ppst.previousEval > eval);
 }
 
 void TryInterrupting(void) {
@@ -607,4 +607,14 @@ void TryInterrupting(void) {
 
     // check if the time is out
     Timer.TryStoppingByTimeout();
+}
+
+void ClearSearchContext(SearchContext& sc) {
+
+    for (int i = 0; i < PlyLimit; ++i) {
+        sc.stack[i].previousCaptureTo = -1;
+        sc.stack[i].previousEval = 0;
+    }
+
+    sc.excludedMove = dummyMove;
 }

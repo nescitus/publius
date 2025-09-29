@@ -15,11 +15,14 @@ void Think(Position* pos) {
 
     History.Clear();
     TT.Age();
+
+    SearchContext sc;
+    ClearSearchContext(sc);
     Timer.Start();
-    Iterate(pos);
+    Iterate(pos, &sc);
 }
 
-void Iterate(Position* pos) {
+void Iterate(Position* pos, SearchContext* sc) {
 
     int val = 0, curVal = 0;
 
@@ -32,7 +35,7 @@ void Iterate(Position* pos) {
         if (Timer.ShouldNotStartIteration() || Timer.isStopping)
             break;
 
-        curVal = Widen(pos, Timer.rootDepth, curVal);
+        curVal = Widen(pos, sc, Timer.rootDepth, curVal);
 
         // Stop searching when we are sure of a checkmate score
         // (the engine is given some depth to confirm that it
@@ -60,7 +63,7 @@ void PrintRootInfo() {
         << " nps " << Timer.nps << std::endl;
 }
 
-int Widen(Position* pos, int depth, int lastScore) {
+int Widen(Position* pos, SearchContext* sc, int depth, int lastScore) {
 
     int currentDepthScore = lastScore, alpha, beta;
 
@@ -74,7 +77,7 @@ int Widen(Position* pos, int depth, int lastScore) {
         for (int margin = 10; margin < 500; margin *= 2) {
             alpha = lastScore - margin;
             beta = lastScore + margin;
-            currentDepthScore = Search(pos, 0, alpha, beta, depth, false, false);
+            currentDepthScore = Search(pos, sc, 0, alpha, beta, depth, false, false);
 
             // timeout
             if (Timer.isStopping)
@@ -94,5 +97,5 @@ int Widen(Position* pos, int depth, int lastScore) {
     if (Timer.isStopping) 
         return lastScore;
     else
-        return Search(pos, 0, -Infinity, Infinity, depth, false, false);  
+        return Search(pos, sc, 0, -Infinity, Infinity, depth, false, false);  
 }
