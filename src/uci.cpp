@@ -265,6 +265,7 @@ void OnNewGame(void) {
 void OnStopCommand() {
 
     Timer.isStopping = true;
+    Timer.SetData(isInfinite, 0); // for smooth analysis under Arena etc.
 
     // UCI protocol requires us to wait
     // after finishing "go infinite" run
