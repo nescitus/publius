@@ -13,9 +13,9 @@
 
 void Think(Position* pos) {
 
-    Timer.Start();
     History.Clear();
     TT.Age();
+    Timer.Start();
     Iterate(pos);
 }
 

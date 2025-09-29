@@ -28,9 +28,9 @@
 #endif
 
    void UciLoop() {
+
        std::ios::sync_with_stdio(false);
        std::cin.tie(nullptr);
-       // std::cout.setf(std::ios::unitbuf); // optional auto-flush for every <<
 
        Position pos[1];
        pos->Set(startFen);
@@ -38,7 +38,7 @@
 
        std::string line;
        while (std::getline(std::cin, line)) {
-           if (line.empty()) continue;            // ignore blank lines
+           if (line.empty()) continue; // ignore blank lines
            std::istringstream ss(line);
            if (!ParseCommand(ss, pos)) break;
        }
@@ -253,7 +253,7 @@ void OnPerftCommand(std::istringstream& stream, Position* pos) {
     std::cout << "Perft " << depth 
               << " completed in " << Timer.Elapsed() 
               << " milliseconds, visiting " << moveCount 
-              << " positions" << "\n";
+              << " positions\n";
 }
 
 void OnNewGame(void) {

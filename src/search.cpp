@@ -55,12 +55,11 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
     // we need to record the best move
     const bool isRoot = !ply;
 
-    // We distinguish two kinds of nodes:
-    // zero window nodes and principal variation
-    // nodes. Zero window nodes can only fail high
-    // or fail low, as there is no distance between
-    // alpha and beta. Only pv-nodes can return
-    // an exact score.
+    // We distinguish between zero window nodes and 
+    // principal variation nodes. Zero window nodes 
+    // can only fail high or fail low, as  there is 
+    // no distance between alpha and beta. Only 
+    // pv-nodes can return an exact score.
     const bool isPv = (beta > alpha + 1);
 
     // QUIESCENCE SEARCH entry point. Ideally we want
@@ -239,7 +238,7 @@ int Search(Position* pos, int ply, int alpha, int beta, int depth, bool wasNullM
         if (eval > beta && depth > 1) {
 
             // Set null move reduction
-            reduction = 3 + depth / 6 +(eval - beta > 200);
+            reduction = 3 + depth / 6 + (eval - beta > 200);
 
             // Do null move search, giving the opponent
             // two moves in a row
@@ -580,7 +579,7 @@ void TryInterrupting(void) {
 
     // We don't check for timeout in every node,
     // but only every so often, to improve speed.
-    if (Timer.nodeCount & 1023 || Timer.rootDepth == 1)
+    if (Timer.nodeCount & 511 || Timer.rootDepth == 1)
         return;
 
     // Search limited by the nodecount
