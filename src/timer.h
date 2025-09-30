@@ -38,6 +38,7 @@ public:
     void TryStoppingByTimeout(void);
     void TryStoppingByNodecount(void);
     void RefreshStats(void);
+    size_t GetHardLimit() { return hardLimit; }
 };
 
 extern UCItimer Timer;

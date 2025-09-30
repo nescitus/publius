@@ -8,6 +8,7 @@
 #include "timer.h"
 #include "history.h"
 #include "pv.h"
+#include "legality.h"
 #include "search.h"
 #include "trans.h"
 
@@ -20,6 +21,13 @@ void Think(Position* pos) {
     TT.Age();
     Timer.Start();
     Iterate(pos, &sc);
+
+    if (Pv.GetBestMove() == 0) {
+        Move move; int unused;
+        TT.Retrieve(pos->boardHash, &move, &unused, &unused, -Infinity, Infinity, 0, 0);
+        if (IsPseudoLegal(pos, move))
+            Pv.EmergencyOverwrite(move);
+    }
 }
 
 void Iterate(Position* pos, SearchContext* sc) {

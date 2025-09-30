@@ -7,6 +7,8 @@ public:
     void Clear();
     void Update(int ply, Move move);
     void SendBestMove();
+    Move GetBestMove();
+    void EmergencyOverwrite(Move move);
     void Display(int score);
 
     // array keeping principal variation, also

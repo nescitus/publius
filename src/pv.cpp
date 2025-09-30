@@ -32,6 +32,15 @@ void PvCollector::Update(const int ply, const Move move) {
     size[ply] = size[ply + 1];
 }
 
+Move PvCollector::GetBestMove() {
+    return line[0][0];
+}
+
+void PvCollector::EmergencyOverwrite(Move move) {
+    line[0][0] = move;
+    line[0][1] -= 0;
+}
+
 // Sends best move (and ponder move if present)
 void PvCollector::SendBestMove() {
 
