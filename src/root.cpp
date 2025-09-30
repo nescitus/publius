@@ -13,11 +13,11 @@
 
 void Think(Position* pos) {
 
-    History.Clear();
-    TT.Age();
-
     SearchContext sc;
     ClearSearchContext(sc);
+    Pv.Clear();
+    History.Clear();
+    TT.Age();
     Timer.Start();
     Iterate(pos, &sc);
 }

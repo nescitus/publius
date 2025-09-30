@@ -39,7 +39,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     // Init
     move = 0;
     ttMove = 0;
-    bestMove = dummyMove;
+    bestMove = 0;
     movesTried = 0;
     quietMovesTried = 0;
     singularExtension = false;
@@ -553,7 +553,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     // This is a common source of bugs. If you 
     // wish, add an explicit test for that.
     if (!isExcluded) {
-        if (bestMove && bestMove != dummyMove)
+        if (bestMove)
             TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, depth, ply);
         else
             TT.Store(pos->boardHash, 0, bestScore, upperBound, depth, ply);

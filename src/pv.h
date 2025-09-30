@@ -4,7 +4,7 @@
 
 class PvCollector {
 public:
-    void Clear(const Move pvMove);
+    void Clear();
     void Update(int ply, Move move);
     void SendBestMove();
     void Display(int score);
