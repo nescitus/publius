@@ -50,7 +50,7 @@ void Iterate(Position* pos, SearchContext* sc) {
         //  cannot find a shorter checkmate)
         if (curVal > EvalLimit || curVal < -EvalLimit) {
             int expectedMateDepth = (MateScore - std::abs(curVal) + 1) + 1;
-            if (Timer.rootDepth >= 2 * expectedMateDepth)
+            if (Timer.rootDepth >= expectedMateDepth * 3 / 2)
                 break;
         }
 

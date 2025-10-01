@@ -86,7 +86,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     // Quick exit on on a statically detected draw, 
     // unless we are at root, where we need to have
     // a move.
-    if (pos->IsDraw() && !isRoot) {
+    if (!isRoot && pos->IsDraw()) {
 
         // Too many early exits in a row 
         // might cause a timeout, so we safeguard
