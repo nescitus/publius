@@ -220,6 +220,8 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
             score = Quiesce(pos, ply, 0, alpha, beta);
             if (score < beta) // no fail high!
                 return score;
+            if (Timer.isStopping)
+                return 0;
         }
 
         // NULL MOVE PRUNING means allowing the opponent
