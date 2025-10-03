@@ -224,23 +224,23 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
                 return 0;
         }
 
-        // NULL MOVE PRUNING means allowing the opponent
-        // to execute two moves in a row, for example 
-        // capturing something and escaping a recapture. 
-        // If this cannot  wreck our position, then it is 
-        // so good that there's  no  point in searching 
+        // NULL MOVE PRUNING  means allowing the  opponent
+        // to  execute  two moves  in a row,  for  example 
+        // capturing  something and  escaping a  recapture. 
+        // If this cannot  wreck our position, then it  is 
+        // so  good that there's  no  point  in  searching 
         // any further. We cannot really do two null moves 
-        // in a row, as this would be the same position
-        // searched at the smaller depth. "wasNull" flag
-        // above takes care of that. Also, null move is 
-        // not used in the endgame because of the risk 
-        // of zugzwang - see CanTryNullMove() function 
+        // in  a row, as  this would be the same  position
+        // searched  at the smaller depth. "wasNull"  flag
+        // above  takes care of that. Also, null  move  is 
+        // not  used  in the endgame because of  the  risk 
+        // of  zugzwang  -  see CanTryNullMove()  function 
         // for details. (~82 Elo)
 
         if (eval > beta && depth > 1) {
 
             // Set null move reduction
-            reduction = 3 + depth / 6 + (eval - beta > 200);
+            reduction = 4 + depth / 6 + (eval - beta > 200);
 
             // Do null move search, giving the opponent
             // two moves in a row
