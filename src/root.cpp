@@ -39,7 +39,7 @@ void Iterate(Position* pos, SearchContext* sc) {
         Timer.RefreshStats();
         PrintRootInfo(); // uses timer stats
 
-        // Stop searching because of soft time limit
+        // Stop searching - soft time limit reached
         if (Timer.ShouldNotStartIteration() || Timer.isStopping)
             break;
 

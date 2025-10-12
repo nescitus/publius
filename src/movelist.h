@@ -3,12 +3,12 @@
 
 #pragma once
 
-constexpr int MovesLimit = 256;
+constexpr int MoveListSize = 256;
 
 class MoveList {
 private:
-    Move moves[MovesLimit];
-    int values[MovesLimit];
+    Move moves[MoveListSize];
+    int values[MoveListSize];
     int ind;
     int get;
     void SwapMoves(const int i, const int j);

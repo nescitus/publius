@@ -20,7 +20,7 @@ void HistoryData::Clear(void) {
             triesHistory[piece][square] = 0;
         }
 
-    for (int ply = 0; ply < PlyLimit; ply++)
+    for (int ply = 0; ply < SearchTreeSize; ply++)
         killer1[ply] = killer2[ply] = 0;
 }
 

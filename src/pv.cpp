@@ -16,8 +16,8 @@
 // Clears pv-array
 void PvCollector::Clear() {
 
-    for (int i = 0; i < PlyLimit + 2; i++)
-        for (int j = 0; j < PlyLimit + 2; j++)
+    for (int i = 0; i < SearchTreeSize + 2; i++)
+        for (int j = 0; j < SearchTreeSize + 2; j++)
             line[i][j] = 0;
 }
 

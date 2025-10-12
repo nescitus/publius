@@ -4,11 +4,11 @@
 
 class HistoryData {
 private:
-    Move killer1[PlyLimit];
-    Move killer2[PlyLimit];
+    Move killer1[SearchTreeSize];
+    Move killer2[SearchTreeSize];
     int cutoffHistory[12][64];
     int triesHistory[12][64];
-    Square lastCaptureSquare[PlyLimit];
+    Square lastCaptureSquare[SearchTreeSize];
     int Inc(const int depth);
 public:
     HistoryData(); // constructor

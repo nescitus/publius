@@ -13,7 +13,7 @@ struct Stack {
 };
 
 struct SearchContext {
-	Stack stack[PlyLimit];
+	Stack stack[SearchTreeSize];
 	Move excludedMove;
 };
 

@@ -61,7 +61,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     }
 
     // Safeguarding against ply limit overflow
-    if (ply >= PlyLimit - 1)
+    if (ply >= SearchTreeSize - 1)
         return Evaluate(pos, &e);
 
     // Are we in check? Then we must flee

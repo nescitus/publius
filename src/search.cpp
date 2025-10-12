@@ -140,7 +140,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     }
 
     // Safeguard against ply limit overflow
-    if (ply >= PlyLimit - 1)
+    if (ply >= SearchTreeSize - 1)
         return Evaluate(pos, &e);
 
     // Prepare for singular extension
@@ -200,15 +200,15 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
         pos->CanTryNullMove())
     {
 
-        // STATIC NULL MOVE (or Reverse Futility Pruning 
-        // or Beta Pruning) is similar to null move.
-        // Instead of letting the opponent search
-        // two moves in a row, it simply assumes some
-        // loss, increasing with depth. If side to move
-        // can accept that loss, then we prune (~14 Elo).
+        // STATIC NULL MOVE (or Reverse Futility  Pruning 
+        // or  Beta  Pruning) is  similar  to  null  move.
+        // Instead  of  letting the opponent  search  two
+        // moves  in a row, it simply assumes  some  loss,
+        // increasing with depth. If the side to move can
+        // accept that loss, then we prune (~14 Elo).
 
         if (depth <= 6) {
-            score = eval - 135 * depth; // TODO: test 125
+            score = eval - 135 * depth;
             if (score > beta)
                 return score;
         }
@@ -613,7 +613,7 @@ void TryInterrupting(void) {
 
 void ClearSearchContext(SearchContext& sc) {
 
-    for (int i = 0; i < PlyLimit; ++i) {
+    for (int i = 0; i < SearchTreeSize; ++i) {
         sc.stack[i].previousCaptureTo = -1;
         sc.stack[i].previousEval = 0;
     }
