@@ -51,23 +51,23 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     const Stack& pst  = (ply     ? sc->stack[ply - 1] : rootSentinel);
     const Stack& ppst = (ply > 1 ? sc->stack[ply - 2] : rootSentinel);
 
-    // Root node is different because
-    // we need to record the best move
+    // Root node is different because we need to record 
+    // the best move
     const bool isRoot = !ply;
 
-    // We distinguish between zero window nodes and 
-    // principal variation nodes. Zero window nodes 
-    // can only fail high or fail low, as  there is 
-    // no distance between alpha and beta. Only 
-    // pv-nodes can return an exact score.
+    // We  distinguish  between zero window  nodes  and 
+    // principal variation nodes. Zero window nodes can
+    // only  fail high or fail low, as there is no dis-
+    // tance between  alpha and beta. Only pv-nodes can
+    // return an exact score.
     const bool isPv = (beta > alpha + 1);
 
-    // QUIESCENCE SEARCH entry point. Ideally we want
-    // to evaluate a quiet position (i.e. a position 
-    // where there are no favourable captures, so that 
-    // we may consider its evaluation stable). That's
-    // why at leaf nodes we initiate a capture-only 
-    // search instead of returning the evaluation score. 
+    // QUIESCENCE SEARCH entry point. We want to evaluate
+    // quiet positions (i.e. positions where there are no
+    // favourable captures, so that we may consider their 
+    // evaluation stable). That's why at  leaf  nodes  we 
+    // initiate a capture-only search instead of returning 
+    // the evaluation score. 
     if (depth <= 0)
         return Quiesce(pos, ply, 0, alpha, beta);
 
@@ -83,24 +83,22 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     if (Timer.isStopping)
         return 0;
 
-    // Quick exit on on a statically detected draw, 
-    // unless we are at root, where we need to have
-    // a move.
+    // Quick exit on on a statically detected draw, unless 
+    // we are at root, where we need to have a move.
     if (!isRoot && pos->IsDraw()) {
 
-        // Too many early exits in a row 
-        // might cause a timeout, so we safeguard
+        //  Too  many  early exits in a  row  might  cause 
+        //  a timeout, so we safeguard
         Timer.TryStoppingByTimeout();
 
         return ScoreDraw;
     }
 
-    // MATE DISTANCE PRUNING, a minor improvement 
-    // shaving off some nodes when the checkmate 
-    // is near. It prevents looking for the longer
-    // checmkates if a shorter one has been already 
-    // found. It cannot be used at the root, as it 
-    // doesn't return a move, only a value.
+    // MATE DISTANCE PRUNING, a minor improvement shaving 
+    // off some nodes when the checkmate is near. It pre-
+    // vents looking for the longer checmkates if a shorter 
+    // one  has been already found. It cannot be  used  at 
+    // the root, as it doesn't return a move, only a value.
 
     if (!isRoot) {
         alpha = std::max(alpha, -MateScore + ply);
@@ -114,12 +112,11 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
         }
     }
 
-    //  READ THE TRANSPOSITION TABLE. If we have 
-    //  already searched the current position to 
-    //  sufficient depth, we may use the score
-    //  of the past search directly. If the depth 
-    //  was lower, we still expect the move from 
-    //  the previous search to be good and we will
+    //  READ THE TRANSPOSITION TABLE. If we have  already
+    //  searched the current position to sufficient depth, 
+    //  we may use the score of the past search  directly. 
+    //  If the depth  was lower, we still expect the move 
+    //  from the previous search to be good and we will
     //  try it first.
 
     bool foundTTrecord = false;
@@ -128,11 +125,11 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
 
         foundTTrecord = true;
 
-        // Because pv-nodes don't use some pruning
-        // or reduction techniques, we cannot always
-        // reuse scores from the zero window nodes. 
-        // Despite  the  same nominal  depth,  they
-        // represent more shallow, less precise search.
+        // Because  pv-nodes  don't use  some  pruning  or
+        // reduction  techniques, we cannot  always  reuse 
+        // scores  from the zero window nodes. Despite the 
+        // same nominal depth, they represent more shallow, 
+        // less precise search.
         if (!isPv || (score > alpha && score < beta) ) {
             if (!isRoot && !isExcluded)
                 return score;
@@ -151,27 +148,27 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
 
         if (TT.Retrieve(pos->boardHash, &singularMove, &singularScore, &hashFlag, alpha, beta, depth - 4, ply)) {
 
-            // We have found upper bound hash entry
-            // and it is not a checkmate score, so
-            // we can try the singular extension.
+            // We have found upper bound hash entry and it
+            // is  not  a checkmate score, so we  can  try 
+            // the singular extension.
             if ((hashFlag & lowerBound) && singularScore < EvalLimit)  
                 singularExtension = true;
         }
     }
 
-    // Are we in check? Knowing that is useful 
-    // for pruning/reduction/extension decisions
+    // Are we in check? Knowing that is useful for pruning
+    // reduction, or extension decisions
     const bool isInCheckBeforeMoving = pos->IsInCheck();
 
-    // Init eval and improving flag. Nodes where the side 
-    // to move is not improving the eval are probably 
-    // less interesting and warrant more pruning.
+    // Init eval and improving flag. Nodes where  the side
+    // to move is not improving the eval are probably less 
+    // interesting and warrant more pruning.
 
     // Evaluate position, unless in check
     eval = isInCheckBeforeMoving ? -Infinity : Evaluate(pos, &e);
 
-    // Adjust node eval by using score from the trans-
-    // position table. It modifies a few things, including 
+    // Adjust  node  eval by using score from  the  trans-
+    // position table. It modifies a few things, including
     // null move probability (~20 Elo)
     if (foundTTrecord) {
         if (hashFlag & (score > eval ? upperBound : lowerBound))
@@ -181,17 +178,17 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     // Save eval for the current ply.
     st.previousEval = eval;
 
-    // We check whether the eval has improved from 
-    // two plies ago. As of now, it affects late move 
+    // We  check  whether  the eval  has  improved  from 
+    // two  plies ago. As of now, it affects  late  move 
     // pruning only, but some more uses will be tested.
     const bool improving = SetImproving(ppst, eval, ply);
 
-    // NODE-LEVEL PRUNING. We try to avoid searching
-    // the current node. All the techniques used for it
+    // NODE-LEVEL PRUNING.  We try  to  avoid  searching
+    // the current node.  All the techniques used for it
     // are speculative, but statistically they work.
     //
-    // We skip node level pruning after a null move,
-    // when in check, in pv-nodes, in the late endgame
+    // We  skip  node level pruning after a  null  move,
+    // when  in check, in pv-nodes, in the late  endgame
     // and in singular search.
     if (!wasNullMove &&
         !isInCheckBeforeMoving &&
@@ -266,12 +263,11 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
         }   // end of null move code
     } // end of node pruning block
 
-    // SET FUTILITY PRUNING FLAG. If the static 
-    // evaluation of a node is bad, we bet that
-    // quiet moves will lead to no improvement.
-    // Score margin is increased with depth. Please
-    // note that our implementation does not prune 
-    // moves that give check, which is slightly unusual.
+    // SET FUTILITY PRUNING FLAG. If the static evaluation
+    // of a node is bad, we bet that quiet moves will lead 
+    // to  no improvement. Score margin is increased  with 
+    // depth. Please note that our implementation does not 
+    // prune moves that give check, which is a bit unusual.
     // (~2 Elo, so definately needs tuning)
 
     bool canDoFutility = (depth <= 6 &&
@@ -279,22 +275,23 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
         !isPv &&
          eval + 75 * depth < beta);
 
-    // INTERNAL ITERATIVE REDUCTION (non-standard).
-    // Reduce when position is not on transposition table.
-    // Idea from Prodeo chess engine (from Ed Schroder).
-    // Please note that the implementation is non-standard,
-    // as normally pv-nodes are not excluded, but this is
-    // what worked for this engine. (~9 Elo)
+    // INTERNAL ITERATIVE REDUCTION  (non-standard). Reduce
+    // when position is not on transposition table. An idea
+    // from Prodeo chess engine (bt Ed Schroder). Note that 
+    // that  the implementation is  non-standard:  normally
+    // pv-nodes  are not excluded, but this is what  worked 
+    // for this engine. (~9 Elo)
+    
     if (depth > 5 && !isPv && ttMove == 0 && !isInCheckBeforeMoving)
         depth--;
 
     // Init moves and variables before entering main loop
     bestScore = -Infinity;
 
-    // Calculate moves' scores to sort them. Normally
-    // we are going to search the transposition table
-    // move first; in root node we start searching
-    // from the best move from the previous iteration.
+    // Calculate moves' scores to sort them. The move from
+    // the  transposition  table is  our  first  candidate, 
+    // except at  root, where we begin with the best  move  
+    // from previous iteration.
     movePicker.Init(modeAll,
                     isRoot ? Pv.line[0][0] : ttMove,
                     History.GetKiller1(ply), 
@@ -304,8 +301,8 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
 
     while ((move = movePicker.NextMove(pos, ply)) != 0) {
 
-        // In singular search we omit the best move
-        // checking whether there are viable alternatives
+        // In singular search we omit the known best move,
+        // checking whether there are viable alternatives.
         if (move == sc->excludedMove && isExcluded)
             continue;
 
@@ -338,39 +335,35 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
             singularExtension &&    // conditions for the singular search are met
             sc->excludedMove == dummyMove) {
 
-            // Move from the transposition table
-            // might be a singular move. We are
-            // trying to disprove it, looking for 
-            // moves that  comes close to it. If 
-            // there are none, we will extend.
+            // Move from the transposition table might  be
+            // a singular move. We are trying to  disprove 
+            // it, looking for moves that  comes close  to 
+            // it. If there are none, we will extend.
             int newAlpha = -singularScore - 50;
 
-            // We are checking for decent alternatives,
-            // so we do not test the singular move
-            // candidate.
+            // We  are looking for decent alternatives, so
+            // we  do not try the singular move  candidate.
             sc->excludedMove = move;
 
-            // The only instance when we search with
-            // isExcluded flag set to "true". The flag
-            // switches off all the node-level pruning
-            // techniques, including reading score from
-            // the transposition table. After all, to 
-            // test alternatives to the singular move, 
-            // we need to search them. We also refrain
-            // from saving the result of this search
-            // in the transposition table, because
-            // it actively avoids searching the best move.
+            // The only time we search with isExcluded flag 
+            // set  to  "true". The flag switches  off  all
+            // the node-level pruning techniques, including 
+            // reading  score from the transposition  table. 
+            // After all, to  test alternatives to the sin-
+            // gular move, we need to search them. We  also 
+            // refrain from saving the result of this search
+            // in  the transposition table, because we have
+            // actively avoided searching the best move.
             int exclusionSearchScore = Search(pos, sc, ply + 1, newAlpha, newAlpha + 1, (depth - 1) / 2, false, true);
             sc->excludedMove = dummyMove;
 
             if (Timer.isStopping)
                 return 0;
 
-            // No move scores close to the singular
-            // move, so we extend. The search result
-            // relies on a single move - it would be
-            // a shame if a deeper search revealed
-            // a refutation.
+            // No move scores close to the singular  move,
+            // so  we extend. The search result relies on 
+            // the  single move - it would be a shame  if 
+            // a deeper search revealed a refutation.
             if (exclusionSearchScore <= newAlpha)
                 doExtension = true;
         } // end of singular extension code
@@ -384,12 +377,12 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
         if (canDoFutility && movesTried > 0 && canPruneMove)
             continue;
 
-        // LATE MOVE PRUNING. At low depths quiet moves 
-        // near the end of the move list are unlikely to 
-        // succeed, so we prune them. This may lead to an 
+        // LATE MOVE PRUNING. At low  depths  quiet  moves
+        // near  the end of the move list are unlikely  to
+        // succeed, so we prune them. This may lead to  an
         // error, but usually depth gain is more important
-        // and  a  deeper search will fix the  error.  Our 
-        // implementation is slightly unusual, because it 
+        // and  a  deeper search will fix the  error.  Our
+        // implementation is slightly unusual, because  it
         // avoids pruning moves that give check. (~90 Elo)
         if (depth <= 3 &&
             canPruneMove &&
@@ -398,8 +391,8 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
             continue;
         }
 
-        // SEE PRUNING. At low depths bad captures are
-        // unlikely to succeed, so we prune them. Static
+        // SEE PRUNING. At  low  depths bad  captures  are
+        // unlikely  to succeed, so we prune them.  Static
         // exchange evaluation margin increases with depth.
         //if (movePicker.stage == stageReturnBad &&
         //    depth < 4 && !isPv &&
@@ -430,13 +423,12 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
         // Set new search depth
         newDepth = depth - 1 + doExtension;
 
-        // LATE MOVE REDUCTION (LMR). We assume that
-        // with decent move ordering early moves are
-        // much more likely to cause a cutoff. That's
-        // why we search later moves at the  reduced
-        // depth. However, if a reduced depth search
-        // scores  above beta, we need to  re-search
-        // at the normal depth (~125 Elo)
+        // LATE MOVE REDUCTION (LMR). We assume that  with
+        // decent  move ordering early moves are much more 
+        // likely to cause a cutoff. That's why we  search 
+        // later  moves at the reduced depth.  However, if 
+        // reduced depth search scores above beta, we need 
+        // to re-search at the normal depth (~125 Elo)
         if (depth > 1 &&
             quietMovesTried > 3 &&
             movePicker.currentMoveStage == stageReturnQuiet &&
@@ -469,14 +461,14 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
             }
         }
 
-        // PVS (Principal variation search). We search 
-        // the first move of a pv-node with a full window. 
+        // PVS  (Principal variation search).  We  search 
+        // the first move of a pv-node with a full window.
         // For each later move we do a scout search first, 
         // testing whether score is above alpha (and thus 
-        // above last best score). Only if it is, we do 
-        // a full window search to get the exact value 
-        // of the current node. Zero window searches are 
-        // still conducted with a zero window.
+        // above  last best score). Only if it is, we  do 
+        // a full window search to get the exact value of 
+        // the current node. Zero window searches continue 
+        // with a zero window.
 
         if (bestScore == -Infinity)
             score = -Search(pos, sc, ply + 1, -beta, -alpha, newDepth, false, false);
@@ -507,18 +499,17 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
             if (!isExcluded)
                 TT.Store(pos->boardHash, move, score, lowerBound, depth, ply);
 
-            // If beta cutoff occurs at the root, 
-            // change the best move and display
-            // the new mainline. (cutoffs can happen
-            // in the root node because we are using
-            // the aspiration window).
+            // If beta cutoff occurs at the root, change
+            // change the best move and display the  new 
+            // mainline. Cutoffs can happen at the  root 
+            // node because we use the aspiration window.
             if (isRoot) {
                 Pv.Update(ply, move);
                 Pv.Display(score);
             }
 
-            // Stop searching this node. It has already
-            // refuted opponent's previous move and looking
+            // Stop  searching this node. We have already
+            // refuted opponent's previous move.  Looking
             // for a better refutation would only waste time.
             return score;
         }
@@ -527,12 +518,13 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
         if (score > bestScore) {
             bestScore = score;
 
-            // The current move is better than whatever
+            // The  current move is better  than  whatever
             // we have calculated so far. The lack of beta
-            // cutoff implies that we are in the pv-node
-            // with some distance between alpha and beta
-            // and we are looking for the best move 
-            // and its exact value.
+            // cutoff  implies that we are in  the pv-node
+            // with  some distance between alpha and  beta
+            // and  we are looking both for the best  move
+            // and  its exact value. That's why we  update
+            // the principal variation here.
             if (score > alpha) {
                 alpha = score;
                 bestMove = move;
@@ -548,12 +540,11 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     if (bestScore == -Infinity)
         return pos->IsInCheck() ? -MateScore + ply : 0;
 
-    // Save score in the transposition table.
-    // Please note that the search structure
-    // ensures this is done only if we are not
-    // unwinding the search due to timeout.
-    // This is a common source of bugs. If you 
-    // wish, add an explicit test for that.
+    // Save score in the transposition table. The search 
+    // structure ensures this is done only if we are not 
+    // unwinding the search due to timeout (otherwise we 
+    // would  sometimes return bad moves and scores). If 
+    // you wish, add an explicit test for that.
     if (!isExcluded) {
         if (bestMove)
             TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, depth, ply);
