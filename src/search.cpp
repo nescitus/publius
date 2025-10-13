@@ -178,18 +178,18 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     // Save eval for the current ply.
     st.previousEval = eval;
 
-    // We  check  whether  the eval  has  improved  from 
-    // two  plies ago. As of now, it affects  late  move 
-    // pruning only, but some more uses will be tested.
+    // We  check  whether  the eval has improved from  two
+    // plies ago. As of now, it affects  late move pruning
+    // only, but some more uses will be tested.
     const bool improving = SetImproving(ppst, eval, ply);
 
-    // NODE-LEVEL PRUNING.  We try  to  avoid  searching
-    // the current node.  All the techniques used for it
+    // NODE-LEVEL PRUNING. Here we try to avoid  searching
+    // the current node. All the techniques we use for  it 
     // are speculative, but statistically they work.
     //
-    // We  skip  node level pruning after a  null  move,
-    // when  in check, in pv-nodes, in the late  endgame
-    // and in singular search.
+    // We  will skip node level pruning after a null  move,
+    // when in check, in pv-nodes, in the late endgame and
+    // in singular search.
     if (!wasNullMove &&
         !isInCheckBeforeMoving &&
         !isPv &&
@@ -197,11 +197,11 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
         pos->CanTryNullMove())
     {
 
-        // STATIC NULL MOVE (or Reverse Futility  Pruning 
-        // or  Beta  Pruning) is  similar  to  null  move.
-        // Instead  of  letting the opponent  search  two
-        // moves  in a row, it simply assumes  some  loss,
-        // increasing with depth. If the side to move can
+        // STATIC NULL MOVE (or Reverse  Futility  Pruning 
+        // or  Beta  Pruning)  is  similar  to  null  move.
+        // Instead  of  letting the  opponent  search  two
+        // moves  in  a row, it simply assumes  some  loss,
+        // increasing with depth. If the side to move  can
         // accept that loss, then we prune (~14 Elo).
 
         if (depth <= 6) {
