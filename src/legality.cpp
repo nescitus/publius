@@ -11,8 +11,18 @@
 #include "position.h"
 #include "move.h"
 #include "legality.h"
+#include "publius.h"
+#include <iostream>
 
 bool IsPseudoLegal(Position* pos, int move) {
+
+    // NOTE: move is not guaranteed to work in the current
+    // position, this is why we are testing it in the first
+    // place. The less obvious implication is that we cannot 
+    // trust the move flag. For example, you can have a legal
+    // d2d4 move by a queen and compare it with an input move 
+    // flagged as a pawn jump. I learned it the hard way during 
+    // an unsuccessful refactor.
 
     if (move == 0) 
         return false;
@@ -31,7 +41,7 @@ bool IsPseudoLegal(Position* pos, int move) {
     // to square empty or own piece on it
     if (preyType != noPieceType && 
         ColorOfPiece(pos->GetPiece(toSquare)) == side)
-        return false;
+        return false;       
 
     // castling
     if (GetTypeOfMove(move) == tCastle)
@@ -47,9 +57,9 @@ bool IsPseudoLegal(Position* pos, int move) {
 
     // single pawn move, including promotion
     if (hunterType == Pawn)
-        return IsPawnMoveLegal(side, fromSquare, toSquare, move, hunterType, preyType);
+        return IsPawnMoveLegal(side, fromSquare, toSquare, move, preyType);
 
-    // real promotion would be accepted earlier
+    // real promotion would be accepted by IsPawnMoveLegal()
     if (IsMovePromotion(move))
         return false;
 
@@ -57,7 +67,7 @@ bool IsPseudoLegal(Position* pos, int move) {
     return (pos->AttacksFrom(fromSquare) & Paint(toSquare)) != 0;
 }
 
-bool IsCastlingLegal(Position *pos, Color side, Square fromSquare, Square toSquare) {
+bool IsCastlingLegal(Position *pos, const Color side, const Square fromSquare, const Square toSquare) {
     
     if (side == White && fromSquare == E1) {
 
@@ -80,8 +90,14 @@ bool IsCastlingLegal(Position *pos, Color side, Square fromSquare, Square toSqua
     return false;
 }
 
-bool IsPawnJumpLegal(Position* pos, Color side, PieceType hunter, PieceType prey,
-                     Square fromSquare, Square toSquare) {
+bool IsPawnJumpLegal(Position* pos, const Color side, const PieceType hunter, const PieceType prey,
+                     const Square fromSquare, const Square toSquare) {
+    
+    // We need to test whether we are moving a pawn,
+    // see comment at the top of the file. We also
+    // need to enter this function in order to reject
+    // moves with the wring flag.
+
     if (hunter == Pawn &&
         prey == noPieceType &&
         pos->GetPiece(toSquare ^ 8) == noPiece) {
@@ -92,8 +108,8 @@ bool IsPawnJumpLegal(Position* pos, Color side, PieceType hunter, PieceType prey
     return false;
 }
 
-bool IsPawnMoveLegal(Color side, Square fromSquare, Square toSquare, 
-                     Move move, PieceType hunter, PieceType prey) {
+bool IsPawnMoveLegal(const Color side, const Square fromSquare, const Square toSquare, 
+                     const Move move, const PieceType prey) {
 
     if (side == White) {
 

@@ -32,11 +32,14 @@ void EvalHashTable::Save(Bitboard key, int val) {
 
 // retrieve position evaluation
 bool EvalHashTable::Retrieve(Bitboard key, int* score) const {
+
     size_t addr = Address(key);
+
     if (EvalTT[addr].key == key) {
         *score = EvalTT[addr].val;
         return true;
     }
+
     return false;
 }
 

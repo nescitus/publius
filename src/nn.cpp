@@ -4,8 +4,7 @@
 // NNUE evaluation. Net architecture and constants make it
 // equivalent to the simple example provided by the bullet trainer:
 // https://github.com/jw1912/bullet/blob/main/examples/simple.rs
-// The architecture is (768 -> HIDDEN_SIZE)x2 -> 1 and the only
-// difference is that the number of hidden neurons is reduced to 32.
+// The architecture is (768 -> 128)x2 -> 1
 
 // This code draws some inspiration from Iris chess engine
 // (https://github.com/citrus610/iris):
@@ -13,11 +12,12 @@
 // struct helped to create a nice file loader and the convention
 // of using this-> helps to notice class members.
 
-// On top pf that, there is an optional AVX2 fast path (optional).
-// This is the same as the simple addition of accumulator values,
-//  but done 16 int16 lanes at a time using 256-bit vectors. If AVX2 
-// isn't available, we compile the scalar code (#ifndef part), and
-// performance is still correct - just slower.
+// On top of that, there is an optional AVX2 fast path. It works
+// the  same  as the simple addition of accumulator  values, but 
+// processes 16 int16 lanes at a time using 256-bit vectors. 
+//
+// If AVX2 isn't available, we can still compile the scalar code 
+// (#ifndef part), and performance is still correct - just slower.
 
 #define __AVX2__
 
@@ -135,7 +135,7 @@
 #endif
     }
 
-    static inline void Indices(i8 color, i8 type, i8 sq, int& idxW, int& idxB) {
+    static inline void SetIndices(i8 color, i8 type, i8 sq, int& idxW, int& idxB) {
         idxW = Index(color, type, sq);
         idxB = Index(!color, type, sq ^ 56);
     }
@@ -145,8 +145,8 @@
     void Net::Move(i8 color, i8 type, i8 addSq, i8 subSq)
     {
         int addW, addB, subW, subB;
-        Indices(color, type, addSq, addW, addB);
-        Indices(color, type, subSq, subW, subB);
+        SetIndices(color, type, addSq, addW, addB);
+        SetIndices(color, type, subSq, subW, subB);
 
 #if defined(__AVX2__)
         i16* __restrict a0 = &this->accumulator[0][0];

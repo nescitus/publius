@@ -83,5 +83,5 @@ constexpr inline Square operator^(Square d1, int d2) {
 // ranks and files
 enum File { fileA, fileB, fileC, fileD, fileE, fileF, fileG, fileH };
 enum Rank { rank1, rank2, rank3, rank4, rank5, rank6, rank7, rank8 };
-enum MoveType { tNormal, tCastle, tEnPassant, tPawnjump, tPromN, tPromB, tPromR, tPromQ };
+enum MoveType { tNormal = 0, tCastle = 1, tEnPassant = 2, tPawnjump = 3, tPromN = 4, tPromB = 5, tPromR = 6, tPromQ = 7 };
 enum CastleFlag { wShortCastle = 1, wLongCastle = 2, bShortCastle = 4, bLongCastle = 8 };

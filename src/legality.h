@@ -1,9 +1,11 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
 
 #pragma once
+
 bool IsPseudoLegal(Position* pos, int move);
-bool IsCastlingLegal(Position* pos, Color side, Square fromSquare, Square toSquare);
-bool IsPawnJumpLegal(Position* pos, Color side, PieceType hunter, PieceType prey,
-    Square fromSquare, Square toSquare);
-bool IsPawnMoveLegal(Color side, Square fromSquare, Square toSquare,
-    Move move, PieceType hunter, PieceType prey);
+bool IsCastlingLegal(Position* pos, const Color side, const Square fromSquare, const Square toSquare);
+bool IsPawnJumpLegal(Position* pos, const Color side, const PieceType hunter, const PieceType prey,
+    const Square fromSquare, const Square toSquare);
+bool IsPawnMoveLegal(const Color side, const Square fromSquare, const Square toSquare,
+    const Move move, const PieceType prey);

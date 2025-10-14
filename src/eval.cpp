@@ -495,10 +495,11 @@ void EvalPasser(const Position* pos, EvalData* e, Color color) {
     }
 }
 
-// Evaluates attacks on hanging pieces
-// (that is pieces that are either attacked
-//  and undefended or attacked by enemy pawn)
-// and attacks of a minor piece on another one.
+// Evaluates attacks on hanging pieces. They are
+// defined as either (1) attacked and undefended 
+// or (2) attacked by enemy pawn. Also, evaluate
+// attacks of a minor piece on another one, as it
+// is advantageous to be able to initiate an exchange.
 void EvalPressure(Position* pos, EvalData* e, Color side) {
 
     const Color oppo = ~side;

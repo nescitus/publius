@@ -6,11 +6,15 @@
 //#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 4331 lines
+// 4347 lines
 
 // r5k1/pQp2qpp/8/4pbN1/3P4/6P1/PPr4P/1K1R3R b - - 0 1 search explosion
 
 // r2q1r2/1b2bpkp/p3p1p1/2ppP1P1/7R/1PN1BQR1/1PP2P1P/4K3 w - - 0 1
+
+// HCE bench
+// Bench at depth 15 took 30081 milliseconds, searching 46833682 nodes at 1556919 nodes per second.
+// Bench at depth 15 took 29738 milliseconds, searching 46833682 nodes at 1574876 nodes per second.
 
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
