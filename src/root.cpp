@@ -8,6 +8,7 @@
 #include "timer.h"
 #include "history.h"
 #include "pv.h"
+#include "move.h"
 #include "legality.h"
 #include "search.h"
 #include "trans.h"

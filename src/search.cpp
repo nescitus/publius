@@ -439,6 +439,8 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
                                  [std::min(depth, 63)]
                                  [std::min(movesTried, 63)];
 
+            //if (reduction) reduction += !improving;
+
             // TODO: increase reduction when not improving
             //if (reduction > 1 && improving) 
             //    reduction--;

@@ -10,6 +10,7 @@
 #include "bitboard.h"
 #include "mask.h"
 #include "bitgen.h"
+#include "move.h"
 #include "legality.h"
 #include "gen.h"
 

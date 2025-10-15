@@ -10,17 +10,12 @@
 
 void Position::DoMove(const Move move, UndoData *undo) {
 
-    // Init variables
-    const Color color = sideToMove;
-    const Square fromSquare = GetFromSquare(move);
-    const Square toSquare = GetToSquare(move);
-    const PieceType hunter = TypeOfPiece(pieceLocation[fromSquare]);
-    const PieceType prey = TypeOfPiece(pieceLocation[toSquare]);
-    const int moveType = GetTypeOfMove(move);
+    // Describe move (better than loose variables)
+    const MoveDescription md(*this, move);
 
     // Save data needed for undoing a move
     undo->move = move;
-    undo->prey = prey;
+    undo->prey = md.prey;
     undo->castleFlags = castleFlags;
     undo->enPassantSq = enPassantSq;
     undo->reversibleMoves = reversibleMoves;
@@ -31,64 +26,64 @@ void Position::DoMove(const Move move, UndoData *undo) {
     repetitionList[repetitionIndex++] = boardHash;
 
     // Capture enemy piece
-    if (prey != noPieceType) {
-        TakePiece(~color, prey, toSquare);
-        if (prey == Pawn)
-            pawnKingHash ^= Key.ForPiece(~color, prey, toSquare);
+    if (md.prey != noPieceType) {
+        TakePiece(~md.side, md.prey, md.toSquare);
+        if (md.prey == Pawn)
+            pawnKingHash ^= Key.ForPiece(~md.side, md.prey, md.toSquare);
     }
 
     // Update reversible moves counter
-    if (hunter == Pawn || prey != noPieceType) reversibleMoves = 0;
-    else                                       reversibleMoves++;
+    if (md.hunter == Pawn || md.prey != noPieceType) reversibleMoves = 0;
+    else                                             reversibleMoves++;
 
     // Update pawn hash
-    if (hunter == Pawn || hunter == King)
-        pawnKingHash ^= Key.ForPiece(color, hunter, fromSquare) ^
-                        Key.ForPiece(color, hunter, toSquare);
+    if (md.hunter == Pawn || md.hunter == King)
+        pawnKingHash ^= Key.ForPiece(md.side, md.hunter, md.fromSquare) ^
+                        Key.ForPiece(md.side, md.hunter, md.toSquare);
 
 
     // Update castling rights
-    UpdateCastlingRights(fromSquare, toSquare);
+    UpdateCastlingRights(md.fromSquare, md.toSquare);
 
     // Clear en passant square
     ClearEnPassant();
 
     // Move piece from the original square
-    MovePiece(color, hunter, fromSquare, toSquare);
+    MovePiece(md.side, md.hunter, md.fromSquare, md.toSquare);
 
     // Update king location
-    if (hunter == King)
-        kingSq[color] = toSquare;
+    if (md.hunter == King)
+        kingSq[md.side] = md.toSquare;
 
     // Make complementary rook move in case of castling
-    if (moveType == tCastle) {
-        switch (toSquare) {
-            case C1: { MovePiece(color, Rook, A1, D1); break; }
-            case G1: { MovePiece(color, Rook, H1, F1); break; }
-            case C8: { MovePiece(color, Rook, A8, D8); break; }
-            case G8: { MovePiece(color, Rook, H8, F8); break; }
+    if (md.type == tCastle) {
+        switch (md.toSquare) {
+            case C1: { MovePiece(md.side, Rook, A1, D1); break; }
+            case G1: { MovePiece(md.side, Rook, H1, F1); break; }
+            case C8: { MovePiece(md.side, Rook, A8, D8); break; }
+            case G8: { MovePiece(md.side, Rook, H8, F8); break; }
             default: break;
         }
     }
 
     // Remove pawn captured en passant
-    if (moveType == tEnPassant) {
+    if (md.type == tEnPassant) {
         int dir = (GetSideToMove() == White ? -8 : 8);
-        TakePiece(~color, Pawn, toSquare + dir);
-        pawnKingHash ^= Key.ForPiece(~color, Pawn, toSquare + dir);
+        TakePiece(~md.side, Pawn, md.toSquare + dir);
+        pawnKingHash ^= Key.ForPiece(~md.side, Pawn, md.toSquare + dir);
     }
 
     // Set new en passant square
-    if (moveType == tPawnjump)
-        SetEnPassantSquare(color, toSquare);
+    if (md.type == tPawnjump)
+        SetEnPassantSquare(md.side, md.toSquare);
 
     // Promotion
     if (IsMovePromotion(move)) {
         const PieceType promoted = GetPromotedPiece(move);
-        boardHash ^= Key.ForPiece(color, Pawn, toSquare) ^
-                     Key.ForPiece(color, promoted, toSquare);
-        pawnKingHash ^= Key.ForPiece(color, Pawn, toSquare);
-        ChangePieceNoHash(Pawn, promoted, color, toSquare);
+        boardHash ^= Key.ForPiece(md.side, Pawn, md.toSquare) ^
+                     Key.ForPiece(md.side, promoted, md.toSquare);
+        pawnKingHash ^= Key.ForPiece(md.side, Pawn, md.toSquare);
+        ChangePieceNoHash(Pawn, promoted, md.side, md.toSquare);
     }
 
     // Switch side to move and update hash key

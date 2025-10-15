@@ -112,6 +112,7 @@ public:
     }
 
     // --- Attack detection ---
+    bool Position::EitherSquareIsAttacked(const Square s1, const Square s2, const Color color) const;
     [[nodiscard]] bool SquareIsAttacked(Square sq, Color byColor) const;
     [[nodiscard]] Bitboard AttacksTo(Square sq) const;
     [[nodiscard]] Bitboard AttacksFrom(Square sq) const;

@@ -11,7 +11,11 @@
 #include "bitgen.h"
 #include "move.h"
 
-// Detect whether a square is attacked by given side
+bool Position::EitherSquareIsAttacked(const Square s1, const Square s2, const Color color) const {
+    return SquareIsAttacked(s1, color) || SquareIsAttacked(s2, color);
+}
+
+// Detect whether a single square is attacked by given side
 bool Position::SquareIsAttacked(const Square sq, const Color color) const {
 
     return (Map(color, Pawn) & GenerateMoves.Pawn(~color, sq)) ||
@@ -60,23 +64,17 @@ bool Position::MoveGivesCheck(const Move move) {
     Bitboard checks, occ;
 
     // Collect information about the move
-    Color color = GetSideToMove();
-    Square fromSquare = GetFromSquare(move);
-    Square toSquare = GetToSquare(move);
-    PieceType hunterType = PieceTypeOnSq(fromSquare);
-    PieceType preyType = PieceTypeOnSq(toSquare);
+    const MoveDescription md(*this, move);
 
-    // Handle promotion
-    if (IsMovePromotion(move))
-        hunterType = GetPromotedPiece(move);
+    PieceType placedPiece = IsMovePromotion(move) ? GetPromotedPiece(move) : md.hunter;
 
     // Locate enemy king
-    Square kingSquare = KingSq(~color);
+    Square kingSquare = KingSq(~md.side);
 
     // Direct checks by a pawn
-    if (hunterType == Pawn) {
-        checks = ForwardOf(SidesOf(Paint(kingSquare)), ~color);
-        if (checks & Paint(toSquare)) return true;
+    if (placedPiece == Pawn) {
+        checks = ForwardOf(SidesOf(Paint(kingSquare)), ~md.side);
+        if (checks & Paint(md.toSquare)) return true;
     }
 
     // Init occupancy bitboard
@@ -86,51 +84,51 @@ bool Position::MoveGivesCheck(const Move move) {
     // otherwise we will not detech checks
     // along the same ray as the promoting move
     if (IsMovePromotion(move))
-        occ ^= Paint(fromSquare);
+        occ ^= Paint(md.fromSquare);
 
     // Direct checks by a knight
-    if (hunterType == Knight) {
+    if (placedPiece == Knight) {
         checks = GenerateMoves.Knight(kingSquare);
-        if (checks & Paint(toSquare)) return true;
+        if (checks & Paint(md.toSquare)) return true;
     }
 
     // Direct diagonal checks
-    if (hunterType == Bishop || hunterType == Queen) {
+    if (placedPiece == Bishop || placedPiece == Queen) {
         checks = GenerateMoves.Bish(occ, kingSquare);
-        if (checks & Paint(toSquare)) return true;
+        if (checks & Paint(md.toSquare)) return true;
     }
 
     // Direct orthogonal checks
-    if (hunterType == Rook || hunterType == Queen) {
+    if (placedPiece == Rook || placedPiece == Queen) {
         checks = GenerateMoves.Rook(occ, kingSquare);
-        if (checks & Paint(toSquare)) return true;
+        if (checks & Paint(md.toSquare)) return true;
     }
 
     // Prepare occupancy map after the move...
-    occ = Occupied() ^ (Paint(fromSquare) | Paint(toSquare));
+    occ = Occupied() ^ (Paint(md.fromSquare) | Paint(md.toSquare));
 
     // ...remembering to take captures into account
-    if (preyType != noPieceType)
-        occ ^= Paint(toSquare);
+    if (md.prey != noPieceType)
+        occ ^= Paint(md.toSquare);
 
     // Diagonal discovered checks
     checks = GenerateMoves.Bish(occ, kingSquare);
-    if (checks & MapDiagonalMovers(color)) return true;
+    if (checks & MapDiagonalMovers(md.side)) return true;
 
     // Orthogonal discovered checks
     checks = GenerateMoves.Rook(occ, kingSquare);
-    if (checks & MapStraightMovers(color)) return true;
+    if (checks & MapStraightMovers(md.side)) return true;
 
     // Checks discovered by en passant capture
     if (GetTypeOfMove(move) == tEnPassant) {
         int dir = (GetSideToMove() == White ? -8 : 8);
-        occ ^= Paint(toSquare + dir);
+        occ ^= Paint(md.toSquare + dir);
 
         checks = GenerateMoves.Bish(occ, kingSquare);
-        if (checks & MapDiagonalMovers(color)) return true;
+        if (checks & MapDiagonalMovers(md.side)) return true;
 
         checks = GenerateMoves.Rook(occ, kingSquare);
-        if (checks & MapStraightMovers(color)) return true;
+        if (checks & MapStraightMovers(md.side)) return true;
     }
 
     // Checks discovered by castling
@@ -154,30 +152,26 @@ bool Position::IsWhiteShortCastleLegal() {
 
     return ((castleFlags & wShortCastle) &&
            !(Occupied() & Paint(F1, G1)) &&
-           !SquareIsAttacked(E1, Black) &&
-           !SquareIsAttacked(F1, Black));
+           !EitherSquareIsAttacked(E1, F1, Black));
 }
 
 bool Position::IsWhiteLongCastleLegal() {
 
     return ((castleFlags & wLongCastle) &&
            !(Occupied() & Paint(B1, C1, D1)) &&
-           !SquareIsAttacked(E1, Black) &&
-           !SquareIsAttacked(D1, Black));
+           !EitherSquareIsAttacked(E1, D1, Black));
 }
 
 bool Position::IsBlackShortCastleLegal() {
 
     return ((castleFlags & bShortCastle) &&
            !(Occupied() & Paint(F8, G8)) &&
-           !SquareIsAttacked(E8, White) &&
-           !SquareIsAttacked(F8, White));
+           !EitherSquareIsAttacked(E8, F8, White));
 }
 
 bool Position::IsBlackLongCastleLegal() {
 
     return ((castleFlags & bLongCastle) &&
            !(Occupied() & Paint(B8, C8, D8)) &&
-           !SquareIsAttacked(E8, White) &&
-           !SquareIsAttacked(D8, White));
+           !EitherSquareIsAttacked(E8, D8, White));
 }

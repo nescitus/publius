@@ -32,3 +32,27 @@
 [[nodiscard]] bool IsMoveNoisy(Position* pos, const Move move);
 [[nodiscard]] std::string MoveToString(const Move move);
 [[nodiscard]] Move StringToMove(Position* pos, const std::string& moveString);
+
+// Several functions need to transform raw move into some variables.
+// Using MoveDescription struct is cleaner than setting separate
+// variables.
+
+struct MoveDescription {
+    const Move      move;
+    const Color     side;     // side to move in 'pos'
+    const Square    fromSquare;
+    const Square    toSquare;
+    const PieceType hunter;   // piece on 'from' (may be noPieceType if illegal)
+    const PieceType prey;     // piece on 'to'   (noPieceType if empty)
+    const int       type;     // your MoveType (tNormal, tCastle, ...)
+
+    explicit MoveDescription(const Position& pos, Move m) noexcept
+        : move(m)
+        , side(pos.GetSideToMove())
+        , fromSquare(GetFromSquare(m))
+        , toSquare(GetToSquare(m))
+        , hunter(pos.PieceTypeOnSq(fromSquare))
+        , prey(pos.PieceTypeOnSq(toSquare))
+        , type(GetTypeOfMove(m))
+    {}
+};

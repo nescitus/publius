@@ -27,119 +27,114 @@ bool IsPseudoLegal(Position* pos, int move) {
     if (move == 0) 
         return false;
 
-    const Color side = pos->GetSideToMove();
-    const Square fromSquare = GetFromSquare(move);
-    const Square toSquare = GetToSquare(move);
-    const PieceType hunterType = pos->PieceTypeOnSq(fromSquare);
-    const PieceType preyType = pos->PieceTypeOnSq(toSquare);
+    // create move description (better than loose variables)
+    const MoveDescription md(*pos, move);
 
     // from square empty or enemy piece on it
-    if (hunterType == noPieceType || 
-        ColorOfPiece(pos->GetPiece(fromSquare)) != side)
+    if (md.hunter == noPieceType || 
+        ColorOfPiece(pos->GetPiece(md.fromSquare)) != md.side)
         return false;
 
     // to square empty or own piece on it
-    if (preyType != noPieceType && 
-        ColorOfPiece(pos->GetPiece(toSquare)) == side)
+    if (md.prey != noPieceType && 
+        ColorOfPiece(pos->GetPiece(md.toSquare)) == md.side)
         return false;       
 
     // castling
-    if (GetTypeOfMove(move) == tCastle)
-        return IsCastlingLegal(pos, side, fromSquare, toSquare);
+    if (md.type == tCastle)
+        return IsCastlingLegal(pos, &md);
 
     // en passant capture
-    if (GetTypeOfMove(move) == tEnPassant)
-        return (hunterType == Pawn && toSquare == pos->EnPassantSq());
+    if (md.type == tEnPassant)
+        return (md.hunter == Pawn && md.toSquare == pos->EnPassantSq());
 
     // double pawn move
-    if (GetTypeOfMove(move) == tPawnjump)
-        return IsPawnJumpLegal(pos, side, hunterType, preyType, fromSquare, toSquare);
+    if (md.type == tPawnjump)
+        return IsPawnJumpLegal(pos, &md);
 
     // single pawn move, including promotion
-    if (hunterType == Pawn)
-        return IsPawnMoveLegal(side, fromSquare, toSquare, move, preyType);
+    if (md.hunter == Pawn)
+        return IsPawnMoveLegal(&md);
 
     // real promotion would be accepted by IsPawnMoveLegal()
     if (IsMovePromotion(move))
         return false;
 
     // normal move - check square accessibility
-    return (pos->AttacksFrom(fromSquare) & Paint(toSquare)) != 0;
+    return (pos->AttacksFrom(md.fromSquare) & Paint(md.toSquare)) != 0;
 }
 
-bool IsCastlingLegal(Position *pos, const Color side, const Square fromSquare, const Square toSquare) {
+bool IsCastlingLegal(Position *pos, const MoveDescription* md) {
     
-    if (side == White && fromSquare == E1) {
+    if (md->side == White && md->fromSquare == E1) {
 
-        if (toSquare == G1)
+        if (md->toSquare == G1)
             return pos->IsWhiteShortCastleLegal();
 
-        else if (toSquare == C1)
+        else if (md->toSquare == C1)
             return pos->IsWhiteLongCastleLegal();
     }
 
-    if (side == Black && fromSquare == E8) {
+    if (md->side == Black && md->fromSquare == E8) {
 
-        if (toSquare == G8)
+        if (md->toSquare == G8)
             return pos->IsBlackShortCastleLegal();
 
-        else if (toSquare == C8)
+        else if (md->toSquare == C8)
             return pos->IsBlackLongCastleLegal();
     }
 
     return false;
 }
 
-bool IsPawnJumpLegal(Position* pos, const Color side, const PieceType hunter, const PieceType prey,
-                     const Square fromSquare, const Square toSquare) {
+bool IsPawnJumpLegal(Position* pos, const MoveDescription *md) {
     
     // We need to test whether we are moving a pawn,
     // see comment at the top of the file. We also
     // need to enter this function in order to reject
     // moves with the wring flag.
 
-    if (hunter == Pawn &&
-        prey == noPieceType &&
-        pos->GetPiece(toSquare ^ 8) == noPiece) {
-        if ((toSquare > fromSquare && side == White) ||
-            (toSquare < fromSquare && side == Black))
+    if (md->hunter == Pawn &&
+        md->prey == noPieceType &&
+        pos->GetPiece(md->toSquare ^ 8) == noPiece) {
+        if ((md->toSquare > md->fromSquare && md->side == White) ||
+            (md->toSquare < md->fromSquare && md->side == Black))
             return true;
     }
     return false;
 }
 
-bool IsPawnMoveLegal(const Color side, const Square fromSquare, const Square toSquare, 
-                     const Move move, const PieceType prey) {
+bool IsPawnMoveLegal(const MoveDescription* md) {
 
-    if (side == White) {
+    if (md->side == White) {
 
         // missing promotion flag
-        if (RankOf(fromSquare) == rank7 && !IsMovePromotion(move))
+        if (RankOf(md->fromSquare) == rank7 && !IsMovePromotion(md->move))
             return false;
 
         // non-capture
-        if (toSquare - fromSquare == 8 && prey == noPieceType)
+        if (md->toSquare - md->fromSquare == 8 && md->prey == noPieceType)
            return true;
         
         // capture
-        if ((toSquare - fromSquare == 7 && FileOf(fromSquare) != fileA) ||
-            (toSquare - fromSquare == 9 && FileOf(fromSquare) != fileH))
-            return (prey != noPieceType);
+        if ((md->toSquare - md->fromSquare == 7 && FileOf(md->fromSquare) != fileA) ||
+            (md->toSquare - md->fromSquare == 9 && FileOf(md->fromSquare) != fileH))
+            return (md->prey != noPieceType);
  
     } else {
 
         // missing promotion flag
-        if (RankOf(fromSquare) == rank2 && !IsMovePromotion(move))
+        if (RankOf(md->fromSquare) == rank2 && !IsMovePromotion(md->move))
             return false;
         
         // non-capture
-        if (toSquare - fromSquare == -8 && prey == noPieceType)
+        if (md->toSquare - md->fromSquare == -8 && md->prey == noPieceType)
             return true;
         
         // capture
-        if ((toSquare - fromSquare == -9 && FileOf(fromSquare) != fileA) ||
-            (toSquare - fromSquare == -7 && FileOf(fromSquare) != fileH))
-            return (prey != noPieceType);
+        if ((md->toSquare - md->fromSquare == -9 && FileOf(md->fromSquare) != fileA) ||
+            (md->toSquare - md->fromSquare == -7 && FileOf(md->fromSquare) != fileH))
+            return (md->prey != noPieceType);
     }
     return false;
 }
