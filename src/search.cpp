@@ -214,7 +214,12 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
         // search if static eval is really bad. (~15 Elo)
 
         if (depth <= 3 && eval + 200 * depth < beta) {
+
+            if (depth <= 1 && eval + 600 < alpha)
+                return Quiesce(pos, ply, 0, alpha, beta);
+
             score = Quiesce(pos, ply, 0, alpha, beta);
+
             if (score < beta) // no fail high!
                 return score;
             if (Timer.isStopping)
@@ -438,8 +443,6 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
             reduction = Lmr.table[isPv]
                                  [std::min(depth, 63)]
                                  [std::min(movesTried, 63)];
-
-            //if (reduction) reduction += !improving;
 
             // TODO: increase reduction when not improving
             //if (reduction > 1 && improving) 
