@@ -104,17 +104,20 @@ void TransTable::Store(Bitboard key, Move move, int score, int flags, int depth,
     // information and can be overwritten.
     for (int i = 0; i < numberOfBuckets; i++) {
 
+        // Position already recorded, updating it 
+        // has absolute priority over finding a new slot
         if (slot->key == key) {
             if (!move) move = slot->move;
             replace = slot;
-            break; // TODO: test, together with more robust replacement formula
+            break;
         }
         
-        // Currently we replace the oldest of tested entries,
-        // but it is possible to get smarter here, for example
-        // using depth and entry type as tie-breaks
+        // Update by age or depth...
         age = ((tt_date - slot->date) & 255) * 256 + 255 - slot->depth;
         
+        // ... but prefer unused entries
+        if (slot->key == 0) age = 1024;
+
         if (age > oldest) {
             oldest = age;
             replace = slot;
