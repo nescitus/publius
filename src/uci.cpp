@@ -74,6 +74,8 @@ bool ParseCommand(std::istringstream& stream, Position* pos) {
 
 void OnUciCommand() {
 
+    isUci = true;
+
     std::cout << "id name " << engineName << " " << engineVersion << "\n";
     std::cout << "id author " << engineAuthor << "\n";
     std::cout << "option name Hash type spin default 16 min 1 max 4096" << "\n";

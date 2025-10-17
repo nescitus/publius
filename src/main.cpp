@@ -30,6 +30,7 @@ LmrData Lmr;
 PvCollector Pv;
 Net NN;
 bool isNNUEloaded;
+bool isUci;
 int nnueWeight;
 int hceWeight;
 
@@ -40,6 +41,7 @@ int main() {
               << "Comment out USE_TUNING in publius.h and recompile\n";
 #endif
 
+    isUci = false;
     Params.Init();
     nnueWeight = 80;
     hceWeight = 0;

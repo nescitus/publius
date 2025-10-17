@@ -20,6 +20,7 @@
 #include "uci.h"
 #include "movepicker.h"
 #include "util.h"
+#include "publius.h"
 #include "search.h"
 
 const int singularDepth = 7;
@@ -424,6 +425,15 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
         movesTried++;
         if (movePicker.currentMoveStage == stageReturnQuiet)
             quietMovesTried++;
+
+        // Report start of analysing the new move
+        if (isRoot && isUci && depth > 19) {
+            std::cout << "info currmove "
+                      << MoveToString(move)
+                      << " currmovenumber "
+                      << movesTried
+                      << "\n";
+        }
 
         // Set new search depth
         newDepth = depth - 1 + doExtension;
