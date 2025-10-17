@@ -126,11 +126,6 @@ void TransTable::Store(Bitboard key, Move move, int score, int flags, int depth,
         slot++;
     }
 
-    // TODO: retest
-    // Don't overwrite better entries
-    // if (replace->key == key && replace->depth > depth)
-    //    return;
-
     // Save the data
     replace->key = key;
     replace->date = tt_date;
