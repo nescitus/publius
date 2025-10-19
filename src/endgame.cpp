@@ -83,11 +83,10 @@ int GetDrawMul(Position* pos, const Color strong, const Color weak) {
                 // Stronger side has two minor pieces
                 if (sMi == 2) {
                     
-                    // Two knights will not win,
-                    // alone or against a minor piece
-                    // (note that two knights vs a pawn
-                    // is already excluded by the earlier 
-                    // conditions)
+                    // Two knights will not win, alone
+                    // or against a minor piece (two 
+                    // knights vs a pawn is already excluded 
+                    // by the earlier conditions)
                     if (sN == 2)
                         return certainDrawMultiplier;
                     

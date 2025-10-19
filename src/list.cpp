@@ -42,16 +42,13 @@ void MoveList::Clear() {
     get = 0; 
 }
 
-// Fet the lat index of the move list
-int MoveList::GetLength() {
-    return ind;
-}
-
 // Get next move from an unsorted list
 
 Move MoveList::GetNextRawMove() {
+
     if (get < ind)
         return moves[get++];
+
     return 0; // 0 means "no more moves"
 }
 
@@ -75,6 +72,7 @@ Move MoveList::GetBestMove() {
     move = moves[loc];
     if (loc > get) 
         SwapMoves(loc, get);
+
     get++;
     return move; 
 };

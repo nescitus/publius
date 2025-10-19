@@ -13,7 +13,6 @@ void Position::UndoMove(const Move move, UndoData* undo) {
     const Square fromSquare = GetFromSquare(move);
     const Square toSquare = GetToSquare(move);
     const PieceType hunterType = TypeOfPiece(pieceLocation[toSquare]);
-    const PieceType preyType = undo->prey;
     const int moveType = GetTypeOfMove(move);
 
     // Copy stuff needed to undo the move
@@ -32,8 +31,8 @@ void Position::UndoMove(const Move move, UndoData* undo) {
         kingSq[color] = fromSquare;
 
     // Undo capture
-    if (preyType != noPieceType)
-        AddPieceNoHash(~color, preyType, toSquare);
+    if (undo->prey != noPieceType)
+        AddPieceNoHash(~color, undo->prey, toSquare);
 
     // Undo complementary rook move in case of castling
     if (moveType == tCastle) {

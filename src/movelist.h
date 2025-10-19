@@ -16,9 +16,11 @@ public:
     void Clear();
     void AddMove(Square fromSquare, Square toSquare, int flag);
     void AddMove(Move move);
-    int GetLength();
     Move GetNextRawMove();
     Move GetBestMove();
     void ScoreNoisy(Position* pos);
     void ScoreQuiet(Position* pos);
+
+    // Get the lat index of the move list
+    [[nodiscard]] int MoveList::GetLength() { return ind; }
 };

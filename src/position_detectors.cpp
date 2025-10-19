@@ -66,6 +66,7 @@ bool Position::MoveGivesCheck(const Move move) {
     // Collect information about the move
     const MoveDescription md(*this, move);
 
+    // What piece is placed on the destination square?
     PieceType placedPiece = IsMovePromotion(move) ? GetPromotedPiece(move) : md.hunter;
 
     // Locate enemy king
@@ -81,7 +82,7 @@ bool Position::MoveGivesCheck(const Move move) {
     occ = Occupied();
 
     // Remove pawn in case of promotion,
-    // otherwise we will not detech checks
+    // otherwise we will not detect checks
     // along the same ray as the promoting move
     if (IsMovePromotion(move))
         occ ^= Paint(md.fromSquare);
@@ -105,7 +106,7 @@ bool Position::MoveGivesCheck(const Move move) {
     }
 
     // Prepare occupancy map after the move...
-    occ = Occupied() ^ (Paint(md.fromSquare) | Paint(md.toSquare));
+    occ = Occupied() ^ Paint(md.fromSquare, md.toSquare);
 
     // ...remembering to take captures into account
     if (md.prey != noPieceType)

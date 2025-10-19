@@ -96,11 +96,10 @@ int Swap(const Position* pos, const Square fromSquare, const Square toSquare) {
             if ((newHunterMap = pos->Map(color, hunterType) & attackers))
                 break;
 
-        // remove the new "hunter" from the occupancy 
-        // map, one piece at a time (there can be more 
-        // than one piece of the same type attacking 
-        // the toSquare). This acts as a replacement 
-        // to making a move.
+        // remove the new "hunter" from the occupancy map,
+        // one piece at a time (there can be more than one 
+        // piece of the same type attacking the toSquare). 
+        // This  acts as a replacement of making  a  move.
         occupancy ^= (newHunterMap & -newHunterMap);
         
         // check if there are new captures available,

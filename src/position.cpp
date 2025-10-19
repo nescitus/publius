@@ -68,6 +68,7 @@ void Position::Set(const std::string& str) {
                 auto tuple = PieceFromChar(letter);
                 Color color = std::get<0>(tuple);
                 PieceType pieceType = std::get<1>(tuple);
+
                 if (color != colorNone) {
                     AddPieceNoHash(color, pieceType, MirrorRank(square));
                     if (pieceType == King)
@@ -90,14 +91,14 @@ void Position::Set(const std::string& str) {
             case 'K': castleFlags |= wShortCastle; break;
             case 'q': castleFlags |= bLongCastle; break;
             case 'Q': castleFlags |= wLongCastle; break;
-            case 'a': if (Is3or6(str[i + 1])) enPassantSq = (str[i + 1] == '3') ? A3 : A6; break;
-            // b is handled separately, since it doubles as side t move
-            case 'c': if (Is3or6(str[i + 1])) enPassantSq = (str[i + 1] == '3') ? C3 : C6; break;
-            case 'd': if (Is3or6(str[i + 1])) enPassantSq = (str[i + 1] == '3') ? D3 : D6; break;
-            case 'e': if (Is3or6(str[i + 1])) enPassantSq = (str[i + 1] == '3') ? E3 : E6; break;
-            case 'f': if (Is3or6(str[i + 1])) enPassantSq = (str[i + 1] == '3') ? F3 : F6; break;
-            case 'g': if (Is3or6(str[i + 1])) enPassantSq = (str[i + 1] == '3') ? G3 : G6; break;
-            case 'h': if (Is3or6(str[i + 1])) enPassantSq = (str[i + 1] == '3') ? H3 : H6; break;
+            case 'a': TrySettingEp(str[i + 1], A3, A6); break;
+            // 'b' is handled separately, since it doubles as side t move
+            case 'c': TrySettingEp(str[i + 1], C3, C6); break;
+            case 'd': TrySettingEp(str[i + 1], D3, D6); break;
+            case 'e': TrySettingEp(str[i + 1], E3, E6); break;
+            case 'f': TrySettingEp(str[i + 1], F3, F6); break;
+            case 'g': TrySettingEp(str[i + 1], G3, G6); break;
+            case 'h': TrySettingEp(str[i + 1], H3, H6); break;
             }
         }
     }
@@ -105,6 +106,11 @@ void Position::Set(const std::string& str) {
     boardHash = CalculateHashKey();
     pawnKingHash = CalculatePawnKingKey();
     NN.Refresh(*this);
+}
+
+void Position::TrySettingEp(char number, Square whiteSq, Square blackSq) {
+    if (Is3or6(number)) 
+        enPassantSq = (number == '3') ? whiteSq : blackSq;
 }
 
 Bitboard Position::CalculateHashKey() {

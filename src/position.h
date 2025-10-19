@@ -52,6 +52,7 @@ private:
     Bitboard CalculatePawnKingKey();
     [[nodiscard]] bool IsDrawByRepetition() const;
     [[nodiscard]] bool IsDrawByInsufficientMaterial() const;
+    void TrySettingEp(char number, Square whiteSq, Square blackSq);
 
 public:
 
