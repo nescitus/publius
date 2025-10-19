@@ -33,7 +33,7 @@ void UCItimer::Clear(void) {
     SetData(bIncrement, 0);
     SetData(moveTime, 0);
     SetData(maxNodes, 0);
-    SetData(movesToGo, 30);
+    SetData(movesToGo, 16);
     SetData(isInfinite, 0);
     isStrict = false;
     isRepeating = false;
