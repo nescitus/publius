@@ -180,19 +180,27 @@ void FillQuietList(Position* pos, MoveList* list) {
         SerializeMoves(list, fromSquare, moves);
     }
 
-    // Diagonal moves
-    pieces = pos->MapDiagonalMovers(color);
+    // Bishop moves
+    pieces = pos->Map(color, Bishop);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);
         moves = GenerateMoves.Bish(occ, fromSquare) & empty;
         SerializeMoves(list, fromSquare, moves);
     }
 
-    // Straight moves
-    pieces = pos->MapStraightMovers(color);
+    // Rook moves
+    pieces = pos->Map(color, Rook);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);
-        moves = GenerateMoves.Rook(pos->Occupied(), fromSquare) & empty;
+        moves = GenerateMoves.Rook(occ, fromSquare) & empty;
+        SerializeMoves(list, fromSquare, moves);
+    }
+
+    // Queen moves
+    pieces = pos->Map(color, Queen);
+    while (pieces) {
+        fromSquare = PopFirstBit(&pieces);
+        moves = GenerateMoves.Queen(pos->Occupied(), fromSquare) & empty;
         SerializeMoves(list, fromSquare, moves);
     }
 
