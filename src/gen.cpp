@@ -268,8 +268,8 @@ void FillCheckList(Position* pos, MoveList* list) {
         SerializeMoves(list, fromSquare, moves);
     }
 
-    // Diagonal checks
-    pieces = pos->MapDiagonalMovers(color);
+    // Bishop checks
+    pieces = pos->Map(color, Bishop);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);
         moves = GenerateMoves.Bish(occ, fromSquare) & empty;
@@ -277,11 +277,20 @@ void FillCheckList(Position* pos, MoveList* list) {
         SerializeMoves(list, fromSquare, moves);
     }
 
-    // Straight checks
-    pieces = pos->MapStraightMovers(color);
+    // Rook checks
+    pieces = pos->Map(color, Rook);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);
         moves = GenerateMoves.Rook(occ, fromSquare) & empty;
+        moves &= straightCheck;
+        SerializeMoves(list, fromSquare, moves);
+    }
+
+    // Queen checks
+    pieces = pos->Map(color, Queen);
+    while (pieces) {
+        fromSquare = PopFirstBit(&pieces);
+        moves = GenerateMoves.Queen(occ, fromSquare) & empty;
         moves &= straightCheck;
         SerializeMoves(list, fromSquare, moves);
     }
