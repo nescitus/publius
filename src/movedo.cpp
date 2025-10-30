@@ -1,9 +1,8 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
 
 #include "types.h"
 #include "position.h"
-#include "bitgen.h"
-#include "mask.h"
 #include "hashkeys.h"
 #include "piece.h"
 #include "move.h"

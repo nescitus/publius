@@ -15,17 +15,9 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
 #include <iostream>
-#include <fstream>
-#include <sstream>
 #include <algorithm>
-#include <cmath>
-#include <cstring>
-#include <stdio.h>
 #include "position.h"
-#include <cstdint>
 
 // int types
 

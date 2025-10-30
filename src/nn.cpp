@@ -24,7 +24,6 @@
 #include "types.h"
 #include "piece.h"
 #include "nn.h"
-#include <iomanip>
 
 #ifdef __AVX2__
 #include <immintrin.h>

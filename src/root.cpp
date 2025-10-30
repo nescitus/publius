@@ -23,6 +23,10 @@ void Think(Position* pos) {
     Timer.Start();
     Iterate(pos, &sc);
 
+    // In ultra-rare cases where we don't get a move
+    // because  time control is too short or we  got
+    // a stop command, a move from the transposition
+    // table is returned.
     if (Pv.GetBestMove() == 0) {
         Move move; int unused;
         TT.Retrieve(pos->boardHash, &move, &unused, &unused, -Infinity, Infinity, 0, 0);

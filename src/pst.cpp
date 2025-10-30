@@ -43,12 +43,9 @@ void Parameters::TunePst() {
     int delta = 1;
     // possible improvement: randomize order
     for (Square s = A1; s <= H8; ++s) {
-        currentFit = Tuner.TuneSingleSquare(&pos, this, Pawn, s, delta, currentFit);
-        currentFit = Tuner.TuneSingleSquare(&pos, this, Knight, s, delta, currentFit);
-        currentFit = Tuner.TuneSingleSquare(&pos, this, Bishop, s, delta, currentFit);
-        currentFit = Tuner.TuneSingleSquare(&pos, this, Rook, s, delta, currentFit);
-        currentFit = Tuner.TuneSingleSquare(&pos, this, Queen, s, delta, currentFit);
-        currentFit = Tuner.TuneSingleSquare(&pos, this, King, s, delta, currentFit);
+        for (PieceType piece = Pawn; piece < noPieceType; ++piece) {
+            currentFit = Tuner.TuneSingleSquare(&pos, this, piece, s, delta, currentFit);
+        }
     }
 
     Tuner.Init(0);

@@ -32,8 +32,8 @@ Bitboard Position::AttacksTo(const Square sq) const {
     return (Map(White, Pawn) & GenerateMoves.Pawn(Black, sq)) |
         (Map(Black, Pawn) & GenerateMoves.Pawn(White, sq)) |
         (MapPieceType(Knight) & GenerateMoves.Knight(sq)) |
-        ((AllDiagMovers()) & GenerateMoves.Bish(Occupied(), sq)) |
-        ((AllStraightMovers()) & GenerateMoves.Rook(Occupied(), sq)) |
+        (AllDiagMovers() & GenerateMoves.Bish(Occupied(), sq)) |
+        (AllStraightMovers() & GenerateMoves.Rook(Occupied(), sq)) |
         (MapPieceType(King) & GenerateMoves.King(sq));
 }
 
@@ -132,7 +132,7 @@ bool Position::MoveGivesCheck(const Move move) {
         if (checks & MapStraightMovers(md.side)) return true;
     }
 
-    // Checks discovered by castling
+    // Horizontal checks discovered by castling
     // (we make and unmake a move, as it's rare enough
     // and writing out correct conditions would be hard)
     if (GetTypeOfMove(move) == tCastle) {
