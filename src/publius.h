@@ -3,7 +3,7 @@
 
 #pragma once
 
-#define USE_TUNING
+//#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
 // 4365 lines
@@ -16,7 +16,7 @@
 
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
-inline constexpr const char* engineVersion = "1.03"; // bump on releases
+inline constexpr const char* engineVersion = "1.04"; // bump on releases
 inline constexpr const char* netPath = "publius_net192_1.bin"; 
 extern bool isNNUEloaded;
 extern bool isUci;
