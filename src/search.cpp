@@ -243,7 +243,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
         if (eval > beta && depth > 1) {
 
             // Set null move reduction
-            reduction = 4 + depth / 5 + (eval - beta > 200);
+            reduction = 4 + depth / 6 + (eval - beta > 200);
 
             // Do null move search, giving the opponent
             // two moves in a row
