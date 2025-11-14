@@ -12,12 +12,20 @@
 
 // r2q1r2/1b2bpkp/p3p1p1/2ppP1P1/7R/1PN1BQR1/1PP2P1P/4K3 w - - 0 1 1.Qf6, unsolved
 
-// Bench at depth 15 took 20879 milliseconds, searching 23603453 nodes at 1130487 nodes per second.
+// Bench at depth 15 took 25622 milliseconds, searching 25859065 nodes at 1009252 nodes per second.
+
+#define FAST_POPCNT
+// uncomment this when compiling for modern Windows systems
+// to gain a little speedup.
 
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
-inline constexpr const char* engineVersion = "1.03"; // bump on releases
-inline constexpr const char* netPath = "publius_net192_1.bin"; 
+#ifdef FAST_POPCNT
+inline constexpr const char* engineVersion = "1.05"; // bump on releases
+#else
+inline constexpr const char* engineVersion = "1.05 slow";
+#endif
+inline constexpr const char* netPath = "publius_net256_1.bin"; 
 extern bool isNNUEloaded;
 extern bool isUci;
 extern int nnueWeight;

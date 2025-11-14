@@ -68,7 +68,10 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     // favourable captures, so that we may consider their 
     // evaluation stable). That's why at  leaf  nodes  we 
     // initiate a capture-only search instead of returning 
-    // the evaluation score. 
+    // the evaluation score. <= comparison is used because
+    // we  future-proof against reductions bringing  depth 
+    // down below 0.
+
     if (depth <= 0)
         return Quiesce(pos, ply, 0, alpha, beta);
 
