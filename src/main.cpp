@@ -42,6 +42,7 @@ int main() {
 #endif
 
     isUci = false;
+    isNNUEloaded = false;
     Params.Init();
     nnueWeight = 80;
     hceWeight = 0;

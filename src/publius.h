@@ -18,14 +18,32 @@
 // uncomment this when compiling for modern Windows systems
 // to gain a little speedup.
 
+// #define HCE_ONLY
+// turn that on if you want a version that uses only handcrafted
+// evaluation function and does not load a NNUE
+
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
-#ifdef FAST_POPCNT
 inline constexpr const char* engineVersion = "1.05"; // bump on releases
+inline constexpr const char* netPath = "publius_net256_1.bin";
+
+// Engine's name will contain information about unusual
+// compile-time settings
+
+#ifdef HCE_ONLY
+    #ifdef FAST_POPCNT
+    inline constexpr const char* compileParams = " HCE";
+    #else
+    inline constexpr const char* compileParams = " HCE slow";
+    #endif
 #else
-inline constexpr const char* engineVersion = "1.05 slow";
+    #ifdef FAST_POPCNT
+    inline constexpr const char* compileParams = "";
+    #else
+    inline constexpr const char* compileParams = " slow";
+    #endif
 #endif
-inline constexpr const char* netPath = "publius_net256_1.bin"; 
+
 extern bool isNNUEloaded;
 extern bool isUci;
 extern int nnueWeight;

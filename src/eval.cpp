@@ -86,6 +86,7 @@ int Evaluate(Position* pos, EvalData* e) {
         return score;
 #endif
 
+#ifndef HCE_ONLY
     if (isNNUEloaded) {
         score = 0;
         if (nnueWeight > 0)
@@ -93,7 +94,9 @@ int Evaluate(Position* pos, EvalData* e) {
         if (hceWeight > 0)
             score += EvalHCE(pos, e) * hceWeight / 100;
     }
-    else {
+    else 
+#endif
+    {
         score = EvalHCE(pos, e);
     }
 
