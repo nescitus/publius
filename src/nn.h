@@ -94,5 +94,4 @@ using i32 = int32_t;
             value += GetScrelu(inputs[i]) * weights[i];
 
         return value;
-
     };

@@ -5,13 +5,16 @@
 
 #include "move.h"
 
-constexpr Move dummyMove = CreateMove(A1, B8, 0); // clearly illegal
+// Constant used to denote clearly illegal move
+constexpr Move dummyMove = CreateMove(A1, B8, 0);
 
+// Struct for saving search data related to a given depth
 struct Stack {
 	int previousCaptureTo; // target square or previous capture if applicable, else -1
-	int previousEval; // eval for each ply, to see if we are improving or not
+	int previousEval;      // eval for each ply, to see if we are improving or not
 };
 
+// SearchContext holds data generated and passed around during search
 struct SearchContext {
 	Stack stack[SearchTreeSize];
 	Move excludedMove;

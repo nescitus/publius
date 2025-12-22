@@ -5,7 +5,6 @@
 #include <iostream>
 #include "types.h"
 #include "bitboard.h"
-#include "bitgen.h"
 #include "limits.h"
 #include "position.h"
 #include "movelist.h"
@@ -24,7 +23,7 @@
 #include "search.h"
 
 const int singularDepth = 7;
-static const Stack rootSentinel{ /*eval=*/0, /*last capture target=*/-1 };
+static const Stack rootSentinel{/*last capture target=*/-1, /*eval=*/0 };
 
 int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded) {
 
@@ -66,11 +65,10 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     // QUIESCENCE SEARCH entry point. We want to evaluate
     // quiet positions (i.e. positions where there are no
     // favourable captures, so that we may consider their 
-    // evaluation stable). That's why at  leaf  nodes  we 
-    // initiate a capture-only search instead of returning 
-    // the evaluation score. <= comparison is used because
-    // we  future-proof against reductions bringing  depth 
-    // down below 0.
+    // evaluation stable). That's why at leaf nodes we run 
+    // a  capture-only  search instead of  returning  eval.
+    // We use <= sign to future-proof against reductions
+    // bringing depth down below zero.
 
     if (depth <= 0)
         return Quiesce(pos, ply, 0, alpha, beta);
@@ -87,7 +85,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     if (Timer.isStopping)
         return 0;
 
-    // Quick exit on on a statically detected draw, unless 
+    // Quick exit on a statically detected draw, unless 
     // we are at root, where we need to have a move.
     if (!isRoot && pos->IsDraw()) {
 
@@ -100,7 +98,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
 
     // MATE DISTANCE PRUNING, a minor improvement shaving 
     // off some nodes when the checkmate is near. It pre-
-    // vents looking for the longer checmkates if a shorter 
+    // vents looking for the longer checkmates if a shorter 
     // one  has been already found. It cannot be  used  at 
     // the root, as it doesn't return a move, only a value.
 
@@ -160,8 +158,8 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
         }
     }
 
-    // Are we in check? Knowing that is useful for pruning
-    // reduction, or extension decisions
+    // Are we in check? Knowing that helps to decide about
+    // pruning, reductions or extensions
     const bool isInCheckBeforeMoving = pos->IsInCheck();
 
     // Init eval and improving flag. Nodes where  the side
@@ -175,7 +173,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     // position table. It modifies a few things, including
     // null move probability (~20 Elo)
     if (foundTTrecord) {
-        if (hashFlag & (score > eval ? upperBound : lowerBound))
+        if (hashFlag & ((score > eval) ? upperBound : lowerBound))
             eval = score;
     }
 
@@ -258,9 +256,9 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
                 return 0;
 
             // NULL MOVE VERIFICATION - at higher depths
-            // we perform a normal search to a reduced
-            // depth. The idea is to have some safeguard
-            // against zugzwangs (~10 Elo)
+            // we  verify null move search with a normal 
+            // reduced  depth  search to  guard  against 
+            // zugzwangs (~10 Elo)
             if (depth - reduction > 5 && score >= beta)
                 score = Search(pos, sc, ply, alpha, beta, depth - reduction - 4, true, false);
 
@@ -277,7 +275,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     // to  no improvement. Score margin is increased  with 
     // depth. Please note that our implementation does not 
     // prune moves that give check, which is a bit unusual.
-    // (~2 Elo, so definately needs tuning)
+    // (~2 Elo, so definitely needs tuning)
 
     bool canDoFutility = (depth <= 6 &&
         !isInCheckBeforeMoving &&
@@ -286,7 +284,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
 
     // INTERNAL ITERATIVE REDUCTION  (non-standard). Reduce
     // when position is not on transposition table. An idea
-    // from Prodeo chess engine (bt Ed Schroder). Note that 
+    // from Prodeo chess engine (by Ed Schroder). Note that 
     // that  the implementation is  non-standard:  normally
     // pv-nodes  are not excluded, but this is what  worked 
     // for this engine. (~9 Elo)
@@ -441,11 +439,11 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
         // Set new search depth
         newDepth = depth - 1 + doExtension;
 
-        // LATE MOVE REDUCTION (LMR). We assume that  with
-        // decent  move ordering early moves are much more 
-        // likely to cause a cutoff. That's why we  search 
-        // later  moves at the reduced depth.  However, if 
-        // reduced depth search scores above beta, we need 
+        // LATE MOVE REDUCTION (LMR).  We assume that  with
+        // decent  move ordering early moves are much  more 
+        // likely  to cause a cutoff. That's why we  search 
+        // later  moves  at the reduced depth.  However, if 
+        // reduced depth search scores above alpha, we need 
         // to re-search at the normal depth (~125 Elo)
         if (depth > 1 &&
             quietMovesTried > 3 &&
@@ -590,6 +588,8 @@ void TryInterrupting(void) {
 
     // We don't check for timeout in every node,
     // but only every so often, to improve speed.
+    // We also let the engine finish depth 1 search
+    // to be sure we have a move to return.
     if (Timer.nodeCount & 511 || Timer.rootDepth == 1)
         return;
 

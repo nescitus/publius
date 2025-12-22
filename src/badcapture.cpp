@@ -41,7 +41,7 @@ bool IsBadCapture(Position* pos, Move move) {
 }
 
 // Static Exchange Evaluator tries to calculate 
-// the valueof an exchange on a single square 
+// the value of an exchange on a single square 
 // without playing out the moves. It is blind 
 // to tactics, such as checks, pins, promotions 
 // and overloaded defenders.

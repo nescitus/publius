@@ -92,7 +92,7 @@ bool IsPawnJumpLegal(Position* pos, const MoveDescription *md) {
     // We need to test whether we are moving a pawn,
     // see comment at the top of the file. We also
     // need to enter this function in order to reject
-    // moves with the wring flag.
+    // moves with the wrong flag.
 
     if (md->hunter == Pawn &&
         md->prey == noPieceType &&
