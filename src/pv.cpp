@@ -32,13 +32,16 @@ void PvCollector::Update(const int ply, const Move move) {
     size[ply] = size[ply + 1];
 }
 
+// Returns best move
 Move PvCollector::GetBestMove() {
     return line[0][0];
 }
 
+// Overwrites best move with a move from th external
+// source, resets ponder move
 void PvCollector::EmergencyOverwrite(Move move) {
     line[0][0] = move;
-    line[0][1] -= 0;
+    line[0][1] = 0; // no ponder move
 }
 
 // Sends best move (and ponder move if present)
