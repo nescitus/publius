@@ -5,9 +5,6 @@
 
 #include "move.h"
 
-// Constant used to denote clearly illegal move
-constexpr Move dummyMove = CreateMove(A1, B8, 0);
-
 // Struct for saving search data related to a given depth
 struct Stack {
 	int previousCaptureTo; // target square or previous capture if applicable, else -1

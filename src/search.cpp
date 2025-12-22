@@ -145,7 +145,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     // Prepare for singular extension
     if (!isRoot &&                  // we are not at the root
         depth > singularDepth &&   // sufficient remaining depth
-        sc->excludedMove == dummyMove) // we are not in the singular search
+        sc->excludedMove == 0) // we are not in the singular search
     {
 
         if (TT.Retrieve(pos->boardHash, &singularMove, &singularScore, &hashFlag, alpha, beta, depth - 4, ply)) {
@@ -340,7 +340,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
             singularMove &&
             move == singularMove && // we are about to search the best move from tt
             singularExtension &&    // conditions for the singular search are met
-            sc->excludedMove == dummyMove) {
+            sc->excludedMove == 0) {
 
             // Move from the transposition table might  be
             // a singular move. We are trying to  disprove 
@@ -362,7 +362,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
             // in  the transposition table, because we have
             // actively avoided searching the best move.
             int exclusionSearchScore = Search(pos, sc, ply + 1, newAlpha, newAlpha + 1, (depth - 1) / 2, false, true);
-            sc->excludedMove = dummyMove;
+            sc->excludedMove = 0;
 
             if (Timer.isStopping)
                 return 0;
@@ -627,5 +627,5 @@ void ClearSearchContext(SearchContext& sc) {
         sc.stack[i].previousEval = 0;
     }
 
-    sc.excludedMove = dummyMove;
+    sc.excludedMove = 0;
 }
