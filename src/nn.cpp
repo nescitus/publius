@@ -19,7 +19,7 @@
 // If AVX2 isn't available, we can still compile the scalar code 
 // (#ifndef part), and performance is still correct - just slower.
 
-//#define __AVX2__
+#define __AVX2__
 
 #include "types.h"
 #include "piece.h"
