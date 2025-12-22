@@ -1,0 +1,108 @@
+// Publius - Didactic public domain bitboard chess engine 
+// by Pawel Koziol
+
+#include "types.h"
+#include "bitboard.h"
+
+// color-dependent forward fill
+Bitboard FillForward(const Bitboard b, const Color color) {
+
+    return (color == White) ? FillNorth(NorthOf(b)) 
+                            : FillSouth(SouthOf(b));
+}
+
+// Occluded fill algorithms are taken from
+// https://www.chessprogramming.org/Kogge-Stone_Algorithm#Occluded_Fill
+// they do multiple shifts, shifting both the bitboard
+// the bitboard and the "shadow" cast by the blocking 
+// pieces. You would be able to generate rook moves
+// by combining orthogonal fill functions and bishop
+// moves by combining diagonal fill functions, but
+// bitgen.cpp implements faster solution - namely 
+// kindergarten bitboards.
+
+Bitboard FillOcclSouth(Bitboard b, Bitboard o) {
+
+    b |= o & (b >> 8);
+    o &= (o >> 8);
+    b |= o & (b >> 16);
+    o &= (o >> 16);
+    b |= o & (b >> 32);
+    return b;
+}
+
+Bitboard FillOcclNorth(Bitboard b, Bitboard o) {
+
+    b |= o & (b << 8);
+    o &= (o << 8);
+    b |= o & (b << 16);
+    o &= (o << 16);
+    b |= o & (b << 32);
+    return b;
+}
+
+Bitboard FillOcclEast(Bitboard b, Bitboard o) {
+
+    o &= excludeA;
+    b |= o & (b << 1);
+    o &= (o << 1);
+    b |= o & (b << 2);
+    o &= (o << 2);
+    b |= o & (b << 4);
+    return b;
+}
+
+Bitboard FillOcclNE(Bitboard b, Bitboard o) {
+
+    o &= excludeA;
+    b |= o & (b << 9);
+    o &= (o << 9);
+    b |= o & (b << 18);
+    o &= (o << 18);
+    b |= o & (b << 36);
+    return b;
+}
+
+Bitboard FillOcclSE(Bitboard b, Bitboard o) {
+
+    o &= excludeA;
+    b |= o & (b >> 7);
+    o &= (o >> 7);
+    b |= o & (b >> 14);
+    o &= (o >> 14);
+    b |= o & (b >> 28);
+    return b;
+}
+
+Bitboard FillOcclWest(Bitboard b, Bitboard o) {
+
+    o &= excludeH;
+    b |= o & (b >> 1);
+    o &= (o >> 1);
+    b |= o & (b >> 2);
+    o &= (o >> 2);
+    b |= o & (b >> 4);
+    return b;
+}
+
+Bitboard FillOcclSW(Bitboard b, Bitboard o) {
+
+    o &= excludeH;
+    b |= o & (b >> 9);
+    o &= (o >> 9);
+    b |= o & (b >> 18);
+    o &= (o >> 18);
+    b |= o & (b >> 36);
+    return b;
+}
+
+Bitboard FillOcclNW(Bitboard b, Bitboard o) {
+
+    o &= excludeH;
+    b |= o & (b << 7);
+    o &= (o << 7);
+    b |= o & (b << 14);
+    o &= (o << 14);
+    b |= o & (b << 28);
+    return b;
+}
