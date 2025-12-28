@@ -23,7 +23,7 @@
 #include "search.h"
 
 const int singularDepth = 7;
-static const Stack rootSentinel{/*last capture target=*/-1, /*eval=*/0 };
+static const Stack rootSentinel{/*capture target=*/-1, /*eval=*/0 };
 
 int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded) {
 
@@ -47,9 +47,9 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     singularMove = 0;
 
     // Init stack pointers for shorter code
-    Stack& st = sc->stack[ply];
-    const Stack& pst  = (ply     ? sc->stack[ply - 1] : rootSentinel);
-    const Stack& ppst = (ply > 1 ? sc->stack[ply - 2] : rootSentinel);
+    Stack& currentPly = sc->stack[ply];
+    const Stack& onePlyAgo   = (ply     ? sc->stack[ply - 1] : rootSentinel);
+    const Stack& twoPliesAgo = (ply > 1 ? sc->stack[ply - 2] : rootSentinel);
 
     // Root node is different because we need to record 
     // the best move
@@ -178,12 +178,12 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     }
 
     // Save eval for the current ply.
-    st.previousEval = eval;
+    currentPly.eval = eval;
 
     // We  check  whether  the eval has improved from  two
     // plies ago. As of now, it affects  late move pruning
     // only, but some more uses will be tested.
-    const bool improving = SetImproving(ppst, eval, ply);
+    const bool improving = SetImproving(twoPliesAgo, eval, ply);
 
     // NODE-LEVEL PRUNING. Here we try to avoid  searching
     // the current node. All the techniques we use for  it 
@@ -316,9 +316,9 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
         // Remember destination square if move has been
         // a capture, preparing for the recapture extension.
         if (IsMoveNoisy(pos, move))
-            st.previousCaptureTo = GetToSquare(move);
+            currentPly.captureSquare = GetToSquare(move);
         else
-            st.previousCaptureTo = -1;
+            currentPly.captureSquare = -1;
 
         // Detect if a move gives check (without playing it).
         // This is not a popular idea, but Koivisto does it.
@@ -329,9 +329,9 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
 
         // Recapture extension - pv node or low depth (~28 Elo)
         if (ply && !doExtension) {
-            if (pst.previousCaptureTo == GetToSquare(move) &&
+            if (onePlyAgo.captureSquare == GetToSquare(move) &&
                (isPv || depth < 7))
-                doExtension = true;;
+                doExtension = true;
         }
 
         // Singular extension: tried once per search
@@ -572,7 +572,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
 }
 
 bool SetImproving(const Stack &ppst, int eval, int ply) {
-    return !(ply > 1 && ppst.previousEval > eval);
+    return !(ply > 1 && ppst.eval > eval);
 }
 
 void TryInterrupting(void) {
@@ -623,8 +623,8 @@ void TryInterrupting(void) {
 void ClearSearchContext(SearchContext& sc) {
 
     for (int i = 0; i < SearchTreeSize; ++i) {
-        sc.stack[i].previousCaptureTo = -1;
-        sc.stack[i].previousEval = 0;
+        sc.stack[i].captureSquare = -1;
+        sc.stack[i].eval = 0;
     }
 
     sc.excludedMove = 0;

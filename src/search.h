@@ -7,8 +7,8 @@
 
 // Struct for saving search data related to a given depth
 struct Stack {
-	int previousCaptureTo; // target square or previous capture if applicable, else -1
-	int previousEval;      // eval for each ply, to see if we are improving or not
+	int captureSquare; // target square of previous capture if applicable, else -1
+	int eval;          // eval for each ply, to see if we are improving or not
 };
 
 // SearchContext holds data generated and passed around during search
