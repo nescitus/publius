@@ -57,6 +57,8 @@ using i32 = int32_t;
     {
     private:
         alignas(64) i16 accumulator[2][HIDDEN_SIZE];
+        int networkWidth = 256;
+        i32 SumHalfAccumulator(i16 inputs[HIDDEN_SIZE], i16 weights[HIDDEN_SIZE]);
     public:
         Net();
         i32 GetScore(i8 color);
@@ -86,14 +88,4 @@ using i32 = int32_t;
 
         i32 value = std::clamp(input, 0, L0_SCALE);
         return value * value;
-    };
-
-    constexpr i32 SumHalfAccumulator(i16 inputs[HIDDEN_SIZE], i16 weights[HIDDEN_SIZE]) {
-
-        i32 value = 0;
-
-        for (size_t i = 0; i < HIDDEN_SIZE; ++i)
-            value += GetScrelu(inputs[i]) * weights[i];
-
-        return value;
     };

@@ -67,7 +67,7 @@
 
         // Pick N (any multiple of 16, 16..256) with smallest extra bytes
         constexpr size_t PAD = 64; // allowed trailing padding/noise
-        size_t bestN = 256;
+        networkWidth = 256;
         size_t bestExtra = (size_t)-1;
 
         for (size_t N = 16; N <= 256; N += 16) {
@@ -77,11 +77,11 @@
             size_t extra = fileBytes - need;
             if (extra <= PAD && extra < bestExtra) {
                 bestExtra = extra;
-                bestN = N;
+                networkWidth = N;
             }
         }
 
-        const size_t N = bestN;
+        const size_t N = networkWidth;
 
         // Zero-fill so unused neurons [N..255] are inert
         std::memset(&PARAMS, 0, sizeof(PARAMS));
@@ -133,6 +133,20 @@
         return (score / L0_SCALE + PARAMS.outputBias) * EVAL_SCALE / MUL_SCALE;
     }
 
+    i32 Net::SumHalfAccumulator(i16 inputs[HIDDEN_SIZE], i16 weights[HIDDEN_SIZE]) {
+
+        i32 value = 0;
+
+        if (networkWidth < HIDDEN_SIZE)
+            for (size_t i = 0; i < networkWidth; ++i)
+                value += GetScrelu(inputs[i]) * weights[i];
+        else
+            for (size_t i = 0; i < HIDDEN_SIZE; ++i)
+                value += GetScrelu(inputs[i]) * weights[i];
+
+        return value;
+    };
+
     // Adds "a feature" (a piece on a square) to the accumulator
     void Net::Add(i8 color, i8 type, i8 square) {
 
@@ -164,10 +178,16 @@
         }
 #else
         // Update the accumulator
-        for (size_t i = 0; i < HIDDEN_SIZE; ++i) {
-            this->accumulator[0][i] += PARAMS.inputWeights[indexWhite][i];
-            this->accumulator[1][i] += PARAMS.inputWeights[indexBlack][i];
-        }
+        if (networkWidth < HIDDEN_SIZE)
+            for (size_t i = 0; i < networkWidth; ++i) {
+                this->accumulator[0][i] += PARAMS.inputWeights[indexWhite][i];
+                this->accumulator[1][i] += PARAMS.inputWeights[indexBlack][i];
+            }
+        else
+            for (size_t i = 0; i < HIDDEN_SIZE; ++i) {
+                this->accumulator[0][i] += PARAMS.inputWeights[indexWhite][i];
+                this->accumulator[1][i] += PARAMS.inputWeights[indexBlack][i];
+            }
 #endif
     }
 
@@ -198,12 +218,16 @@
             _mm256_storeu_si256((__m256i*)(a1 + i), A1);
         }
 #else
-
-        for (size_t i = 0; i < HIDDEN_SIZE; ++i) {
-            this->accumulator[0][i] -= PARAMS.inputWeights[indexWhite][i];
-            this->accumulator[1][i] -= PARAMS.inputWeights[indexBlack][i];
-        }
-
+        if (networkWidth < HIDDEN_SIZE)
+            for (size_t i = 0; i < networkWidth; ++i) {
+                this->accumulator[0][i] -= PARAMS.inputWeights[indexWhite][i];
+                this->accumulator[1][i] -= PARAMS.inputWeights[indexBlack][i];
+            }
+        else
+            for (size_t i = 0; i < HIDDEN_SIZE; ++i) {
+                this->accumulator[0][i] -= PARAMS.inputWeights[indexWhite][i];
+                this->accumulator[1][i] -= PARAMS.inputWeights[indexBlack][i];
+            }
 #endif
     }
 
@@ -247,6 +271,15 @@
         }
 
 #else
+        if (networkWidth < HIDDEN_SIZE)
+            for (size_t i = 0; i < networkWidth; ++i) {
+                this->accumulator[0][i] += PARAMS.inputWeights[addW][i];
+                this->accumulator[1][i] += PARAMS.inputWeights[addB][i];
+                this->accumulator[0][i] -= PARAMS.inputWeights[subW][i];
+                this->accumulator[1][i] -= PARAMS.inputWeights[subB][i];
+            }
+        else
+
         for (size_t i = 0; i < HIDDEN_SIZE; ++i) {
             this->accumulator[0][i] += PARAMS.inputWeights[addW][i];
             this->accumulator[1][i] += PARAMS.inputWeights[addB][i];

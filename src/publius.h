@@ -26,6 +26,10 @@ inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
 inline constexpr const char* engineVersion = "1.06"; // bump on releases
 inline constexpr const char* netPath = "publius_net256_1.bin";
+//inline constexpr const char* netPath = "publius_net32_4.bin";
+
+// net32 : info depth 16 time 1917 nodes 1263632 nps 659171
+// net256: info depth 16 time 11784 nodes 2580714 nps 219001
 
 // Engine's name will contain information about unusual
 // compile-time settings

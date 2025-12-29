@@ -99,6 +99,9 @@ int Evaluate(Position* pos, EvalData* e) {
         score = EvalHCE(pos, e);
     }
 
+    // Make sure eval doesn't exceed mate score
+    return std::clamp(score, -EvalLimit, EvalLimit);
+
     // Save the score in the evaluation hashtable
     EvalHash.Save(pos->boardHash, score);
 
@@ -110,8 +113,7 @@ int EvalNN(Position* pos) {
     // Get score from the neural network
     int score = NN.GetScore(pos->GetSideToMove());
 
-    // Make sure eval doesn't exceed mate score
-    return std::clamp(score, -EvalLimit, EvalLimit);
+    return score;
 }
 
 // Hand-crafted evaluation function
@@ -184,9 +186,6 @@ int EvalHCE(Position* pos, EvalData* e) {
         multiplier = GetDrawMul(pos, Black, White);
 
     score = (score * multiplier) / 64;
-
-    // Make sure eval doesn't exceed mate score
-    score = std::clamp(score, -EvalLimit, EvalLimit);
 
     // Make score relative to the side to move
     if (pos->GetSideToMove() == Black)
