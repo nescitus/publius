@@ -1,12 +1,11 @@
 // Publius - Didactic public domain bitboard chess engine 
 // by Pawel Koziol
 
-// Hand-crafted evaluation function is
-// a compromise between size, the need to cover
-// the most important elements, and strength.
-// It would be possible to increase Publius'
-// strength by 100-150 Elo at the cost of doubling
-// its size, but this wouldn't be a good idea
+// Hand-crafted evaluation function is a compromise
+// between size, the need to cover the most important 
+// elements, and strength. It would be possible to 
+// increase Publius' strength by 100-150 Elo at the cost 
+// of doubling eval size, but this wouldn't be a good idea
 // for an educational engine ;)
 
 // What is included:
@@ -561,11 +560,8 @@ void EvalKingAttacks(EvalData* e, Color color) {
 int Interpolate(EvalData* e) {
 
     // Sum all the eval factors
-    int mgScore = ScoreMG(e->score[White])
-                - ScoreMG(e->score[Black]);
-
-    int egScore = ScoreEG(e->score[White])
-                - ScoreEG(e->score[Black]);
+    int mgScore = ScoreMG(e->score[White]) - ScoreMG(e->score[Black]);
+    int egScore = ScoreEG(e->score[White]) - ScoreEG(e->score[Black]);
 
     // Score interpolation
     int mgPhase = std::min(MaxGamePhase, e->gamePhase);

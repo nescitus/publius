@@ -4,8 +4,10 @@
 // NNUE evaluation. Net architecture and constants make it
 // equivalent to the simple example provided by the bullet trainer:
 // https://github.com/jw1912/bullet/blob/main/examples/simple.rs
-// The architecture is (768 -> HIDDEN_SIZE)x2 -> 1 and the only
-// difference is that the number of hidden neurons is reduced to 16.
+// The architecture is (768 -> HIDDEN_SIZE)x2 -> 1. Publius
+// is able to read networks with any number of hidden neurons 
+// from 16 to 256, as long as it is the multiple of 16, but
+// smaller networks aren't faster.
 
 // This code draws some inspiration from Iris chess engine
 // (https://github.com/citrus610/iris):

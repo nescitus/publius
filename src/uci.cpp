@@ -21,6 +21,7 @@
 #include "params.h"
 #include "tuner.h"
 #include "api.h"
+#include "eval.h"
 #include "nn.h"
 
 #ifdef USE_TUNING
@@ -258,6 +259,7 @@ void OnNewGame(void) {
 
     History.Clear();
     TT.Clear();
+    EvalHash.Clear();
 }
 
 void OnStopCommand() {
@@ -280,4 +282,6 @@ void TryLoadingNNUE(const char * path) {
     if (!isNNUEloaded)
         std::cout << "info string NNUE file " << path
         << " not found. Reverting to HCE eval." << "\n" << std::flush;
+    else
+        NN.Clear();
 }

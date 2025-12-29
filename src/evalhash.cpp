@@ -47,3 +47,10 @@ bool EvalHashTable::Retrieve(Bitboard key, int* score) const {
 size_t EvalHashTable::Address(Bitboard key) const {
     return key & (tableSize - 1); // Bitwise AND operation
 }
+
+void EvalHashTable::Clear() {
+    for (int i = 0; i < tableSize; i++) {
+        EvalTT[i].key = 0;
+        EvalTT[i].val = 0;
+    }
+}

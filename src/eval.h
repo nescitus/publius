@@ -15,6 +15,7 @@ class EvalHashTable {
 public:
     EvalHashTable(size_t size); // constructor
     ~EvalHashTable(); // destructor
+    void Clear();
     void Save(Bitboard key, int val);
     bool Retrieve(Bitboard key, int* score) const;
 

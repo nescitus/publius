@@ -4,7 +4,10 @@
 // NNUE evaluation. Net architecture and constants make it
 // equivalent to the simple example provided by the bullet trainer:
 // https://github.com/jw1912/bullet/blob/main/examples/simple.rs
-// The architecture is (768 -> 128)x2 -> 1
+// The architecture is (768 -> N from 16 to 256)x2 -> 1.
+// Publius is able to use neworks with hidden neuron count
+// from 16 to 256, as long as it is a multiple of 16, but smaller
+// nets aren't faster.
 
 // This code draws some inspiration from Iris chess engine
 // (https://github.com/citrus610/iris):
@@ -19,11 +22,12 @@
 // If AVX2 isn't available, we can still compile the scalar code 
 // (#ifndef part), and performance is still correct - just slower.
 
-//#define __AVX2__
+#define __AVX2__
 
 #include "types.h"
 #include "piece.h"
 #include "nn.h"
+#include "publius.h"
 
 #ifdef __AVX2__
 #include <immintrin.h>
@@ -34,19 +38,88 @@
         this->Clear();
     }
 
-    // Loads a net from the bullet-compatibile file
+    static bool ReadI16(std::FILE* f, i16* dst, size_t count) {
+        return std::fread(dst, sizeof(i16), count, f) == count;
+    }
+
     bool Net::LoadFromFile(const char* path) {
 
         std::FILE* f = std::fopen(path, "rb");
         if (!f) return false;
 
-        // Read the whole Parameters blob
-        const size_t need = sizeof(PARAMS);
-        const size_t got = std::fread(&PARAMS, 1, need, f);
+        // Measure file size
+        std::fseek(f, 0, SEEK_END);
+        long fileBytesL = std::ftell(f);
+        std::rewind(f);
+
+        if (fileBytesL <= 0) { 
+            std::fclose(f); 
+            return false; 
+        }
+
+        const size_t fileBytes = (size_t)fileBytesL;
+
+        // Packed layout size in bytes (without tail padding):
+        // bytes = (771*N + 1) * sizeof(i16) = 1542*N + 2
+        auto packedBytes = [](size_t N) -> size_t {
+            return 1542u * N + 2u;
+            };
+
+        // Pick N (any multiple of 16, 16..256) with smallest extra bytes
+        constexpr size_t PAD = 64; // allowed trailing padding/noise
+        size_t bestN = 256;
+        size_t bestExtra = (size_t)-1;
+
+        for (size_t N = 16; N <= 256; N += 16) {
+            size_t need = packedBytes(N);
+            if (fileBytes < need) continue;
+
+            size_t extra = fileBytes - need;
+            if (extra <= PAD && extra < bestExtra) {
+                bestExtra = extra;
+                bestN = N;
+            }
+        }
+
+        const size_t N = bestN;
+
+        // Zero-fill so unused neurons [N..255] are inert
+        std::memset(&PARAMS, 0, sizeof(PARAMS));
+
+        // Read packed params into the first N columns
+        for (size_t in = 0; in < INPUT_SIZE; ++in) {
+            if (!ReadI16(f, &PARAMS.inputWeights[in][0], N)) {
+                std::fclose(f);
+                return false;
+            }
+        }
+
+        if (!ReadI16(f, &PARAMS.inputBiases[0], N)) {
+            std::fclose(f);
+            return false;
+        }
+
+        if (!ReadI16(f, &PARAMS.outputWeights[0][0], N) ||
+            !ReadI16(f, &PARAMS.outputWeights[1][0], N)) {
+            std::fclose(f);
+            return false;
+        }
+
+        if (std::fread(&PARAMS.outputBias, sizeof(i16), 1, f) != 1) {
+            std::fclose(f);
+            return false;
+        }
+
+        // Ignore whatever remains (tail padding)
         std::fclose(f);
 
-        // size matches 
-        return got == need;
+        // Rebuild accumulator from loaded biases
+        this->Clear();
+
+        // Clear history and all the transposition tables
+        OnNewGame();
+
+        return true;
     }
 
     // Returns NNUE evaluation of position
