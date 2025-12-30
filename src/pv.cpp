@@ -17,6 +17,9 @@
 void PvCollector::Clear() {
 
     for (int i = 0; i < SearchTreeSize + 2; i++)
+        size[i] = 0;
+
+    for (int i = 0; i < SearchTreeSize + 2; i++)
         for (int j = 0; j < SearchTreeSize + 2; j++)
             line[i][j] = 0;
 }
@@ -59,12 +62,25 @@ void PvCollector::SendBestMove() {
     }
 }
 
-// Displays engine's main line
+// Displays engine's main line during non-multipv search
 void PvCollector::Display(int score) {
-
-    std::string scoreType;
     
+    std::cout << "info depth " << Timer.rootDepth
+              << GetOutputStringWithoutDepth(score) << std::flush;
+}
+
+std::string PvCollector::GetOutputStringWithoutDepth(int score) {
+
     Timer.RefreshStats();
+
+    return " time " + std::to_string(Timer.timeUsed)
+         + " nodes " + std::to_string(Timer.nodeCount)
+         + " nps " + std::to_string(Timer.nps)
+         + GetScoreString(score)
+         + GetPvString() + "\n";
+}
+
+std::string PvCollector::GetScoreString(int score) {
 
     // If we are outside of normal evaluation range,
     // then the engine either gives a checkmate
@@ -72,23 +88,23 @@ void PvCollector::Display(int score) {
     // the score into distance to mate and set
     // approppriate score type ("mate" instead of
     // the usual centipawns)
-    scoreType = "mate";
+
+    std::string scoreType = " score mate";
     if (score < -EvalLimit)
         score = (-MateScore - score) / 2;
     else if (score > EvalLimit)
         score = (MateScore - score + 1) / 2;
-    else scoreType = "cp";
+    else scoreType = " score cp";
 
-    // print statistics
-    std::cout << "info depth " << Timer.rootDepth
-              << " time " << Timer.timeUsed
-              << " nodes " << Timer.nodeCount
-              << " nps " << Timer.nps
-              << " score "
-              << scoreType << " " << score << " pv";
+    return scoreType + " " + std::to_string(score);
+}
 
+std::string PvCollector::GetPvString() {
+
+    std::string result = " pv";
+    
     for (int j = 0; j < size[0]; ++j)
-        std::cout << " " << MoveToString(line[0][j]);
+        result += " " + MoveToString(line[0][j]);
 
-    std::cout << "\n" << std::flush;
+    return result;
 }

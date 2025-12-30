@@ -10,6 +10,9 @@ public:
     Move GetBestMove();
     void EmergencyOverwrite(Move move);
     void Display(int score);
+    std::string GetOutputStringWithoutDepth(int score);
+    std::string GetScoreString(int score);
+    std::string GetPvString();
 
     // array keeping principal variation, also
     // used to retrieve best move and ponder move

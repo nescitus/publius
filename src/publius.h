@@ -52,6 +52,7 @@ extern bool isNNUEloaded;
 extern bool isUci;
 extern int nnueWeight;
 extern int hceWeight;
+extern int multiPv;
 
 // entry points
 

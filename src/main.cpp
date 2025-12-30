@@ -33,6 +33,7 @@ bool isNNUEloaded;
 bool isUci;
 int nnueWeight;
 int hceWeight;
+int multiPv;
 
 int main() {
 
@@ -41,6 +42,7 @@ int main() {
               << "Comment out USE_TUNING in publius.h and recompile\n";
 #endif
 
+    multiPv = 1;
     isUci = false;
     isNNUEloaded = false;
     Params.Init();

@@ -313,6 +313,10 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
         if (move == sc->excludedMove && isExcluded)
             continue;
 
+        // Exclude already processed moves in Multi-pv re-searches
+        if (isRoot && rootExclusions.IsExcluded(move))
+            continue;
+
         // Remember destination square if move has been
         // a capture, preparing for the recapture extension.
         if (IsMoveNoisy(pos, move))
@@ -545,7 +549,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
                 alpha = score;
                 bestMove = move;
                 Pv.Update(ply, move);
-                if (isRoot)
+                if (isRoot && multiPv == 1)
                     Pv.Display(score);
             }
         }

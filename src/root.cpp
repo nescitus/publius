@@ -12,6 +12,9 @@
 #include "legality.h"
 #include "search.h"
 #include "trans.h"
+#include "publius.h"
+
+ExcludedMoves rootExclusions;
 
 void Think(Position* pos) {
 
@@ -38,22 +41,26 @@ void Think(Position* pos) {
 void Iterate(Position* pos, SearchContext* sc) {
 
     int val = 0, curVal = 0;
+    rootExclusions.Clear();
 
     for (Timer.rootDepth = 1; Timer.rootDepth <= Timer.GetData(maxDepth); Timer.rootDepth++) {
 
         Timer.RefreshStats();
-        PrintRootInfo(); // uses timer stats
+        if (multiPv == 1) PrintRootInfo(); // uses timer stats
 
         // Stop searching - soft time limit reached
         if (Timer.ShouldNotStartIteration() || Timer.isStopping)
             break;
 
-        curVal = Widen(pos, sc, Timer.rootDepth, curVal);
+        if (multiPv == 1)
+            curVal = Widen(pos, sc, Timer.rootDepth, curVal);
+        else
+            curVal = MultiPv(pos, sc, Timer.rootDepth);
 
         // Stop searching when we are sure of a checkmate score
         // (the engine is given some depth to confirm that it
         //  cannot find a shorter checkmate)
-        if (curVal > EvalLimit || curVal < -EvalLimit) {
+        if (curVal > EvalLimit || curVal < -EvalLimit && multiPv == 1) {
             int expectedMateDepth = (MateScore - std::abs(curVal) + 1) + 1;
             if (Timer.rootDepth >= expectedMateDepth * 3 / 2)
                 break;
@@ -67,6 +74,56 @@ void Iterate(Position* pos, SearchContext* sc) {
             Timer.waitingForStop = true;
     }
 }
+
+int MultiPv(Position* pos, SearchContext* sc, int depth) {
+
+    MultiPVLines lines(multiPv);
+    lines.Clear();
+    rootExclusions.Clear();
+
+    // Fallback move from previous iteration (or TT later)
+    Move fallbackMove = Pv.GetBestMove();
+
+    // 1) First PV (no exclusions yet)
+    int score = Search(pos, sc, 0, -Infinity, Infinity, depth, false, false);
+
+    if (!Timer.IsTimeout()) {
+        Move m = Pv.GetBestMove();
+        if (m) {
+            rootExclusions.Add(m);
+            lines.Add(score, m, Pv.GetOutputStringWithoutDepth(score));
+        }
+    }
+    else {
+        if (fallbackMove) Pv.EmergencyOverwrite(fallbackMove);
+        return score; // or fallback score; up to you
+    }
+
+    // 2) Remaining PVs
+    for (int i = 1; i < multiPv; ++i) {
+
+        Pv.Clear(); // ok if Clear() resets size[] too
+
+        score = Search(pos, sc, 0, -Infinity, Infinity, depth, false, false);
+        if (Timer.IsTimeout()) break;
+
+        Move m = Pv.GetBestMove();
+        if (!m) break;
+
+        rootExclusions.Add(m);
+        lines.Add(score, m, Pv.GetOutputStringWithoutDepth(score));
+    }
+
+    lines.DisplayAll(depth, multiPv);
+
+    // Ensure correct move is played (best after sorting)
+    Move best = lines.GetBestMove();
+    if (best) Pv.EmergencyOverwrite(best);
+    else if (fallbackMove) Pv.EmergencyOverwrite(fallbackMove);
+
+    return lines.GetBestScore(); // <-- important: consistent with chosen best move
+}
+
 
 void PrintRootInfo() {
 
