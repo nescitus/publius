@@ -7,12 +7,12 @@
 #include "move.h"
 #include "history.h"
 
-// constructor
+// Constructor
 HistoryData::HistoryData() {
     Clear();
 }
 
-// clear all values
+// Clear all values
 void HistoryData::Clear(void) {
 
     for (ColoredPiece piece = WhitePawn; piece < noPiece; ++piece)
@@ -25,7 +25,7 @@ void HistoryData::Clear(void) {
         killer1[ply] = killer2[ply] = 0;
 }
 
-// halve history values (used when they grow too high)
+// Halve history values (used when they grow too high)
 void HistoryData::Trim(void) {
 
     for (ColoredPiece piece = WhitePawn; piece < noPiece; ++piece)
@@ -35,6 +35,7 @@ void HistoryData::Trim(void) {
         }
 }
 
+// Update history values on a positive outcome, like a beta cutoff
 void HistoryData::Update(Position* pos, const Move move, const int depth, const int ply) {
 
     // History is updated only for quiet moves
@@ -111,7 +112,7 @@ int HistoryData::GetScore(Position* pos, const Move move) {
     // How many times did a move actually cause a cutoff?
     int cutoffsCount = cutoffHistory[piece][toSquare];
 
-    // return history score in 0..10000 range
+    // Return history score in 0..10000 range
     return (10000 * cutoffsCount) / triesCount;
 }
 

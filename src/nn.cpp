@@ -6,8 +6,7 @@
 // https://github.com/jw1912/bullet/blob/main/examples/simple.rs
 // The architecture is (768 -> N from 16 to 256)x2 -> 1.
 // Publius is able to use neworks with hidden neuron count
-// from 16 to 256, as long as it is a multiple of 16, but smaller
-// nets aren't faster.
+// from 16 to 256, as long as it is a multiple of 16.
 
 // This code draws some inspiration from Iris chess engine
 // (https://github.com/citrus610/iris):
@@ -38,10 +37,15 @@
         this->Clear();
     }
 
+    // Helper function to read i16 value from the NNUE file
     static bool ReadI16(std::FILE* f, i16* dst, size_t count) {
         return std::fread(dst, sizeof(i16), count, f) == count;
     }
 
+    // Load a network from the bullet-generated file. This loader
+    // is nice because it can comfortably read and set up nets
+    // with the hidden layer size between 16 and 256, as long as
+    // that size is a multiple of 16.
     bool Net::LoadFromFile(const char* path) {
 
         std::FILE* f = std::fopen(path, "rb");
@@ -60,47 +64,48 @@
         const size_t fileBytes = (size_t)fileBytesL;
 
         // Packed layout size in bytes (without tail padding):
-        // bytes = (771*N + 1) * sizeof(i16) = 1542*N + 2
-        auto packedBytes = [](size_t N) -> size_t {
-            return 1542u * N + 2u;
+        // bytes = (771*width + 1) * sizeof(i16) = 1542*width + 2
+        auto packedBytes = [](size_t width) -> size_t {
+            return 1542u * width + 2u;
             };
 
         // Pick N (any multiple of 16, 16..256) with smallest extra bytes
-        constexpr size_t PAD = 64; // allowed trailing padding/noise
+        constexpr size_t padding = 64; // allowed trailing padding/noise
         networkWidth = 256;
         size_t bestExtra = (size_t)-1;
 
-        for (size_t N = 16; N <= 256; N += 16) {
-            size_t need = packedBytes(N);
+        for (size_t width = 16; width <= 256; width += 16) {
+            size_t need = packedBytes(width);
             if (fileBytes < need) continue;
 
             size_t extra = fileBytes - need;
-            if (extra <= PAD && extra < bestExtra) {
+            if (extra <= padding && extra < bestExtra) {
                 bestExtra = extra;
-                networkWidth = N;
+                networkWidth = width;
             }
         }
 
-        const size_t N = networkWidth;
+        // Now that we know the network width, we can read it
+        const size_t width = networkWidth;
 
         // Zero-fill so unused neurons [N..255] are inert
         std::memset(&PARAMS, 0, sizeof(PARAMS));
 
         // Read packed params into the first N columns
         for (size_t in = 0; in < INPUT_SIZE; ++in) {
-            if (!ReadI16(f, &PARAMS.inputWeights[in][0], N)) {
+            if (!ReadI16(f, &PARAMS.inputWeights[in][0], width)) {
                 std::fclose(f);
                 return false;
             }
         }
 
-        if (!ReadI16(f, &PARAMS.inputBiases[0], N)) {
+        if (!ReadI16(f, &PARAMS.inputBiases[0], width)) {
             std::fclose(f);
             return false;
         }
 
-        if (!ReadI16(f, &PARAMS.outputWeights[0][0], N) ||
-            !ReadI16(f, &PARAMS.outputWeights[1][0], N)) {
+        if (!ReadI16(f, &PARAMS.outputWeights[0][0], width) ||
+            !ReadI16(f, &PARAMS.outputWeights[1][0], width)) {
             std::fclose(f);
             return false;
         }
@@ -133,15 +138,16 @@
         return (score / L0_SCALE + PARAMS.outputBias) * EVAL_SCALE / MUL_SCALE;
     }
 
+    // Sums the accumulated scoes for one side
     i32 Net::SumHalfAccumulator(i16 inputs[HIDDEN_SIZE], i16 weights[HIDDEN_SIZE]) {
 
         i32 value = 0;
 
         if (networkWidth < HIDDEN_SIZE)
-            for (size_t i = 0; i < networkWidth; ++i)
+            for (size_t i = 0; i < networkWidth; ++i) // works faster for smaller nets
                 value += GetScrelu(inputs[i]) * weights[i];
         else
-            for (size_t i = 0; i < HIDDEN_SIZE; ++i)
+            for (size_t i = 0; i < HIDDEN_SIZE; ++i) // works faster for max network size
                 value += GetScrelu(inputs[i]) * weights[i];
 
         return value;
@@ -179,12 +185,12 @@
 #else
         // Update the accumulator
         if (networkWidth < HIDDEN_SIZE)
-            for (size_t i = 0; i < networkWidth; ++i) {
+            for (size_t i = 0; i < networkWidth; ++i) { // works faster for smaller nets
                 this->accumulator[0][i] += PARAMS.inputWeights[indexWhite][i];
                 this->accumulator[1][i] += PARAMS.inputWeights[indexBlack][i];
             }
         else
-            for (size_t i = 0; i < HIDDEN_SIZE; ++i) {
+            for (size_t i = 0; i < HIDDEN_SIZE; ++i) {  // works faster for max network size
                 this->accumulator[0][i] += PARAMS.inputWeights[indexWhite][i];
                 this->accumulator[1][i] += PARAMS.inputWeights[indexBlack][i];
             }
@@ -219,12 +225,12 @@
         }
 #else
         if (networkWidth < HIDDEN_SIZE)
-            for (size_t i = 0; i < networkWidth; ++i) {
+            for (size_t i = 0; i < networkWidth; ++i) { // works faster for smaller nets
                 this->accumulator[0][i] -= PARAMS.inputWeights[indexWhite][i];
                 this->accumulator[1][i] -= PARAMS.inputWeights[indexBlack][i];
             }
         else
-            for (size_t i = 0; i < HIDDEN_SIZE; ++i) {
+            for (size_t i = 0; i < HIDDEN_SIZE; ++i) {  // works faster for max network size
                 this->accumulator[0][i] -= PARAMS.inputWeights[indexWhite][i];
                 this->accumulator[1][i] -= PARAMS.inputWeights[indexBlack][i];
             }

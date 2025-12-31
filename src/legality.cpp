@@ -1,8 +1,9 @@
 // Publius - Didactic public domain bitboard chess engine 
 // by Pawel Koziol
 
-// This file contains functions detecting
-// whether a move is pseudo-legal
+// This  file contains functions detecting whether a move  is 
+// pseudo-legal. This means testing all the conditions except
+// the in check status, which is dealt with during the search.
 
 #include "types.h"
 #include "piece.h"
@@ -14,56 +15,58 @@
 #include "publius.h"
 #include <iostream>
 
+// Detect if a move is pseudo-legal
 bool IsPseudoLegal(Position* pos, int move) {
 
-    // NOTE: move is not guaranteed to work in the current
-    // position, this is why we are testing it in the first
-    // place. The less obvious implication is that we cannot 
+    // NOTE: a move is not guaranteed to work in the  current
+    // position,  this is why we are testing it in the  first
+    // place. The less obvious implication is that we  cannot 
     // trust the move flag. For example, you can have a legal
     // d2d4 move by a queen and compare it with an input move 
-    // flagged as a pawn jump. I learned it the hard way during 
-    // an unsuccessful refactor.
+    // flagged  as a pawn jump. I learned this the  hard  way 
+    // during an unsuccessful refactor.
 
     if (move == 0) 
         return false;
 
-    // create move description (better than loose variables)
+    // Create move description (better than loose variables)
     const MoveDescription md(*pos, move);
 
-    // from square empty or enemy piece on it
+    // From square is empty or enemy piece occupies it
     if (md.hunter == noPieceType || 
         ColorOfPiece(pos->GetPiece(md.fromSquare)) != md.side)
         return false;
 
-    // to square empty or own piece on it
+    // To square is empty or an own piece occupies it
     if (md.prey != noPieceType && 
         ColorOfPiece(pos->GetPiece(md.toSquare)) == md.side)
         return false;       
 
-    // castling
+    // Castling
     if (md.type == tCastle)
         return IsCastlingLegal(pos, &md);
 
-    // en passant capture
+    // En passant capture
     if (md.type == tEnPassant)
         return (md.hunter == Pawn && md.toSquare == pos->EnPassantSq());
 
-    // double pawn move
+    // Double pawn move
     if (md.type == tPawnjump)
         return IsPawnJumpLegal(pos, &md);
 
-    // single pawn move, including promotion
+    // Single pawn move, including promotion
     if (md.hunter == Pawn)
         return IsPawnMoveLegal(&md);
 
-    // real promotion would be accepted by IsPawnMoveLegal()
+    // Real promotion would be accepted by IsPawnMoveLegal()
     if (IsMovePromotion(move))
         return false;
 
-    // normal move - check square accessibility
+    // Normal move - check square accessibility
     return (pos->AttacksFrom(md.fromSquare) & Paint(md.toSquare)) != 0;
 }
 
+// Test castling moves for pseudo-legality
 bool IsCastlingLegal(Position *pos, const MoveDescription* md) {
     
     if (md->side == White && md->fromSquare == E1) {
@@ -87,6 +90,7 @@ bool IsCastlingLegal(Position *pos, const MoveDescription* md) {
     return false;
 }
 
+// Test two square pawn moves for pseudo-legality
 bool IsPawnJumpLegal(Position* pos, const MoveDescription *md) {
     
     // We need to test whether we are moving a pawn,
@@ -104,34 +108,35 @@ bool IsPawnJumpLegal(Position* pos, const MoveDescription *md) {
     return false;
 }
 
+// Test non-jump pawn moves for pseudo-legality
 bool IsPawnMoveLegal(const MoveDescription* md) {
 
     if (md->side == White) {
 
-        // missing promotion flag
+        // Missing promotion flag
         if (RankOf(md->fromSquare) == rank7 && !IsMovePromotion(md->move))
             return false;
 
-        // non-capture
+        // Non-capture
         if (md->toSquare - md->fromSquare == 8 && md->prey == noPieceType)
            return true;
         
-        // capture
+        // Capture
         if ((md->toSquare - md->fromSquare == 7 && FileOf(md->fromSquare) != fileA) ||
             (md->toSquare - md->fromSquare == 9 && FileOf(md->fromSquare) != fileH))
             return (md->prey != noPieceType);
  
     } else {
 
-        // missing promotion flag
+        // Missing promotion flag
         if (RankOf(md->fromSquare) == rank2 && !IsMovePromotion(md->move))
             return false;
         
-        // non-capture
+        // Non-capture
         if (md->toSquare - md->fromSquare == -8 && md->prey == noPieceType)
             return true;
         
-        // capture
+        // Capture
         if ((md->toSquare - md->fromSquare == -9 && FileOf(md->fromSquare) != fileA) ||
             (md->toSquare - md->fromSquare == -7 && FileOf(md->fromSquare) != fileH))
             return (md->prey != noPieceType);

@@ -6,8 +6,7 @@
 // https://github.com/jw1912/bullet/blob/main/examples/simple.rs
 // The architecture is (768 -> HIDDEN_SIZE)x2 -> 1. Publius
 // is able to read networks with any number of hidden neurons 
-// from 16 to 256, as long as it is the multiple of 16, but
-// smaller networks aren't faster.
+// from 16 to 256, as long as it is the multiple of 16.
 
 // This code draws some inspiration from Iris chess engine
 // (https://github.com/citrus610/iris):
@@ -30,8 +29,14 @@ using i32 = int32_t;
 // Parameters are the same as in the simple example
 // of the bullet trainer.
 
+    // 64 squares * 5 piece types * two colors
     constexpr size_t INPUT_SIZE = 768;
-    constexpr size_t HIDDEN_SIZE = 256; // must be a multiple of 16
+
+    // Maximum size of a hidden layer. Must be
+    // a multiple of 16. The engine is capable
+    // of loading smaller nets, as long as the
+    // above condition is satisfied.
+    constexpr size_t HIDDEN_SIZE = 256;
 
     constexpr i32 EVAL_SCALE = 400;
     constexpr i32 L0_SCALE = 255;
