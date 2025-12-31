@@ -40,9 +40,9 @@ Move PvCollector::GetBestMove() {
     return line[0][0];
 }
 
-// Overwrites best move with a move from th external
+// Overwrites best move with a move from the external
 // source, resets ponder move
-void PvCollector::EmergencyOverwrite(Move move) {
+void PvCollector::Overwrite(Move move) {
     line[0][0] = move;
     line[0][1] = 0; // no ponder move
 }
@@ -80,6 +80,7 @@ std::string PvCollector::GetOutputStringWithoutDepth(int score) {
          + GetPvString() + "\n";
 }
 
+// Gets score string with score type
 std::string PvCollector::GetScoreString(int score) {
 
     // If we are outside of normal evaluation range,
@@ -99,6 +100,7 @@ std::string PvCollector::GetScoreString(int score) {
     return scoreType + " " + std::to_string(score);
 }
 
+// Gets mainline move sequence
 std::string PvCollector::GetPvString() {
 
     std::string result = " pv";

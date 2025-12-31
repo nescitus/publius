@@ -25,7 +25,7 @@
 const int singularDepth = 7;
 static const Stack rootSentinel{/*capture target=*/-1, /*eval=*/0 };
 
-int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded) {
+int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded) {
 
     int bestScore, newDepth, eval, movesTried, quietMovesTried;
     int hashFlag, reduction, score, singularScore;
@@ -47,9 +47,9 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
     singularMove = 0;
 
     // Init stack pointers for shorter code
-    Stack& currentPly = sc->stack[ply];
-    const Stack& onePlyAgo   = (ply     ? sc->stack[ply - 1] : rootSentinel);
-    const Stack& twoPliesAgo = (ply > 1 ? sc->stack[ply - 2] : rootSentinel);
+    Stack& currentPly = context->stack[ply];
+    const Stack& onePlyAgo   = (ply     ? context->stack[ply - 1] : rootSentinel);
+    const Stack& twoPliesAgo = (ply > 1 ? context->stack[ply - 2] : rootSentinel);
 
     // Root node is different because we need to record 
     // the best move
@@ -144,8 +144,8 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
 
     // Prepare for singular extension
     if (!isRoot &&                  // we are not at the root
-        depth > singularDepth &&   // sufficient remaining depth
-        sc->excludedMove == 0) // we are not in the singular search
+        depth > singularDepth &&    // sufficient remaining depth
+        context->excludedMove == 0) // we are not in the singular search
     {
 
         if (TT.Retrieve(pos->boardHash, &singularMove, &singularScore, &hashFlag, alpha, beta, depth - 4, ply)) {
@@ -249,7 +249,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
             // Do null move search, giving the opponent
             // two moves in a row
             pos->DoNull(&undo);
-            score = -Search(pos, sc, ply + 1, -beta, -beta + 1, depth - reduction, true, false);
+            score = -Search(pos, context, ply + 1, -beta, -beta + 1, depth - reduction, true, false);
             pos->UndoNull(&undo);
 
             if (Timer.isStopping)
@@ -260,7 +260,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
             // reduced  depth  search to  guard  against 
             // zugzwangs (~10 Elo)
             if (depth - reduction > 5 && score >= beta)
-                score = Search(pos, sc, ply, alpha, beta, depth - reduction - 4, true, false);
+                score = Search(pos, context, ply, alpha, beta, depth - reduction - 4, true, false);
 
             if (Timer.isStopping)
                 return 0;
@@ -310,7 +310,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
 
         // In singular search we omit the known best move,
         // checking whether there are viable alternatives.
-        if (move == sc->excludedMove && isExcluded)
+        if (move == context->excludedMove && isExcluded)
             continue;
 
         // Exclude already processed moves in Multi-pv re-searches
@@ -344,7 +344,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
             singularMove &&
             move == singularMove && // we are about to search the best move from tt
             singularExtension &&    // conditions for the singular search are met
-            sc->excludedMove == 0) {
+            context->excludedMove == 0) {
 
             // Move from the transposition table might  be
             // a singular move. We are trying to  disprove 
@@ -354,7 +354,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
 
             // We  are looking for decent alternatives, so
             // we  do not try the singular move  candidate.
-            sc->excludedMove = move;
+            context->excludedMove = move;
 
             // The only time we search with isExcluded flag 
             // set  to  "true". The flag switches  off  all
@@ -365,8 +365,8 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
             // refrain from saving the result of this search
             // in  the transposition table, because we have
             // actively avoided searching the best move.
-            int exclusionSearchScore = Search(pos, sc, ply + 1, newAlpha, newAlpha + 1, (depth - 1) / 2, false, true);
-            sc->excludedMove = 0;
+            int exclusionSearchScore = Search(pos, context, ply + 1, newAlpha, newAlpha + 1, (depth - 1) / 2, false, true);
+            context->excludedMove = 0;
 
             if (Timer.isStopping)
                 return 0;
@@ -468,7 +468,7 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
 
             // do a reduced depth search
             if (reduction > 0) {
-                score = -Search(pos, sc, ply + 1, -alpha - 1, -alpha, newDepth - reduction, false, false);
+                score = -Search(pos, context, ply + 1, -alpha - 1, -alpha, newDepth - reduction, false, false);
 
                 // If  the reduced search score falls  below
                 // alpha, don't bother with full depth search
@@ -491,11 +491,11 @@ int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int d
         // with a zero window.
 
         if (bestScore == -Infinity)
-            score = -Search(pos, sc, ply + 1, -beta, -alpha, newDepth, false, false);
+            score = -Search(pos, context, ply + 1, -beta, -alpha, newDepth, false, false);
         else {
-            score = -Search(pos, sc, ply + 1, -alpha - 1, -alpha, newDepth, false, false);
+            score = -Search(pos, context, ply + 1, -alpha - 1, -alpha, newDepth, false, false);
             if (!Timer.isStopping && score > alpha)
-                score = -Search(pos, sc, ply + 1, -beta, -alpha, newDepth, false, false);
+                score = -Search(pos, context, ply + 1, -beta, -alpha, newDepth, false, false);
         }
 
         // Undo move

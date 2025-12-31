@@ -119,11 +119,11 @@ struct MultiPVLines {
 
 extern ExcludedMoves rootExclusions;
 
-void ClearSearchContext(SearchContext& sc);
-void Iterate(Position* pos, SearchContext* sc);
-int MultiPv(Position* pos, SearchContext* sc, int depth);
-int Widen(Position* pos, SearchContext* sc, int depth, int lastScore);
-int Search(Position* pos, SearchContext* sc, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded);
+void ClearSearchContext(SearchContext& context);
+void Iterate(Position* pos, SearchContext* context);
+int MultiPv(Position* pos, SearchContext* context, int depth);
+int Widen(Position* pos, SearchContext* context, int depth, int lastScore);
+int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded);
 int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta);
 bool SetImproving(const Stack &ppst, int eval, int ply);
 void PrintRootInfo();

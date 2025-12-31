@@ -18,27 +18,28 @@ ExcludedMoves rootExclusions;
 
 void Think(Position* pos) {
 
-    SearchContext sc;
-    ClearSearchContext(sc);
+    SearchContext context;
+    ClearSearchContext(context);
     Pv.Clear();
     History.Clear();
     TT.Age();
     Timer.Start();
-    Iterate(pos, &sc);
+    Iterate(pos, &context);
 
     // In ultra-rare cases where we don't get a move
     // because  time control is too short or we  got
     // a stop command, a move from the transposition
     // table is returned.
     if (Pv.GetBestMove() == 0) {
-        Move move; int unused;
+        Move move; 
+        int unused; // TT.Retrieve() wants to set flags and we don't need them
         TT.Retrieve(pos->boardHash, &move, &unused, &unused, -Infinity, Infinity, 0, 0);
         if (IsPseudoLegal(pos, move))
-            Pv.EmergencyOverwrite(move);
+            Pv.Overwrite(move);
     }
 }
 
-void Iterate(Position* pos, SearchContext* sc) {
+void Iterate(Position* pos, SearchContext* context) {
 
     int val = 0, curVal = 0;
     rootExclusions.Clear();
@@ -53,9 +54,9 @@ void Iterate(Position* pos, SearchContext* sc) {
             break;
 
         if (multiPv == 1)
-            curVal = Widen(pos, sc, Timer.rootDepth, curVal);
+            curVal = Widen(pos, context, Timer.rootDepth, curVal);
         else
-            curVal = MultiPv(pos, sc, Timer.rootDepth);
+            curVal = MultiPv(pos, context, Timer.rootDepth);
 
         // Stop searching when we are sure of a checkmate score
         // (the engine is given some depth to confirm that it
@@ -75,7 +76,7 @@ void Iterate(Position* pos, SearchContext* sc) {
     }
 }
 
-int MultiPv(Position* pos, SearchContext* sc, int depth) {
+int MultiPv(Position* pos, SearchContext* context, int depth) {
 
     MultiPVLines lines(multiPv);
     lines.Clear();
@@ -85,7 +86,7 @@ int MultiPv(Position* pos, SearchContext* sc, int depth) {
     Move fallbackMove = Pv.GetBestMove();
 
     // 1) First PV (no exclusions yet)
-    int score = Search(pos, sc, 0, -Infinity, Infinity, depth, false, false);
+    int score = Search(pos, context, 0, -Infinity, Infinity, depth, false, false);
 
     if (!Timer.IsTimeout()) {
         Move m = Pv.GetBestMove();
@@ -95,7 +96,7 @@ int MultiPv(Position* pos, SearchContext* sc, int depth) {
         }
     }
     else {
-        if (fallbackMove) Pv.EmergencyOverwrite(fallbackMove);
+        if (fallbackMove) Pv.Overwrite(fallbackMove);
         return score; // or fallback score; up to you
     }
 
@@ -104,7 +105,7 @@ int MultiPv(Position* pos, SearchContext* sc, int depth) {
 
         Pv.Clear(); // ok if Clear() resets size[] too
 
-        score = Search(pos, sc, 0, -Infinity, Infinity, depth, false, false);
+        score = Search(pos, context, 0, -Infinity, Infinity, depth, false, false);
         if (Timer.IsTimeout()) break;
 
         Move m = Pv.GetBestMove();
@@ -117,13 +118,14 @@ int MultiPv(Position* pos, SearchContext* sc, int depth) {
     lines.DisplayAll(depth, multiPv);
 
     // Ensure correct move is played (best after sorting)
-    Move best = lines.GetBestMove();
-    if (best) Pv.EmergencyOverwrite(best);
-    else if (fallbackMove) Pv.EmergencyOverwrite(fallbackMove);
+    Move bestMove = lines.GetBestMove();
+    if (bestMove) 
+        Pv.Overwrite(bestMove);
+    else if (fallbackMove) 
+        Pv.Overwrite(fallbackMove);
 
     return lines.GetBestScore(); // <-- important: consistent with chosen best move
 }
-
 
 void PrintRootInfo() {
 
@@ -133,7 +135,7 @@ void PrintRootInfo() {
         << " nps " << Timer.nps << std::endl;
 }
 
-int Widen(Position* pos, SearchContext* sc, int depth, int lastScore) {
+int Widen(Position* pos, SearchContext* context, int depth, int lastScore) {
 
     int currentDepthScore = lastScore, alpha, beta;
 
@@ -147,7 +149,7 @@ int Widen(Position* pos, SearchContext* sc, int depth, int lastScore) {
         for (int margin = 10; margin < 500; margin *= 2) {
             alpha = lastScore - margin;
             beta = lastScore + margin;
-            currentDepthScore = Search(pos, sc, 0, alpha, beta, depth, false, false);
+            currentDepthScore = Search(pos, context, 0, alpha, beta, depth, false, false);
 
             // timeout
             if (Timer.isStopping)
@@ -167,5 +169,5 @@ int Widen(Position* pos, SearchContext* sc, int depth, int lastScore) {
     if (Timer.isStopping) 
         return lastScore;
     else
-        return Search(pos, sc, 0, -Infinity, Infinity, depth, false, false);  
+        return Search(pos, context, 0, -Infinity, Infinity, depth, false, false);  
 }

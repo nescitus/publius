@@ -8,7 +8,7 @@ public:
     void Update(int ply, Move move);
     void SendBestMove();
     Move GetBestMove();
-    void EmergencyOverwrite(Move move);
+    void Overwrite(Move move);
     void Display(int score);
     std::string GetOutputStringWithoutDepth(int score);
     std::string GetScoreString(int score);
