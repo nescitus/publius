@@ -21,7 +21,7 @@
 // If AVX2 isn't available, we can still compile the scalar code 
 // (#ifndef part), and performance is still correct - just slower.
 
-//#define __AVX2__
+#define __AVX2__
 
 #include "types.h"
 #include "piece.h"
@@ -211,7 +211,7 @@
         const i16* __restrict w1 = &PARAMS.inputWeights[indexBlack][0];
 
         size_t i = 0;
-        for (; i + 16 <= HIDDEN_SIZE; i += 16) {
+        for (; i + 16 <=networkWidth; i += 16) {
             __m256i A0 = _mm256_loadu_si256((const __m256i*)(a0 + i));
             __m256i W0 = _mm256_loadu_si256((const __m256i*)(w0 + i));
             __m256i A1 = _mm256_loadu_si256((const __m256i*)(a1 + i));
@@ -259,7 +259,7 @@
         const i16* __restrict wSub1 = &PARAMS.inputWeights[subB][0];
 
         size_t i = 0;
-        for (; i + 16 <= HIDDEN_SIZE; i += 16) {
+        for (; i + 16 <= networkWidth; i += 16) {
             __m256i A0 = _mm256_loadu_si256((const __m256i*)(a0 + i));
             __m256i A1 = _mm256_loadu_si256((const __m256i*)(a1 + i));
             __m256i ADD0 = _mm256_loadu_si256((const __m256i*)(wAdd0 + i));

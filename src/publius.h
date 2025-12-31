@@ -12,8 +12,6 @@
 
 // r2q1r2/1b2bpkp/p3p1p1/2ppP1P1/7R/1PN1BQR1/1PP2P1P/4K3 w - - 0 1 1.Qf6, unsolved
 
-// Bench at depth 15 took 25622 milliseconds, searching 25859065 nodes at 1009252 nodes per second.
-
 #define FAST_POPCNT
 // uncomment this when compiling for modern Windows systems
 // to gain a little speedup.
@@ -24,12 +22,9 @@
 
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
-inline constexpr const char* engineVersion = "1.1 release candidate"; // bump on releases
+inline constexpr const char* engineVersion = "1.1"; // bump on releases
 inline constexpr const char* netPath = "publius_net256_1.bin";
 //inline constexpr const char* netPath = "publius_net32_4.bin";
-
-// net32 : info depth 16 time 1917 nodes 1263632 nps 659171
-// net256: info depth 16 time 11784 nodes 2580714 nps 219001
 
 // Engine's name will contain information about unusual
 // compile-time settings
