@@ -80,7 +80,7 @@ void OnUciCommand() {
     std::cout << "id name " << engineName << " " << engineVersion << compileParams << "\n";
     std::cout << "id author " << engineAuthor << "\n";
     std::cout << "option name Hash type spin default 16 min 1 max 4096" << "\n";
-    std::cout << "option name MultiPV type spin default " << multiPv << "min 1 max 12" << "\n";
+    std::cout << "option name MultiPV type spin default " << multiPv << " min 1 max 12" << "\n";
     std::cout << "option name Clear Hash type button" << "\n";
     std::cout << "option name NNUEfile type string default " << netPath << "\n";
     std::cout << "option name nnueWeight type spin default "<<  nnueWeight << " min 0 max 200" << "\n";
@@ -290,3 +290,4 @@ void TryLoadingNNUE(const char * path) {
     else
         NN.Clear();
 }
+
