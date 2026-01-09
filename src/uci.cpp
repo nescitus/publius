@@ -290,4 +290,3 @@ void TryLoadingNNUE(const char * path) {
     else
         NN.Clear();
 }
-

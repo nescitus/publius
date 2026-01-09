@@ -105,7 +105,7 @@ int HistoryData::GetScore(Position* pos, const Move move) {
     // produced a beta cutoff?
     int triesCount = triesHistory[piece][toSquare];
 
-    // Avoiding division by zero
+    // Avoiding division by zero and giving a new move a decent score
     if (triesCount == 0)
         return 5000;
 
@@ -118,5 +118,4 @@ int HistoryData::GetScore(Position* pos, const Move move) {
 
 int HistoryData::Inc(const int depth) {
     return depth * depth;
-
 }

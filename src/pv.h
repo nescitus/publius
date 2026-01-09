@@ -8,11 +8,14 @@ public:
     void Update(int ply, Move move);
     void SendBestMove();
     Move GetBestMove();
+    void RememberBestLine();
     void Overwrite(Move move);
-    void Display(int score);
-    std::string GetOutputStringWithoutDepth(int score);
-    std::string GetScoreString(int score);
+    void Display(int score, int bound);
+    std::string GetOutputStringWithoutDepth(int score, int bound);
+    std::string GetTimeString();
+    std::string GetScoreString(int score, int bound);
     std::string GetPvString();
+    std::string oldPvString = "";
 
     // array keeping principal variation, also
     // used to retrieve best move and ponder move

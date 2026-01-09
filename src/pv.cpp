@@ -4,12 +4,14 @@
 // This class implements triangular pv-table
 // (https://www.chessprogramming.org/Triangular_PV-Table)
 // that remembers the main line calculated by the engine.
+// We build various display functions around that. 
 
 #include <iostream>
 #include "types.h"
 #include "limits.h"
 #include "position.h"
 #include "move.h"
+#include "trans.h" // for bounds
 #include "pv.h"
 #include "timer.h"
 
@@ -40,6 +42,14 @@ Move PvCollector::GetBestMove() {
     return line[0][0];
 }
 
+// Remembers best line. We use it for simplifying
+// upperbound message display. Displaying just the first
+// move would be more rational, but unfortunately if we 
+// do it, Arena hides the line instead of printing it.
+void PvCollector::RememberBestLine() {
+    oldPvString = GetPvString();
+}
+
 // Overwrites best move with a move from the external
 // source, resets ponder move
 void PvCollector::Overwrite(Move move) {
@@ -63,25 +73,34 @@ void PvCollector::SendBestMove() {
 }
 
 // Displays engine's main line during non-multipv search
-void PvCollector::Display(int score) {
+void PvCollector::Display(int score, int bound) {
     
     std::cout << "info depth " << Timer.rootDepth
-              << GetOutputStringWithoutDepth(score) << std::flush;
+              << GetOutputStringWithoutDepth(score, bound) << std::flush;
 }
 
-std::string PvCollector::GetOutputStringWithoutDepth(int score) {
+// get the main chunk of the string to display. A prefix will be
+// added, depending on whether we are doing a multiPv search.
+std::string PvCollector::GetOutputStringWithoutDepth(int score, int bound) {
 
     Timer.RefreshStats();
 
-    return " time " + std::to_string(Timer.timeUsed)
-         + " nodes " + std::to_string(Timer.nodeCount)
-         + " nps " + std::to_string(Timer.nps)
-         + GetScoreString(score)
-         + GetPvString() + "\n";
+    return GetTimeString()
+         + GetScoreString(score, bound)
+         + (bound == upperBound ? oldPvString : GetPvString()) 
+        + "\n";
 }
 
-// Gets score string with score type
-std::string PvCollector::GetScoreString(int score) {
+// Get substring with time and engine speed data
+std::string PvCollector::GetTimeString() {
+
+        return " time " + std::to_string(Timer.timeUsed)
+         + " nodes " + std::to_string(Timer.nodeCount)
+         + " nps " + std::to_string(Timer.nps);
+}
+
+// Gets score, score type and bound substring
+std::string PvCollector::GetScoreString(int score, int bound) {
 
     // If we are outside of normal evaluation range,
     // then the engine either gives a checkmate
@@ -97,7 +116,11 @@ std::string PvCollector::GetScoreString(int score) {
         score = (MateScore - score + 1) / 2;
     else scoreType = " score cp";
 
-    return scoreType + " " + std::to_string(score);
+    std::string scoreBound = "";
+    if (bound == lowerBound) scoreBound = " lowerbound";
+    if (bound == upperBound) scoreBound = " upperbound";
+
+    return scoreType + " " + std::to_string(score) + scoreBound;
 }
 
 // Gets mainline move sequence

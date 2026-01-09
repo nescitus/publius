@@ -67,6 +67,8 @@ void Iterate(Position* pos, SearchContext* context) {
                 break;
         }
 
+        Pv.RememberBestLine(); // hack for correct upperbound display
+
         val = curVal;
 
         // For go infinite, where we have to wait
@@ -92,7 +94,7 @@ int MultiPv(Position* pos, SearchContext* context, int depth) {
         Move m = Pv.GetBestMove();
         if (m) {
             rootExclusions.Add(m);
-            lines.Add(score, m, Pv.GetOutputStringWithoutDepth(score));
+            lines.Add(score, m, Pv.GetOutputStringWithoutDepth(score, exactEntry));
         }
     }
     else {
@@ -112,7 +114,7 @@ int MultiPv(Position* pos, SearchContext* context, int depth) {
         if (!m) break;
 
         rootExclusions.Add(m);
-        lines.Add(score, m, Pv.GetOutputStringWithoutDepth(score));
+        lines.Add(score, m, Pv.GetOutputStringWithoutDepth(score, exactEntry));
     }
 
     lines.DisplayAll(depth, multiPv);

@@ -62,7 +62,7 @@ using i32 = int32_t;
     {
     private:
         alignas(64) i16 accumulator[2][HIDDEN_SIZE];
-        int networkWidth = 256;
+        int networkWidth = HIDDEN_SIZE; // assume we are loading the biggest net available
         i32 SumHalfAccumulator(i16 inputs[HIDDEN_SIZE], i16 weights[HIDDEN_SIZE]);
     public:
         Net();

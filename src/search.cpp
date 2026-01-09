@@ -22,6 +22,8 @@
 #include "publius.h"
 #include "search.h"
 
+Move bestRootMove = 0;
+
 const int singularDepth = 7;
 static const Stack rootSentinel{/*capture target=*/-1, /*eval=*/0 };
 
@@ -48,7 +50,7 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
 
     // Init stack pointers for shorter code
     Stack& currentPly = context->stack[ply];
-    const Stack& onePlyAgo   = (ply     ? context->stack[ply - 1] : rootSentinel);
+    const Stack& onePlyAgo = (ply ? context->stack[ply - 1] : rootSentinel);
     const Stack& twoPliesAgo = (ply > 1 ? context->stack[ply - 2] : rootSentinel);
 
     // Root node is different because we need to record 
@@ -109,7 +111,7 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
             // Too many early exits in a row 
             // might cause a timeout, so we safeguard
             Timer.TryStoppingByTimeout();
-            
+
             return alpha;
         }
     }
@@ -132,7 +134,7 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
         // scores  from the zero window nodes. Despite the 
         // same nominal depth, they represent more shallow, 
         // less precise search.
-        if (!isPv || (score > alpha && score < beta) ) {
+        if (!isPv || (score > alpha && score < beta)) {
             if (!isRoot && !isExcluded)
                 return score;
         }
@@ -153,7 +155,7 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
             // We have found upper bound hash entry and it
             // is  not  a checkmate score, so we  can  try 
             // the singular extension.
-            if ((hashFlag & lowerBound) && singularScore < EvalLimit)  
+            if ((hashFlag & lowerBound) && singularScore < EvalLimit)
                 singularExtension = true;
         }
     }
@@ -280,7 +282,7 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
     bool canDoFutility = (depth <= 6 &&
         !isInCheckBeforeMoving &&
         !isPv &&
-         eval + 75 * depth < beta);
+        eval + 75 * depth < beta);
 
     // INTERNAL ITERATIVE REDUCTION  (non-standard). Reduce
     // when position is not on transposition table. An idea
@@ -288,7 +290,7 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
     // that  the implementation is  non-standard:  normally
     // pv-nodes  are not excluded, but this is what  worked 
     // for this engine. (~9 Elo)
-    
+
     if (depth > 5 && !isPv && ttMove == 0 && !isInCheckBeforeMoving)
         depth--;
 
@@ -300,9 +302,9 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
     // except at  root, where we begin with the best  move  
     // from previous iteration.
     movePicker.Init(modeAll,
-                    isRoot ? Pv.line[0][0] : ttMove,
-                    History.GetKiller1(ply), 
-                    History.GetKiller2(ply));
+        isRoot ? Pv.line[0][0] : ttMove,
+        History.GetKiller1(ply),
+        History.GetKiller2(ply));
 
     // Main loop
 
@@ -334,13 +336,13 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
         // Recapture extension - pv node or low depth (~28 Elo)
         if (ply && !doExtension) {
             if (onePlyAgo.captureSquare == GetToSquare(move) &&
-               (isPv || depth < 7))
+                (isPv || depth < 7))
                 doExtension = true;
         }
 
         // Singular extension: tried once per search
         if (depth > singularDepth &&
-           !doExtension &&
+            !doExtension &&
             singularMove &&
             move == singularMove && // we are about to search the best move from tt
             singularExtension &&    // conditions for the singular search are met
@@ -434,10 +436,10 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
         // Report start of analysing the new move
         if (isRoot && isUci && depth > 19) {
             std::cout << "info currmove "
-                      << MoveToString(move)
-                      << " currmovenumber "
-                      << movesTried
-                      << "\n";
+                << MoveToString(move)
+                << " currmovenumber "
+                << movesTried
+                << "\n";
         }
 
         // Set new search depth
@@ -456,13 +458,13 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
             !moveGivesCheck)
         {
             reduction = Lmr.table[isPv]
-                                 [std::min(depth, 63)]
-                                 [std::min(movesTried, 63)];
+                [std::min(depth, 63)]
+                [std::min(movesTried, 63)];
 
             // TODO: increase reduction when not improving
             //if (reduction > 1 && improving) 
             //    reduction--;
-            
+
             // Reduction cannot exceed actual depth
             reduction = std::min(reduction, newDepth - 1);
 
@@ -525,7 +527,7 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
             // node because we use the aspiration window.
             if (isRoot) {
                 Pv.Update(ply, move);
-                Pv.Display(score);
+                Pv.Display(score, lowerBound);
             }
 
             // Stop  searching this node. We have already
@@ -550,7 +552,7 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
                 bestMove = move;
                 Pv.Update(ply, move);
                 if (isRoot && multiPv == 1)
-                    Pv.Display(score);
+                    Pv.Display(score, exactEntry);
             }
         }
 
@@ -568,14 +570,17 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
     if (!isExcluded) {
         if (bestMove)
             TT.Store(pos->boardHash, bestMove, bestScore, exactEntry, depth, ply);
-        else
+        else {
             TT.Store(pos->boardHash, 0, bestScore, upperBound, depth, ply);
+            if (isRoot)
+                Pv.Display(bestScore, upperBound);
+        }
     }
 
     return bestScore;
 }
 
-bool SetImproving(const Stack &ppst, int eval, int ply) {
+bool SetImproving(const Stack& ppst, int eval, int ply) {
     return !(ply > 1 && ppst.eval > eval);
 }
 
@@ -608,15 +613,15 @@ void TryInterrupting(void) {
         std::getline(std::cin, line);
 
         // user ordered us to stop
-        if (line == "stop") 
+        if (line == "stop")
             OnStopCommand();
-        
+
         // transition from pondering to normal search
-        else if (line == "ponderhit") 
+        else if (line == "ponderhit")
             Timer.isPondering = false;
-        
+
         // ping equivalent in the UCI protocol
-        else if (line == "isready") 
+        else if (line == "isready")
             std::cout << "readyok\n" << std::flush;
     }
 
