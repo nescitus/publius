@@ -107,7 +107,7 @@ int HistoryData::GetScore(Position* pos, const Move move) {
 
     // Avoiding division by zero
     if (triesCount == 0)
-        return 0;
+        return 5000;
 
     // How many times did a move actually cause a cutoff?
     int cutoffsCount = cutoffHistory[piece][toSquare];
@@ -118,4 +118,5 @@ int HistoryData::GetScore(Position* pos, const Move move) {
 
 int HistoryData::Inc(const int depth) {
     return depth * depth;
+
 }
