@@ -128,3 +128,4 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta);
 bool SetImproving(const Stack &ppst, int eval, int ply);
 void PrintRootInfo();
 void TryInterrupting(void);
+void OverwriteFromTT(Position* pos);

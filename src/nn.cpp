@@ -21,7 +21,7 @@
 // If AVX2 isn't available, we can still compile the scalar code 
 // (#ifndef part), and performance is still correct - just slower.
 
-#define __AVX2__
+//#define __AVX2__
 
 #include "types.h"
 #include "piece.h"
@@ -285,13 +285,12 @@
                 this->accumulator[1][i] -= PARAMS.inputWeights[subB][i];
             }
         else
-
-        for (size_t i = 0; i < HIDDEN_SIZE; ++i) {
-            this->accumulator[0][i] += PARAMS.inputWeights[addW][i];
-            this->accumulator[1][i] += PARAMS.inputWeights[addB][i];
-            this->accumulator[0][i] -= PARAMS.inputWeights[subW][i];
-            this->accumulator[1][i] -= PARAMS.inputWeights[subB][i];
-        }
+            for (size_t i = 0; i < HIDDEN_SIZE; ++i) {
+                this->accumulator[0][i] += PARAMS.inputWeights[addW][i];
+                this->accumulator[1][i] += PARAMS.inputWeights[addB][i];
+                this->accumulator[0][i] -= PARAMS.inputWeights[subW][i];
+                this->accumulator[1][i] -= PARAMS.inputWeights[subB][i];
+            }
 #endif
     }
 

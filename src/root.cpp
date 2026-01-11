@@ -19,26 +19,38 @@ ExcludedMoves rootExclusions;
 void Think(Position* pos) {
 
     SearchContext context;
+
+    // Init
     ClearSearchContext(context);
     Pv.Clear();
     History.Clear();
     TT.Age();
     Timer.Start();
+
+    // Search, increasing depth, until stopped.
     Iterate(pos, &context);
 
-    // In ultra-rare cases where we don't get a move
-    // because  time control is too short or we  got
-    // a stop command, a move from the transposition
-    // table is returned.
-    if (Pv.GetBestMove() == 0) {
-        Move move; 
-        int unused; // TT.Retrieve() wants to set flags and we don't need them
-        TT.Retrieve(pos->boardHash, &move, &unused, &unused, -Infinity, Infinity, 0, 0);
-        if (IsPseudoLegal(pos, move))
-            Pv.Overwrite(move);
-    }
+    // In ultra-rare cases we don't get a move because  the 
+    // time  control is too short or we got a stop  command. 
+    // A move from the transposition table is returned then.
+    if (Pv.GetBestMove() == 0)
+        OverwriteFromTT(pos);
 }
 
+// Replace the first move of pv with the move from the transposition table,
+// if possible.
+void OverwriteFromTT(Position *pos) 
+{
+    Move move;
+    int unused; // TT.Retrieve() wants to set flags and we don't need them
+    
+    TT.Retrieve(pos->boardHash, &move, &unused, &unused, -Infinity, Infinity, 0, 0);
+    
+    if (IsPseudoLegal(pos, move))
+        Pv.Overwrite(move);
+}
+
+// Search with inceasing depth
 void Iterate(Position* pos, SearchContext* context) {
 
     int val = 0, curVal = 0;
@@ -46,13 +58,16 @@ void Iterate(Position* pos, SearchContext* context) {
 
     for (Timer.rootDepth = 1; Timer.rootDepth <= Timer.GetData(maxDepth); Timer.rootDepth++) {
 
-        Timer.RefreshStats();
-        if (multiPv == 1) PrintRootInfo(); // uses timer stats
-
-        // Stop searching - soft time limit reached
+        // Do not start searching at a greater depth 
+        // - soft time limit reached
         if (Timer.ShouldNotStartIteration() || Timer.isStopping)
             break;
 
+        // Diplay stats when begining search to a new depth
+        Timer.RefreshStats();
+        if (multiPv == 1) PrintRootInfo(); // uses timer stats
+
+        // Search
         if (multiPv == 1)
             curVal = Widen(pos, context, Timer.rootDepth, curVal);
         else
@@ -61,7 +76,7 @@ void Iterate(Position* pos, SearchContext* context) {
         // Stop searching when we are sure of a checkmate score
         // (the engine is given some depth to confirm that it
         //  cannot find a shorter checkmate)
-        if (curVal > EvalLimit || curVal < -EvalLimit && multiPv == 1) {
+        if ((curVal > EvalLimit || curVal < -EvalLimit) && multiPv == 1) {
             int expectedMateDepth = (MateScore - std::abs(curVal) + 1) + 1;
             if (Timer.rootDepth >= expectedMateDepth * 3 / 2)
                 break;
@@ -78,6 +93,7 @@ void Iterate(Position* pos, SearchContext* context) {
     }
 }
 
+// Search to find n best moves
 int MultiPv(Position* pos, SearchContext* context, int depth) {
 
     MultiPVLines lines(multiPv);
@@ -91,10 +107,10 @@ int MultiPv(Position* pos, SearchContext* context, int depth) {
     int score = Search(pos, context, 0, -Infinity, Infinity, depth, false, false);
 
     if (!Timer.IsTimeout()) {
-        Move m = Pv.GetBestMove();
-        if (m) {
-            rootExclusions.Add(m);
-            lines.Add(score, m, Pv.GetOutputStringWithoutDepth(score, exactEntry));
+        Move move = Pv.GetBestMove();
+        if (move) {
+            rootExclusions.Add(move);
+            lines.Add(score, move, Pv.GetOutputStringWithoutDepth(score, exactEntry));
         }
     }
     else {
@@ -105,16 +121,16 @@ int MultiPv(Position* pos, SearchContext* context, int depth) {
     // 2) Remaining PVs
     for (int i = 1; i < multiPv; ++i) {
 
-        Pv.Clear(); // ok if Clear() resets size[] too
+        Pv.Clear();
 
         score = Search(pos, context, 0, -Infinity, Infinity, depth, false, false);
         if (Timer.IsTimeout()) break;
 
-        Move m = Pv.GetBestMove();
-        if (!m) break;
+        Move move = Pv.GetBestMove();
+        if (!move) break;
 
-        rootExclusions.Add(m);
-        lines.Add(score, m, Pv.GetOutputStringWithoutDepth(score, exactEntry));
+        rootExclusions.Add(move);
+        lines.Add(score, move, Pv.GetOutputStringWithoutDepth(score, exactEntry));
     }
 
     lines.DisplayAll(depth, multiPv);
@@ -126,22 +142,23 @@ int MultiPv(Position* pos, SearchContext* context, int depth) {
     else if (fallbackMove) 
         Pv.Overwrite(fallbackMove);
 
-    return lines.GetBestScore(); // <-- important: consistent with chosen best move
+    return lines.GetBestScore(); // consistent with chosen best move
 }
 
 void PrintRootInfo() {
 
-        std::cout << "info depth " << Timer.rootDepth
-        << " time " << Timer.timeUsed
-        << " nodes " << Timer.nodeCount
-        << " nps " << Timer.nps << std::endl;
+    std::cout << "info depth " << Timer.rootDepth
+              << " time " << Timer.timeUsed
+              << " nodes " << Timer.nodeCount
+              << " nps " << Timer.nps << std::endl;
 }
 
+// Search with increasing aspiration window
 int Widen(Position* pos, SearchContext* context, int depth, int lastScore) {
 
     int currentDepthScore = lastScore, alpha, beta;
 
-    // apply aspiration window on sufficient depth
+    // Apply aspiration window if sufficient depth has been reached
     // and if checkmate is not expected
 
     if (depth > 6 && lastScore < EvalLimit) {
