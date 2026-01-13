@@ -161,13 +161,19 @@ int Widen(Position* pos, SearchContext* context, int depth, int lastScore) {
     // Apply aspiration window if sufficient depth has been reached
     // and if checkmate is not expected
 
-    if (depth > 6 && lastScore < EvalLimit) {
+    if (depth > 6 && std::abs(lastScore) < EvalLimit) {
 
-        // progressively widen aspiration window
+        // set initial aspiration window
+        int margin = 8;
+        alpha = std::max(lastScore - margin, -MateScore);
+        beta = std::min(lastScore + margin, MateScore);
 
-        for (int margin = 10; margin < 500; margin *= 2) {
-            alpha = lastScore - margin;
-            beta = lastScore + margin;
+        while (true) {
+
+            // time for mate search
+            if (alpha < -1000) alpha = -MateScore;
+            if (beta > 1000) beta = MateScore;
+
             currentDepthScore = Search(pos, context, 0, alpha, beta, depth, false, false);
 
             // timeout
@@ -178,9 +184,23 @@ int Widen(Position* pos, SearchContext* context, int depth, int lastScore) {
             if (currentDepthScore > alpha && currentDepthScore < beta)
                 return currentDepthScore;
 
+            else if (currentDepthScore <= alpha) {
+                // adjust beta downward when failing low
+                beta = (alpha + beta) / 2;
+                alpha = std::max(alpha - margin, -MateScore);
+            }
+            else if (currentDepthScore >= beta) {
+                beta = std::min(beta + margin, MateScore);
+                // alpha stays
+            }
+
             // verify a checkmate by searching with infinite bounds
             if (currentDepthScore > EvalLimit)
                 break;
+
+            // delta change
+            margin *= 24;
+            margin /= 16;
         }
     }
 
