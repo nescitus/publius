@@ -9,7 +9,7 @@
 // 4392 lines of source code
 
 // r5k1/pQp2qpp/8/4pbN1/3P4/6P1/PPr4P/1K1R3R b - - 0 1 search explosion
-// r2q1rk1/1b3p1p/p3pPp1/2ppP3/7R/1PN1B1R1/1PP2P1P/4K3 w - - 1 3  d 26, 166 s.
+// r2q1rk1/1b3p1p/p3pPp1/2ppP3/7R/1PN1B1R1/1PP2P1P/4K3 w - - 1 3  d 25, 176 s.
 // r2q1r2/1b2bpkp/p3p1p1/2ppP1P1/7R/1PN1BQR1/1PP2P1P/4K3 w - - 0 1 1.Qf6, unsolved at depth 33
 
 #define FAST_POPCNT
@@ -22,7 +22,7 @@
 
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
-inline constexpr const char* engineVersion = "1.1.3"; // bump on releases
+inline constexpr const char* engineVersion = "1.1.5"; // bump on releases
 inline constexpr const char* netPath = "publius_net256_1.bin";
 //inline constexpr const char* netPath = "publius_net32_4.bin";
 

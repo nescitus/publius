@@ -184,5 +184,9 @@ Move MovePicker::NextMove(Position* pos, int ply) {
 // Is a killer move acceptable as such
 // in the current position?
 bool MovePicker::IsAcceptableKiller(Position* pos, Move killer) {
-    return (killer && !IsMoveNoisy(pos, killer) && IsPseudoLegal(pos, killer));
+    
+    return (killer && 
+            killer != moveFromTT && 
+           !IsMoveNoisy(pos, killer) && 
+            IsPseudoLegal(pos, killer));
 }
