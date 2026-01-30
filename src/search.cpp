@@ -302,9 +302,9 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
     // except at  root, where we begin with the best  move  
     // from previous iteration.
     movePicker.Init(modeAll,
-        isRoot ? Pv.line[0][0] : ttMove,
-        History.GetKiller1(ply),
-        History.GetKiller2(ply));
+                    isRoot ? Pv.line[0][0] : ttMove,
+                    History.GetKiller1(ply),
+                    History.GetKiller2(ply));
 
     // Main loop
 
@@ -514,8 +514,13 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
             // so that the move will be sorted higher
             // next time we encounter it.
             History.Update(pos, move, depth, ply);
-            for (int i = 0; i < movesTried; i++)
-                History.UpdateTries(pos, listOfTriedMoves[i], depth);
+            //if (!IsMoveNoisy(pos, move)) 
+            {
+                for (int i = 0; i < movesTried; i++) {
+                    if (listOfTriedMoves[i] != move)
+                       History.UpdateTries(pos, listOfTriedMoves[i], depth);
+                }
+            }
 
             // Store move in the transposition table
             if (!isExcluded)
