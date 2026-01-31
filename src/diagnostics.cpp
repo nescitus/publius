@@ -106,7 +106,7 @@ Bitboard Perft(Position* pos, int ply, int depth, bool isNoisy) {
     UndoData undo;
     MovePicker movePicker;
 
-    movePicker.Init(modeAll, 0, 0, 0);
+    movePicker.Init(modeAll, 0, 0, 0, 0);
 
     while ((move = movePicker.NextMove(pos, ply)) != 0) {
 

@@ -1,7 +1,3 @@
-// Publius - Didactic public domain bitboard chess engine by Pawel Koziol
-
-#pragma once
-
 // Publius - Didactic public domain bitboard chess engine
 // by Pawel Koziol
 
@@ -17,20 +13,21 @@ public:
 
     // Clears history tables and killers
     void Clear(void);
+    void ClearRefutation(void);
 
     // Update history on a quiet beta cutoff.
     // Returns true if quiet history was updated (i.e. move was quiet).
-    bool Update(Position* pos, const Move move, const int depth, const int ply);
+    bool Update(Position* pos, const Move move, const Move oldMove, const int depth, const int ply);
 
     // Penalize a quiet move that was tried before the cutoff move.
-    void UpdateTries(Position* pos, const Move move, const int depth);
+    void UpdateTries(Position* pos, const Move move, const Move oldMove, const int depth);
 
     bool IsKiller(const Move move, const int ply);
     Move GetKiller1(const int ply);
     Move GetKiller2(const int ply);
 
     // Score for quiet move ordering
-    int GetScore(Position* pos, const Move move);
+    int GetScore(Position* pos, const Move move, const Move oldMove);
 
 private:
 
@@ -39,6 +36,8 @@ private:
 
     // Signed history in range [-H, +H]
     int cutoffHistory[noPiece][sqNone][sqNone];
+
+    int refutation[sqNone][sqNone][noPiece][sqNone][sqNone];
 
     // Killer moves per ply
     Move killer1[SearchTreeSize];

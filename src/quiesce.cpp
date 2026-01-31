@@ -98,7 +98,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
 
     movePicker.Init(movegenMode, ttMove,
                     History.GetKiller1(ply), 
-                    History.GetKiller2(ply));
+                    History.GetKiller2(ply), 0);
 
     while ((move = movePicker.NextMove(pos, ply)) != 0) {
 

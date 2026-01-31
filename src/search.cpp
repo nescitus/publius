@@ -25,7 +25,7 @@
 Move bestRootMove = 0;
 
 const int singularDepth = 7;
-static const Stack rootSentinel{/*capture target=*/-1, /*eval=*/0 };
+static const Stack rootSentinel{/*capture target=*/-1, /*eval=*/0, /*move*/ CreateMove(A8, B1, 0)};
 
 int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded) {
 
@@ -251,6 +251,7 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
             // Do null move search, giving the opponent
             // two moves in a row
             pos->DoNull(&undo);
+            currentPly.move = 0;
             score = -Search(pos, context, ply + 1, -beta, -beta + 1, depth - reduction, true, false);
             pos->UndoNull(&undo);
 
@@ -304,7 +305,8 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
     movePicker.Init(modeAll,
                     isRoot ? Pv.line[0][0] : ttMove,
                     History.GetKiller1(ply),
-                    History.GetKiller2(ply));
+                    History.GetKiller2(ply),
+                    onePlyAgo.move);
 
     // Main loop
 
@@ -321,10 +323,14 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
 
         // Remember destination square if move has been
         // a capture, preparing for the recapture extension.
-        if (IsMoveNoisy(pos, move))
+        if (IsMoveNoisy(pos, move)) {
             currentPly.captureSquare = GetToSquare(move);
-        else
+            currentPly.move = CreateMove(A8, B1, 0);
+        } else {
             currentPly.captureSquare = -1;
+            currentPly.move = move;
+        }
+
 
         // Detect if a move gives check (without playing it).
         // This is not a popular idea, but Koivisto does it.
@@ -513,12 +519,12 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
             // Update history table and killer moves
             // so that the move will be sorted higher
             // next time we encounter it.
-            History.Update(pos, move, depth, ply);
+            History.Update(pos, move, onePlyAgo.move, depth, ply);
             //if (!IsMoveNoisy(pos, move)) 
             {
                 for (int i = 0; i < movesTried; i++) {
                     if (listOfTriedMoves[i] != move)
-                       History.UpdateTries(pos, listOfTriedMoves[i], depth);
+                       History.UpdateTries(pos, listOfTriedMoves[i], onePlyAgo.move, depth);
                 }
             }
 

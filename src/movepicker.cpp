@@ -24,7 +24,7 @@
 #include "movepicker.h"
 
 //Initialize with the move ordering data
-void MovePicker::Init(Mode mode, Move ttMove, Move firstKiller, Move secondKiller) {
+void MovePicker::Init(Mode mode, Move ttMove, Move firstKiller, Move secondKiller, Move old) {
     
     moveFromTT = ttMove;
     killer1 = firstKiller;
@@ -32,6 +32,7 @@ void MovePicker::Init(Mode mode, Move ttMove, Move firstKiller, Move secondKille
     stage = stageTT;
     currentMoveStage = stageTT;
     movegenMode = mode;
+    oldMove = old;
 }
 
 // Emits the next move
@@ -125,7 +126,7 @@ Move MovePicker::NextMove(Position* pos, int ply) {
                 (movegenMode == modeChecks) ? FillCheckList(pos, &quietList) 
                                             : FillQuietList(pos, &quietList);
 
-                quietList.ScoreQuiet(pos);
+                quietList.ScoreQuiet(pos, oldMove);
                 quietLength = quietList.GetLength();
                 quietCnt = 0;
                 stage = stageReturnQuiet;

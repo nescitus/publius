@@ -47,12 +47,13 @@ private:
     MoveList allNoisyList, goodNoisyList, badNoisyList, quietList;
     Move killer1;
     Move killer2;
+    Move oldMove;
     bool IsAcceptableKiller(Position* pos, Move killer);
     bool IsOkForMode(Position* pos, Move move);  
 public:
     Move moveFromTT;
     int stage;
     int currentMoveStage;
-    void Init(Mode mode, Move ttMove, Move firstKiller, Move secondKiller);
+    void Init(Mode mode, Move ttMove, Move firstKiller, Move secondKiller, Move old);
     Move NextMove(Position* pos, int ply);
 };
