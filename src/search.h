@@ -9,7 +9,7 @@
 struct Stack {
 	int captureSquare; // target square of previous capture if applicable, else -1
 	int eval;          // eval for each ply, to see if we are improving or not
-    Move move;
+    Move move;         // move made at current ply
 };
 
 // SearchContext holds data generated and passed around during search

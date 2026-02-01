@@ -25,7 +25,8 @@
 Move bestRootMove = 0;
 
 const int singularDepth = 7;
-static const Stack rootSentinel{/*capture target=*/-1, /*eval=*/0, /*move*/ CreateMove(A8, B1, 0)};
+static const Move noPreviousMove = CreateMove(A8, B1, 0);
+static const Stack rootSentinel{/*capture target=*/-1, /*eval=*/0, /*move*/ noPreviousMove};
 
 int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded) {
 
@@ -48,7 +49,8 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
     singularScore = -Infinity;
     singularMove = 0;
 
-    // Init stack pointers for shorter code
+    // Init stack pointers for shorter code. If there is
+    // no previous depth, use artificial rootSentinel data.
     Stack& currentPly = context->stack[ply];
     const Stack& onePlyAgo = (ply ? context->stack[ply - 1] : rootSentinel);
     const Stack& twoPliesAgo = (ply > 1 ? context->stack[ply - 2] : rootSentinel);
@@ -325,7 +327,7 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
         // a capture, preparing for the recapture extension.
         if (IsMoveNoisy(pos, move)) {
             currentPly.captureSquare = GetToSquare(move);
-            currentPly.move = CreateMove(A8, B1, 0);
+            currentPly.move = noPreviousMove; // don't consider quiet refutations of noisy moves
         } else {
             currentPly.captureSquare = -1;
             currentPly.move = move;
@@ -464,8 +466,8 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
             !moveGivesCheck)
         {
             reduction = Lmr.table[isPv]
-                [std::min(depth, 63)]
-                [std::min(movesTried, 63)];
+                                 [std::min(depth, 63)]
+                                 [std::min(movesTried, 63)];
 
             // TODO: increase reduction when not improving
             //if (reduction > 1 && improving) 
@@ -645,6 +647,7 @@ void ClearSearchContext(SearchContext& sc) {
     for (int i = 0; i < SearchTreeSize; ++i) {
         sc.stack[i].captureSquare = -1;
         sc.stack[i].eval = 0;
+        sc.stack[i].move = noPreviousMove;
     }
 
     sc.excludedMove = 0;

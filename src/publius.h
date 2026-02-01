@@ -29,7 +29,7 @@
 
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
-inline constexpr const char* engineVersion = "1.1.6"; // bump on releases
+inline constexpr const char* engineVersion = "1.1.7"; // bump on releases
 inline constexpr const char* netPath = "publius_net256_1.bin";
 //inline constexpr const char* netPath = "publius_net32_4.bin";
 

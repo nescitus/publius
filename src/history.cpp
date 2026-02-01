@@ -34,7 +34,7 @@ void HistoryData::Clear(void) {
 // Update history values on a positive outcome, like a beta cutoff.
 // Returns true if we actually updated quiet history (so caller may decide
 // whether to penalize other quiet tries).
-bool HistoryData::Update(Position* pos, const Move move, const Move oldMove, const int depth, const int ply) {
+bool HistoryData::Update(Position* pos, const Move move, const Move refuted, const int depth, const int ply) {
 
     // History is updated only for quiet moves
     if (IsMoveNoisy(pos, move))
@@ -56,12 +56,12 @@ bool HistoryData::Update(Position* pos, const Move move, const Move oldMove, con
     int bonus = Inc(depth);
 
     ApplyHistoryDelta(cutoffHistory[piece][fromSquare][toSquare], +bonus);
-    ApplyHistoryDelta(refutation[GetFromSquare(oldMove)][GetToSquare(oldMove)][piece][fromSquare][toSquare], +bonus);
+    ApplyHistoryDelta(refutation[GetFromSquare(refuted)][GetToSquare(refuted)][piece][fromSquare][toSquare], +bonus);
 
     return true;
 }
 
-void HistoryData::UpdateTries(Position* pos, const Move move, const Move oldMove, const int depth) {
+void HistoryData::UpdateTries(Position* pos, const Move move, const Move refuted, const int depth) {
 
     // Update only for quiet moves
     if (IsMoveNoisy(pos, move))
@@ -75,7 +75,7 @@ void HistoryData::UpdateTries(Position* pos, const Move move, const Move oldMove
     int bonus = Inc(depth);
 
     ApplyHistoryDelta(cutoffHistory[piece][fromSquare][toSquare], -bonus);
-    ApplyHistoryDelta(refutation[GetFromSquare(oldMove)][GetToSquare(oldMove)][piece][fromSquare][toSquare], -bonus);
+    ApplyHistoryDelta(refutation[GetFromSquare(refuted)][GetToSquare(refuted)][piece][fromSquare][toSquare], -bonus);
 }
 
 bool HistoryData::IsKiller(const Move move, const int ply) {
@@ -90,7 +90,7 @@ Move HistoryData::GetKiller2(const int ply) {
     return killer2[ply];
 }
 
-int HistoryData::GetScore(Position* pos, const Move move, const Move oldMove) {
+int HistoryData::GetScore(Position* pos, const Move move, const Move refuted) {
 
     // Init square variables
     Square fromSquare = GetFromSquare(move);
@@ -98,7 +98,7 @@ int HistoryData::GetScore(Position* pos, const Move move, const Move oldMove) {
     ColoredPiece piece = pos->GetPiece(fromSquare);
 
     return cutoffHistory[piece][fromSquare][toSquare]
-         + refutation[GetFromSquare(oldMove)][GetToSquare(oldMove)][piece][fromSquare][toSquare];
+         + refutation[GetFromSquare(refuted)][GetToSquare(refuted)][piece][fromSquare][toSquare];
 }
 
 int HistoryData::Inc(const int depth) {
@@ -108,20 +108,21 @@ int HistoryData::Inc(const int depth) {
 // Update  value in a history array; the nice thing about this  function
 // is that entry can be an array of any dimensions, because we are using
 // a pointer.
-void HistoryData::ApplyHistoryDelta(int& entry, int delta) {
+void HistoryData::ApplyHistoryDelta(int16_t& entry, int delta) {
 
     // delta may be positive (reward) or negative (penalty)
     int bonus = (delta >= 0) ? delta : -delta;
-    int old = entry;
+
+    int old = (int)entry;
+    int value = old;
 
     // Basic update
-    entry += delta;
+    value += delta;
 
-    // Effectively  undoing part of the change. The  larger  abs(entry)
-    // already is, the smaller the effective change, so history doesn't 
-    // "run away" and can both learn and unlearn smoothly.
-    entry -= int((int64_t)old * bonus / maxHist);
+    // Diminishing returns
+    value -= int((int64_t)old * bonus / maxHist);
 
-    // Make sure entry value stays within bounds, just in case.
-    entry = std::clamp(entry, -maxHist, maxHist);
+    // Clamp and store back
+    value = std::clamp(value, -maxHist, maxHist);
+    entry = (int16_t)value;
 }
