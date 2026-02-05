@@ -52,13 +52,13 @@ private:
     Bitboard CalculatePawnKingKey();
     [[nodiscard]] bool IsDrawByRepetition() const;
     [[nodiscard]] bool IsDrawByInsufficientMaterial() const;
-    void TrySettingEp(char number, Square whiteSq, Square blackSq);
+    void TrySettingEp(char numberChar, Square whiteSq, Square blackSq);
 
 public:
 
     // --- Zobrist hashes ---
     Bitboard boardHash;  // full position hash (side to move, pieces, castling, ep)
-    Bitboard pawnKingHash; // hash for pawn + king structure(faster pawn eval)
+    Bitboard pawnKingHash; // hash key for pawn + king structure (for faster pawn eval)
 
     // --- Move execution ---
     void Set(const std::string& fen);
@@ -79,7 +79,6 @@ public:
     [[nodiscard]] bool IsBlackLongCastleLegal();
 
     // --- Piece counting ---
-
     [[nodiscard]] int CountMinors(const Color color) const {
         return Count(color, Knight) + Count(color, Bishop);
     }
@@ -101,8 +100,8 @@ public:
         return pieceBitboard[color][piece];
     }
     [[nodiscard]] Bitboard Pieces(Color color) const;
-    [[nodiscard]] Bitboard MapDiagonalMovers(Color color) const;
-    [[nodiscard]] Bitboard MapStraightMovers(Color color) const;
+    [[nodiscard]] Bitboard MapDiagonalSliders(Color color) const;
+    [[nodiscard]] Bitboard MapStraightSliders(Color color) const;
     [[nodiscard]] Bitboard AllDiagMovers() const;
     [[nodiscard]] Bitboard AllStraightMovers() const;
     [[nodiscard]] Bitboard Occupied() const;
@@ -130,6 +129,3 @@ public:
 
 // this helps keeping Position::Set() more concise
 std::tuple<Color, PieceType> PieceFromChar(char c);
-
-// helper for en passant 
-constexpr bool Is3or6(char ch) { return ch == '3' || ch == '6'; }

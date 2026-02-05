@@ -20,8 +20,8 @@ bool Position::SquareIsAttacked(const Square sq, const Color color) const {
 
     return (Map(color, Pawn) & GenerateMoves.Pawn(~color, sq)) ||
            (Map(color, Knight) & GenerateMoves.Knight(sq)) ||
-           (MapDiagonalMovers(color) & GenerateMoves.Bish(Occupied(), sq)) ||
-           (MapStraightMovers(color) & GenerateMoves.Rook(Occupied(), sq)) ||
+           (MapDiagonalSliders(color) & GenerateMoves.Bish(Occupied(), sq)) ||
+           (MapStraightSliders(color) & GenerateMoves.Rook(Occupied(), sq)) ||
            (Map(color, King) & GenerateMoves.King(sq));
 }
 
@@ -114,11 +114,11 @@ bool Position::MoveGivesCheck(const Move move) {
 
     // Diagonal discovered checks
     checks = GenerateMoves.Bish(occ, kingSquare);
-    if (checks & MapDiagonalMovers(md.side)) return true;
+    if (checks & MapDiagonalSliders(md.side)) return true;
 
     // Orthogonal discovered checks
     checks = GenerateMoves.Rook(occ, kingSquare);
-    if (checks & MapStraightMovers(md.side)) return true;
+    if (checks & MapStraightSliders(md.side)) return true;
 
     // Checks discovered by en passant capture
     if (GetTypeOfMove(move) == tEnPassant) {
@@ -126,10 +126,10 @@ bool Position::MoveGivesCheck(const Move move) {
         occ ^= Paint(md.toSquare + dir);
 
         checks = GenerateMoves.Bish(occ, kingSquare);
-        if (checks & MapDiagonalMovers(md.side)) return true;
+        if (checks & MapDiagonalSliders(md.side)) return true;
 
         checks = GenerateMoves.Rook(occ, kingSquare);
-        if (checks & MapStraightMovers(md.side)) return true;
+        if (checks & MapStraightSliders(md.side)) return true;
     }
 
     // Horizontal checks discovered by castling

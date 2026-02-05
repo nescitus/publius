@@ -11,7 +11,7 @@ std::uniform_int_distribution<Bitboard> dist(std::llround(std::pow(2, 56)), std:
 
 HashKeys::HashKeys() {
 
-    // init piece.square keys
+    // init piece/square keys
     for (ColoredPiece piece = WhitePawn; piece < noPiece; ++piece)
         for (Square square = A1; square < sqNone; ++square)
             pieceKey[piece][square] = Random64();

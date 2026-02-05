@@ -348,7 +348,7 @@ void EvalRook(const Position* pos, EvalData* e, Color color) {
 
         // Rook's attacks on the enemy king's zone
         // including attacks through own rook or queen
-        occupancy ^= pos->MapStraightMovers(color);
+        occupancy ^= pos->MapStraightSliders(color);
         att = GenerateMoves.Rook(occupancy, square);
         att &= e->enemyKingZone[color];
         e->AddAttacks(color, att, 6, 4);

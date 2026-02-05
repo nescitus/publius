@@ -90,13 +90,11 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
         return 0;
 
     // Quick exit on a statically detected draw, unless 
-    // we are at root, where we need to have a move.
+    // we are at root, where we need a move. Too many
+    // early exits in a row might cause a timeout, so 
+    // we safeguard.
     if (!isRoot && pos->IsDraw()) {
-
-        //  Too  many  early exits in a  row  might  cause 
-        //  a timeout, so we safeguard
-        Timer.TryStoppingByTimeout();
-
+        Timer.TryStopping();
         return ScoreDraw;
     }
 
@@ -105,15 +103,14 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
     // vents looking for the longer checkmates if a shorter 
     // one  has been already found. It cannot be  used  at 
     // the root, as it doesn't return a move, only a value.
+    // Too many early exits in a row might cause a timeout, 
+    // so we safeguard.
 
     if (!isRoot) {
         alpha = std::max(alpha, -MateScore + ply);
         beta = std::min(beta, MateScore - ply + 1);
         if (alpha >= beta) {
-            // Too many early exits in a row 
-            // might cause a timeout, so we safeguard
-            Timer.TryStoppingByTimeout();
-
+            Timer.TryStopping();
             return alpha;
         }
     }
@@ -639,7 +636,7 @@ void TryInterrupting(void) {
     }
 
     // check if the time is out
-    Timer.TryStoppingByTimeout();
+    Timer.TryStopping();
 }
 
 void ClearSearchContext(SearchContext& sc) {

@@ -77,16 +77,15 @@ void UCItimer::SetMoveTiming(void) {
         return;
     }
 
-    // We set two time limits: hardTimeLimit (break
-    // the search no matter what) and softTimeLimit
-    // (don't start the next iteration). There is
-    // some scope for smarter tricks taking into
-    // account root move changes and fail lows, 
-    // but our current implementation focuses
-    // on staying out of trouble: counteracting 
-    // the GUI lag and being extra careful under 
-    // the incremental time control near the end 
-    // of the game.
+    // We set two time limits:  hardTimeLimit  (break
+    // the  search no matter what) and  softTimeLimit
+    // (don't  start  the next  iteration).  There is
+    // some  scope  for smarter  tricks  taking  into
+    // account  root move changes and fail lows,  but
+    // our current implementation focuses on  staying 
+    // out of trouble: counteracting  the GUI lag and 
+    // being extra careful under the incremental time 
+    // control near the end of the game.
 
     if (ShouldCalculateTimeControl()) {
 
@@ -106,8 +105,7 @@ void UCItimer::SetMoveTiming(void) {
                hardLimit = 1;
         }
 
-        // ensure that our limit does not exceed 
-        // total time available
+        // ensure we do not exceed total time available
         if (hardLimit > data[engTime])
             hardLimit = data[engTime];
 
@@ -162,7 +160,7 @@ void UCItimer::TryStoppingByNodecount() {
 
 // detects whether we should stop searching
 // based on timeout
-void UCItimer::TryStoppingByTimeout() {
+void UCItimer::TryStopping() {
     if (IsTimeout())
         isStopping = true;
 }

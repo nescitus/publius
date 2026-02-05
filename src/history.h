@@ -34,9 +34,8 @@ private:
     int Inc(const int depth);
     void ApplyHistoryDelta(int16_t& entry, int delta);
 
-    // Signed history in range [-H, +H]
+    // History data
     int16_t cutoffHistory[noPiece][sqNone][sqNone];
-
     int16_t refutation[sqNone][sqNone][noPiece][sqNone][sqNone];
 
     // Killer moves per ply

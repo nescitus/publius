@@ -102,7 +102,7 @@ int HistoryData::GetScore(Position* pos, const Move move, const Move refuted) {
 }
 
 int HistoryData::Inc(const int depth) {
-    return std::clamp(128 * depth - 96, 0, 2000); // +3 Elo
+    return std::clamp(128 * depth - 96, 0, 2000);
 }
 
 // Update  value in a history array; the nice thing about this  function

@@ -104,7 +104,7 @@ void FillNoisyList(Position* pos, MoveList* list) {
     }
 
     // Diagonal captures
-    pieces = pos->MapDiagonalMovers(color);
+    pieces = pos->MapDiagonalSliders(color);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);
         moves = GenerateMoves.Bish(occ, fromSquare) & prey;
@@ -112,7 +112,7 @@ void FillNoisyList(Position* pos, MoveList* list) {
     }
 
     // Straight line captures
-    pieces = pos->MapStraightMovers(color);
+    pieces = pos->MapStraightSliders(color);
     while (pieces) {
         fromSquare = PopFirstBit(&pieces);
         moves = GenerateMoves.Rook(occ, fromSquare) & prey;

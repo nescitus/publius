@@ -55,7 +55,7 @@ int Quiesce(Position* pos, int ply, int qdepth, int alpha, int beta) {
     // in case too many draws detected in succession
     // mess with controlling the time)
     if (pos->IsDraw()) {
-        Timer.TryStoppingByTimeout();
+        Timer.TryStopping();
         return ScoreDraw;
     }
 

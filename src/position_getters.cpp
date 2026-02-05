@@ -29,13 +29,13 @@ Bitboard Position::Empty() const {
 }
 
 // Map pieces of a given color that move diagonally
-Bitboard Position::MapDiagonalMovers(const Color color) const {
+Bitboard Position::MapDiagonalSliders(const Color color) const {
     return (Map(color, Bishop) | Map(color, Queen));
 }
 
 // Map pieces of a given color that move vertically 
 // and horizontally
-Bitboard Position::MapStraightMovers(const Color color) const {
+Bitboard Position::MapStraightSliders(const Color color) const {
     return (Map(color, Rook) | Map(color, Queen));
 }
 

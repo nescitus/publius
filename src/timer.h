@@ -35,7 +35,7 @@ public:
     void SetData(const int slot, const size_t val);
     void SetDataForColor(const Color color);
     bool IsTimeout(void);
-    void TryStoppingByTimeout(void);
+    void TryStopping(void);
     void TryStoppingByNodecount(void);
     void RefreshStats(void);
     size_t GetHardLimit() { return hardLimit; }

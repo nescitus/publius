@@ -108,9 +108,9 @@ void Position::Set(const std::string& str) {
     NN.Refresh(*this);
 }
 
-void Position::TrySettingEp(char number, Square whiteSq, Square blackSq) {
-    if (Is3or6(number)) 
-        enPassantSq = (number == '3') ? whiteSq : blackSq;
+void Position::TrySettingEp(char numberChar, Square whiteSq, Square blackSq) {
+    if (numberChar == '3' || numberChar == '6')
+        enPassantSq = (numberChar == '3') ? whiteSq : blackSq;
 }
 
 Bitboard Position::CalculateHashKey() {
