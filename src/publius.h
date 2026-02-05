@@ -3,10 +3,10 @@
 
 #pragma once
 
-// fastchess.exe -openings order=random file=c:\fastchess\UHO_Lichess_4852_v1.epd -engine proto=uci name=new cmd=c:\fastchess\new.exe -engine proto=uci name=base cmd=c:\fastchess\old1.exe -concurrency 3 -each tc=8+0.08 -rounds 100000 -repeat -recover -sprt alpha=0.05 beta=0.10 elo0=0 elo1=10
+// fastchess.exe -openings order=random file=c:\fastchess\UHO_Lichess_4852_v1.epd -engine proto=uci name=new cmd=c:\fastchess\new1.exe -engine proto=uci name=base cmd=c:\fastchess\old1.exe -concurrency 3 -each tc=8+0.08 -rounds 100000 -repeat -recover -sprt alpha=0.05 beta=0.10 elo0=0 elo1=10
 
 // non-regression
-// fastchess.exe -openings order=random file=c:\fastchess\UHO_Lichess_4852_v1.epd -engine proto=uci name=new cmd=c:\fastchess\new.exe -engine proto=uci name=base cmd=c:\fastchess\old1.exe -concurrency 3 -each tc=8+0.08 -rounds 100000 -repeat -recover -sprt alpha=0.05 beta=0.10 elo0=-10 elo1=0
+// fastchess.exe -openings order=random file=c:\fastchess\UHO_Lichess_4852_v1.epd -engine proto=uci name=new cmd=c:\fastchess\new1.exe -engine proto=uci name=base cmd=c:\fastchess\old1.exe -concurrency 3 -each tc=8+0.08 -rounds 100000 -repeat -recover -sprt alpha=0.05 beta=0.10 elo0=-10 elo1=0
 
 // SPRT calculator: https://elocalculator.netlify.app/
 

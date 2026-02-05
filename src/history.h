@@ -36,7 +36,7 @@ private:
 
     // History data
     int16_t cutoffHistory[noPiece][sqNone][sqNone];
-    int16_t refutation[sqNone][sqNone][noPiece][sqNone][sqNone];
+    int16_t refutation[sqNone/4][sqNone][noPiece][sqNone][sqNone];
 
     // Killer moves per ply
     Move killer1[SearchTreeSize];

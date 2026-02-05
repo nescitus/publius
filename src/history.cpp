@@ -11,6 +11,17 @@
 
 const int maxHist = 16384;
 
+const int bucket[64] = {
+    0,  0,  1,  1,  2,  2,  3,  3,
+    0,  0,  1,  1,  2,  2,  3,  3,
+    4,  4,  5,  5,  6,  6,  7,  7,
+    4,  4,  5,  5,  6,  6,  7,  7,
+    8,  8,  9,  9, 10, 10, 11, 11,
+    8,  8,  9,  9, 10, 10, 11, 11,
+   12, 12, 13, 13, 14, 14, 15, 15,
+   12, 12, 13, 13, 14, 14, 15, 15
+};
+
 // Constructor
 HistoryData::HistoryData() {
     Clear();
@@ -20,6 +31,7 @@ HistoryData::HistoryData() {
 void HistoryData::ClearRefutation() {
     std::memset(refutation, 0, sizeof(refutation));
 }
+
 
 // Clear all values
 void HistoryData::Clear(void) {
@@ -56,7 +68,7 @@ bool HistoryData::Update(Position* pos, const Move move, const Move refuted, con
     int bonus = Inc(depth);
 
     ApplyHistoryDelta(cutoffHistory[piece][fromSquare][toSquare], +bonus);
-    ApplyHistoryDelta(refutation[GetFromSquare(refuted)][GetToSquare(refuted)][piece][fromSquare][toSquare], +bonus);
+    ApplyHistoryDelta(refutation[bucket[GetFromSquare(refuted)]][GetToSquare(refuted)][piece][fromSquare][toSquare], +bonus);
 
     return true;
 }
@@ -75,7 +87,7 @@ void HistoryData::UpdateTries(Position* pos, const Move move, const Move refuted
     int bonus = Inc(depth);
 
     ApplyHistoryDelta(cutoffHistory[piece][fromSquare][toSquare], -bonus);
-    ApplyHistoryDelta(refutation[GetFromSquare(refuted)][GetToSquare(refuted)][piece][fromSquare][toSquare], -bonus);
+    ApplyHistoryDelta(refutation[bucket[GetFromSquare(refuted)]][GetToSquare(refuted)][piece][fromSquare][toSquare], -bonus);
 }
 
 bool HistoryData::IsKiller(const Move move, const int ply) {
@@ -98,7 +110,7 @@ int HistoryData::GetScore(Position* pos, const Move move, const Move refuted) {
     ColoredPiece piece = pos->GetPiece(fromSquare);
 
     return cutoffHistory[piece][fromSquare][toSquare]
-         + refutation[GetFromSquare(refuted)][GetToSquare(refuted)][piece][fromSquare][toSquare];
+         + refutation[bucket[GetFromSquare(refuted)]][GetToSquare(refuted)][piece][fromSquare][toSquare];
 }
 
 int HistoryData::Inc(const int depth) {
