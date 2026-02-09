@@ -68,7 +68,7 @@ bool HistoryData::Update(Position* pos, const Move move, const Move refuted, con
     int bonus = Inc(depth);
 
     ApplyHistoryDelta(cutoffHistory[piece][fromSquare][toSquare], +bonus);
-    ApplyHistoryDelta(refutation[bucket[GetFromSquare(refuted)]][GetToSquare(refuted)][piece][fromSquare][toSquare], +bonus);
+    ApplyHistoryDelta(refutation[pos->GetSideToMove()][bucket[GetFromSquare(refuted)]][GetToSquare(refuted)][piece][bucket[fromSquare]][toSquare], +bonus);
 
     return true;
 }
@@ -87,7 +87,7 @@ void HistoryData::UpdateTries(Position* pos, const Move move, const Move refuted
     int bonus = Inc(depth);
 
     ApplyHistoryDelta(cutoffHistory[piece][fromSquare][toSquare], -bonus);
-    ApplyHistoryDelta(refutation[bucket[GetFromSquare(refuted)]][GetToSquare(refuted)][piece][fromSquare][toSquare], -bonus);
+    ApplyHistoryDelta(refutation[pos->GetSideToMove()][bucket[GetFromSquare(refuted)]][GetToSquare(refuted)][piece][bucket[fromSquare]][toSquare], -bonus);
 }
 
 bool HistoryData::IsKiller(const Move move, const int ply) {
@@ -110,7 +110,7 @@ int HistoryData::GetScore(Position* pos, const Move move, const Move refuted) {
     ColoredPiece piece = pos->GetPiece(fromSquare);
 
     return cutoffHistory[piece][fromSquare][toSquare]
-         + refutation[bucket[GetFromSquare(refuted)]][GetToSquare(refuted)][piece][fromSquare][toSquare];
+         + refutation[pos->GetSideToMove()][bucket[GetFromSquare(refuted)]][GetToSquare(refuted)][piece][bucket[fromSquare]][toSquare];
 }
 
 int HistoryData::Inc(const int depth) {

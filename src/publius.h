@@ -3,10 +3,10 @@
 
 #pragma once
 
-// fastchess.exe -openings order=random file=c:\fastchess\UHO_Lichess_4852_v1.epd -engine proto=uci name=new cmd=c:\fastchess\new1.exe -engine proto=uci name=base cmd=c:\fastchess\old1.exe -concurrency 3 -each tc=8+0.08 -rounds 100000 -repeat -recover -sprt alpha=0.05 beta=0.10 elo0=0 elo1=10
+// fastchess.exe -openings order=random file=c:\fastchess\UHO_Lichess_4852_v1.epd -engine proto=uci name=new cmd=c:\fastchess\new.exe -engine proto=uci name=base cmd=c:\fastchess\old.exe -concurrency 3 -each tc=8+0.08 -rounds 100000 -repeat -recover -sprt alpha=0.05 beta=0.10 elo0=0 elo1=10
 
 // non-regression
-// fastchess.exe -openings order=random file=c:\fastchess\UHO_Lichess_4852_v1.epd -engine proto=uci name=new cmd=c:\fastchess\new1.exe -engine proto=uci name=base cmd=c:\fastchess\old1.exe -concurrency 3 -each tc=8+0.08 -rounds 100000 -repeat -recover -sprt alpha=0.05 beta=0.10 elo0=-10 elo1=0
+// fastchess.exe -openings order=random file=c:\fastchess\UHO_Lichess_4852_v1.epd -engine proto=uci name=new cmd=c:\fastchess\new.exe -engine proto=uci name=base cmd=c:\fastchess\old.exe -concurrency 3 -each tc=8+0.08 -rounds 100000 -repeat -recover -sprt alpha=0.05 beta=0.10 elo0=-10 elo1=0
 
 // SPRT calculator: https://elocalculator.netlify.app/
 
@@ -16,8 +16,8 @@
 // 4427 lines of source code
 
 // r5k1/pQp2qpp/8/4pbN1/3P4/6P1/PPr4P/1K1R3R b - - 0 1 search explosion
-// r2q1rk1/1b3p1p/p3pPp1/2ppP3/7R/1PN1B1R1/1PP2P1P/4K3 w - - 1 3  d 25, 42 s.
-// r2q1r2/1b2bpkp/p3p1p1/2ppP1P1/7R/1PN1BQR1/1PP2P1P/4K3 w - - 0 1 1.Qf6, unsolved at depth 33
+// r2q1rk1/1b3p1p/p3pPp1/2ppP3/7R/1PN1B1R1/1PP2P1P/4K3 w - - 1 3  d 24, 30 s.
+// r2q1r2/1b2bpkp/p3p1p1/2ppP1P1/7R/1PN1BQR1/1PP2P1P/4K3 w - - 0 1 1.Qf6, solved at depth 32 30 min
 
 #define FAST_POPCNT
 // uncomment this when compiling for modern Windows systems
@@ -29,7 +29,7 @@
 
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
-inline constexpr const char* engineVersion = "1.1.8"; // bump on releases
+inline constexpr const char* engineVersion = "1.1.9"; // bump on releases
 inline constexpr const char* netPath = "publius_net256_1.bin";
 //inline constexpr const char* netPath = "publius_net32_4.bin";
 
