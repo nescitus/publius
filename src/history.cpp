@@ -60,15 +60,19 @@ bool HistoryData::Update(Position* pos, const Move move, const Move refuted, con
         killer1[ply] = move;
     }
 
-    // Gather data for updating history score
+    // Init table indices
+    Color side = pos->GetSideToMove();
+    int refFromBucket = bucket[GetFromSquare(refuted)];
+    Square refToSquare = GetToSquare(refuted);
     Square fromSquare = GetFromSquare(move);
+    int fromBucket = bucket[fromSquare];
     Square toSquare = GetToSquare(move);
     ColoredPiece piece = pos->GetPiece(fromSquare);
 
     int bonus = Inc(depth);
 
     ApplyHistoryDelta(cutoffHistory[piece][fromSquare][toSquare], +bonus);
-    ApplyHistoryDelta(refutation[pos->GetSideToMove()][bucket[GetFromSquare(refuted)]][GetToSquare(refuted)][piece][bucket[fromSquare]][toSquare], +bonus);
+    ApplyHistoryDelta(refutation[side][refFromBucket][refToSquare][piece][fromBucket][toSquare], +bonus);
 
     return true;
 }
@@ -79,15 +83,19 @@ void HistoryData::UpdateTries(Position* pos, const Move move, const Move refuted
     if (IsMoveNoisy(pos, move))
         return;
 
-    // Init
+    // Init table indices
+    Color side = pos->GetSideToMove();
+    int refFromBucket = bucket[GetFromSquare(refuted)];
+    Square refToSquare = GetToSquare(refuted);
     Square fromSquare = GetFromSquare(move);
+    int fromBucket = bucket[fromSquare];
     Square toSquare = GetToSquare(move);
     ColoredPiece piece = pos->GetPiece(fromSquare);
 
     int bonus = Inc(depth);
 
     ApplyHistoryDelta(cutoffHistory[piece][fromSquare][toSquare], -bonus);
-    ApplyHistoryDelta(refutation[pos->GetSideToMove()][bucket[GetFromSquare(refuted)]][GetToSquare(refuted)][piece][bucket[fromSquare]][toSquare], -bonus);
+    ApplyHistoryDelta(refutation[side][refFromBucket][refToSquare][piece][fromBucket][toSquare], -bonus);
 }
 
 bool HistoryData::IsKiller(const Move move, const int ply) {
@@ -104,13 +112,17 @@ Move HistoryData::GetKiller2(const int ply) {
 
 int HistoryData::GetScore(Position* pos, const Move move, const Move refuted) {
 
-    // Init square variables
+    // Init table indices
+    Color side = pos->GetSideToMove();
+    int refFromBucket = bucket[GetFromSquare(refuted)];
+    Square refToSquare = GetToSquare(refuted);
     Square fromSquare = GetFromSquare(move);
+    int fromBucket = bucket[fromSquare];
     Square toSquare = GetToSquare(move);
     ColoredPiece piece = pos->GetPiece(fromSquare);
 
     return cutoffHistory[piece][fromSquare][toSquare]
-         + refutation[pos->GetSideToMove()][bucket[GetFromSquare(refuted)]][GetToSquare(refuted)][piece][bucket[fromSquare]][toSquare];
+         + refutation[side][refFromBucket][refToSquare][piece][fromBucket][toSquare];
 }
 
 int HistoryData::Inc(const int depth) {
