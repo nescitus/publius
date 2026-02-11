@@ -22,10 +22,10 @@
 #include "publius.h"
 #include "search.h"
 
-Move bestRootMove = 0;
+Move bestRootMove = 0; // 3157245
 
 const int singularDepth = 7;
-static const Move noPreviousMove = CreateMove(A8, B1, 0);
+static const Move noPreviousMove = CreateMove(A8, C1, 0);
 static const Stack rootSentinel{/*capture target=*/-1, /*eval=*/0, /*move*/ noPreviousMove};
 
 int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, int depth, bool wasNullMove, bool isExcluded) {
@@ -250,7 +250,7 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
             // Do null move search, giving the opponent
             // two moves in a row
             pos->DoNull(&undo);
-            currentPly.move = 0;
+            currentPly.move = 0; // we don't want to pollute refutation history
             score = -Search(pos, context, ply + 1, -beta, -beta + 1, depth - reduction, true, false);
             pos->UndoNull(&undo);
 

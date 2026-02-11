@@ -11,6 +11,9 @@
 
 const int maxHist = 16384;
 
+// buckets are used to compress refutation table;
+// instead of [squareFrom][squareTo] we will use
+// [bucketOfSquareFrom] [squareTo]
 const int bucket[64] = {
     0,  0,  1,  1,  2,  2,  3,  3,
     0,  0,  1,  1,  2,  2,  3,  3,
@@ -21,6 +24,22 @@ const int bucket[64] = {
    12, 12, 13, 13, 14, 14, 15, 15,
    12, 12, 13, 13, 14, 14, 15, 15
 };
+
+static constexpr int refCount = 16 * 64;   // 1024 real contexts
+static constexpr int refNull = refCount;   // 1024 = dedicated null/none slot
+
+// returns index of a refutation move, based on 
+// bucket of from square [0..16] and to square [0..64]
+static inline int RefIndex(Move refuted) {
+    
+    if (!refuted)
+        return refNull; // 1024 (null / none)
+
+    const int rf = bucket[GetFromSquare(refuted)]; // 0..15
+    const int rt = int(GetToSquare(refuted));      // 0..63
+
+    return rf * 64 + rt; // 0..1023
+}
 
 // Constructor
 HistoryData::HistoryData() {
@@ -62,8 +81,7 @@ bool HistoryData::Update(Position* pos, const Move move, const Move refuted, con
 
     // Init table indices
     Color side = pos->GetSideToMove();
-    int refFromBucket = bucket[GetFromSquare(refuted)];
-    Square refToSquare = GetToSquare(refuted);
+    int refIndex = RefIndex(refuted);
     Square fromSquare = GetFromSquare(move);
     int fromBucket = bucket[fromSquare];
     Square toSquare = GetToSquare(move);
@@ -72,7 +90,7 @@ bool HistoryData::Update(Position* pos, const Move move, const Move refuted, con
     int bonus = Inc(depth);
 
     ApplyHistoryDelta(cutoffHistory[piece][fromSquare][toSquare], +bonus);
-    ApplyHistoryDelta(refutation[side][refFromBucket][refToSquare][piece][fromBucket][toSquare], +bonus);
+    ApplyHistoryDelta(refutation[side][refIndex][piece][fromBucket][toSquare], +bonus);
 
     return true;
 }
@@ -85,8 +103,7 @@ void HistoryData::UpdateTries(Position* pos, const Move move, const Move refuted
 
     // Init table indices
     Color side = pos->GetSideToMove();
-    int refFromBucket = bucket[GetFromSquare(refuted)];
-    Square refToSquare = GetToSquare(refuted);
+    int refIndex = RefIndex(refuted);
     Square fromSquare = GetFromSquare(move);
     int fromBucket = bucket[fromSquare];
     Square toSquare = GetToSquare(move);
@@ -95,7 +112,7 @@ void HistoryData::UpdateTries(Position* pos, const Move move, const Move refuted
     int bonus = Inc(depth);
 
     ApplyHistoryDelta(cutoffHistory[piece][fromSquare][toSquare], -bonus);
-    ApplyHistoryDelta(refutation[side][refFromBucket][refToSquare][piece][fromBucket][toSquare], -bonus);
+    ApplyHistoryDelta(refutation[side][refIndex][piece][fromBucket][toSquare], -bonus);
 }
 
 bool HistoryData::IsKiller(const Move move, const int ply) {
@@ -114,15 +131,14 @@ int HistoryData::GetScore(Position* pos, const Move move, const Move refuted) {
 
     // Init table indices
     Color side = pos->GetSideToMove();
-    int refFromBucket = bucket[GetFromSquare(refuted)];
-    Square refToSquare = GetToSquare(refuted);
+    int refIndex = RefIndex(refuted);
     Square fromSquare = GetFromSquare(move);
     int fromBucket = bucket[fromSquare];
     Square toSquare = GetToSquare(move);
     ColoredPiece piece = pos->GetPiece(fromSquare);
 
     return cutoffHistory[piece][fromSquare][toSquare]
-         + refutation[side][refFromBucket][refToSquare][piece][fromBucket][toSquare];
+         + refutation[side][refIndex][piece][fromBucket][toSquare];
 }
 
 int HistoryData::Inc(const int depth) {
