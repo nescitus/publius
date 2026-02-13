@@ -13,7 +13,7 @@
 //#define USE_TUNING
 
 // REGEX to count all the lines under MSVC 13: ^(?([^\r\n])\s)*[^\s+?/]+[^\n]*$
-// 4427 lines of source code
+// 4455 lines of source code
 
 // r5k1/pQp2qpp/8/4pbN1/3P4/6P1/PPr4P/1K1R3R b - - 0 1 search explosion
 // r2q1rk1/1b3p1p/p3pPp1/2ppP3/7R/1PN1B1R1/1PP2P1P/4K3 w - - 1 3  d 24, 30 s.
@@ -29,7 +29,7 @@
 
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
-inline constexpr const char* engineVersion = "1.1.10"; // bump on releases
+inline constexpr const char* engineVersion = "1.1.11"; // bump on releases
 inline constexpr const char* netPath = "publius_net256_1.bin";
 //inline constexpr const char* netPath = "publius_net32_4.bin";
 

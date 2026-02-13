@@ -105,7 +105,7 @@ void MoveList::ScoreNoisy(Position* pos) {
 // generation framework, so it does not have to compare 
 // quiet moves with tactical ("noisy") moves.
 
-void MoveList::ScoreQuiet(Position* pos, Move refuted) {
+void MoveList::ScoreQuiet(Position* pos, const Move refuted) {
 
     for (int i = 0; i < ind; i++)
         values[i] = History.GetScore(pos, moves[i], refuted);

@@ -2,25 +2,30 @@
 
 #pragma once
 
-// MovePicker class is a framework for staged
-// move generation. The idea is to delay generating
-// all the moves as much as possible.
+// MovePicker  class  handles  staged  move  generation. The  idea  
+// is  to avoid generating all the  moves  if  possible. This  way,  
+// if we get a cutoff on a move from the  transposition table,  we  
+// will skip the move generation entirely, and if a  good  capture 
+// causes  a cutoff, we omit quiet move  generation.  MovegenStage
+// enum shows the exact stages.
 
-// Please note that even something as simple 
-// as separating a stage that returns a move
-// from the transposition table changes node counts.
-// Colin Jenkins, author of Lozza, explained it
-// as follows: "consider a position with 3 moves 
-// (m1,2), (m2,2), (tt,100). in a non-staged context 
-// the moves are served as {tt, m2, m1} because m1 
-// is swapped with tt (assuming > condition). 
-// in a staged move context tt is not there and 
-// the moves are served as {tt}, {m1, m2}."
+// You can think of MovePicker as a finite state machine that will
+// eventually return all the required moves, but is lazy and  asks
+// several times: "Do you have a cutoff so that I can stop?"
+
+// Please note that even something as simple as separating a stage 
+// that  returns a move from the transposition table changes  node 
+// counts. Colin Jenkins, author of Lozza, explained it as follows: 
+// "consider  a  position  with  3 moves  (m1,2), (m2,2), (tt,100). 
+// In  a  non-staged context the moves are served  as {tt, m2, m1}
+// because  m1  is  swapped with tt  (assuming > condition).  in a  
+// staged gen context tt is not there and the moves are served  as 
+// {tt}, {m1, m2}."
 
 // Staged move generator goes through the following
 // stages, from top to bottom:
 
-enum {
+enum MovegenStage {
     stageTT,              // return move from transposition table 
     stageGenCapt,         // generate noisy moves, split them to good and bad
     stagePrepareGood,     // score good noisies
@@ -33,7 +38,9 @@ enum {
     stageReturnBad,       // return bad noisies
     stageEnd };           // no more moves
 
-// MovePicker can be run in a few different modes:
+// MovePicker can be run in a few different modes. Think of them as
+// specific paths, skipping certain stages if they are not necessary
+// in the current context:
 
 enum Mode { modeAll,        // main search or check evasion in qs
             modeChecks,     // check-aware quiescence search
@@ -44,16 +51,16 @@ private:
     Mode movegenMode;
     int goodNoisyLength, badNoisyLength, quietLength;
     int goodNoisyCnt, badNoisyCnt, quietCnt;
+    MovegenStage stage;
     MoveList allNoisyList, goodNoisyList, badNoisyList, quietList;
-    Move killer1;
-    Move killer2;
-    Move refutedMove;
-    bool IsAcceptableKiller(Position* pos, Move killer);
-    bool IsOkForMode(Position* pos, Move move);  
-public:
     Move moveFromTT;
-    int stage;
-    int currentMoveStage;
-    void Init(Mode mode, Move ttMove, Move firstKiller, Move secondKiller, Move refuted);
-    Move NextMove(Position* pos, int ply);
+    Move killer1, killer2;
+    Move refutedMove; // needed to sort quiet moves by refutation history
+
+    void PrepareNoisyList(Position* pos, MoveList& list, int& length, int& cnt);
+    bool IsAcceptableKiller(Position* pos, const Move killer);
+public:
+    MovegenStage currentMoveStage; // read in search.cpp
+    void Init(const Mode mode, const Move ttMove, const Move firstKiller, const Move secondKiller, const Move refuted);
+    Move NextMove(Position* pos);
 };

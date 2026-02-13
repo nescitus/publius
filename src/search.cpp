@@ -309,7 +309,7 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
 
     // Main loop
 
-    while ((move = movePicker.NextMove(pos, ply)) != 0) {
+    while ((move = movePicker.NextMove(pos)) != 0) {
 
         // In singular search we omit the known best move,
         // checking whether there are viable alternatives.

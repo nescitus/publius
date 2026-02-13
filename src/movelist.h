@@ -19,7 +19,7 @@ public:
     Move GetNextRawMove();
     Move GetBestMove();
     void ScoreNoisy(Position* pos);
-    void ScoreQuiet(Position* pos, Move refuted);
+    void ScoreQuiet(Position* pos, const Move refuted);
 
     // Get the lat index of the move list
     [[nodiscard]] int MoveList::GetLength() { return ind; }

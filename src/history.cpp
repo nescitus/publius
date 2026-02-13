@@ -29,7 +29,7 @@ static constexpr int refCount = 16 * 64;   // 1024 real contexts
 static constexpr int refNull = refCount;   // 1024 = dedicated null/none slot
 
 // returns index of a refutation move, based on 
-// bucket of from square [0..16] and to square [0..64]
+// bucket of from square [0..15] and to square [0..63]
 static inline int RefIndex(Move refuted) {
     
     if (!refuted)
@@ -82,6 +82,7 @@ bool HistoryData::Update(Position* pos, const Move move, const Move refuted, con
     // Init table indices
     Color side = pos->GetSideToMove();
     int refIndex = RefIndex(refuted);
+
     Square fromSquare = GetFromSquare(move);
     int fromBucket = bucket[fromSquare];
     Square toSquare = GetToSquare(move);
@@ -91,6 +92,7 @@ bool HistoryData::Update(Position* pos, const Move move, const Move refuted, con
 
     ApplyHistoryDelta(cutoffHistory[piece][fromSquare][toSquare], +bonus);
     ApplyHistoryDelta(refutation[side][refIndex][piece][fromBucket][toSquare], +bonus);
+
 
     return true;
 }

@@ -2,11 +2,8 @@
 // by Pawel Koziol
 
 // MovePicker class handles staged move generation.
-// Depending on mode setting, it can generate all
+// Depending on mode setting, it can generate  all
 // the moves, just captures, or captures and checks.
-// It is a kind of a finite state machine, going
-// through various stages and emitting appropriate
-// kind of moves.
 
 // In the quiescence search nodes where checks 
 // are generated, algorithm tries to be clever, 
@@ -24,7 +21,7 @@
 #include "movepicker.h"
 
 //Initialize with the move ordering data
-void MovePicker::Init(Mode mode, Move ttMove, Move firstKiller, Move secondKiller, Move refuted) {
+void MovePicker::Init(const Mode mode, const Move ttMove, const Move firstKiller, const Move secondKiller, const Move refuted) {
     
     moveFromTT = ttMove;
     killer1 = firstKiller;
@@ -36,7 +33,7 @@ void MovePicker::Init(Mode mode, Move ttMove, Move firstKiller, Move secondKille
 }
 
 // Emits the next move
-Move MovePicker::NextMove(Position* pos, int ply) {
+Move MovePicker::NextMove(Position* pos) {
 
     Move move;
 
@@ -73,9 +70,7 @@ Move MovePicker::NextMove(Position* pos, int ply) {
 
             case stagePrepareGood:
             {
-                goodNoisyList.ScoreNoisy(pos);
-                goodNoisyLength = goodNoisyList.GetLength();
-                goodNoisyCnt = 0;
+                PrepareNoisyList(pos, goodNoisyList, goodNoisyLength, goodNoisyCnt);
                 stage = stageReturnGoodCapt;
                 currentMoveStage = stageReturnGoodCapt;
                 break;
@@ -91,10 +86,10 @@ Move MovePicker::NextMove(Position* pos, int ply) {
                     return move;
                 }
 
-                // "modeCaptures" is used in the late stage 
-                // of quiescence search. In this case we try
-                // only good or equal captures, not bothering
-                // with the later stages of move generation.
+                // "modeCaptures"  means we are in the  late  stage 
+                // of quiescence search. We try only good or  equal 
+                // captures here, skipping the later stages of move 
+                // generation.
 
                 stage = (movegenMode == modeCaptures) 
                       ? stageEnd 
@@ -109,6 +104,7 @@ Move MovePicker::NextMove(Position* pos, int ply) {
                     currentMoveStage = stageFirstKiller;
                     return killer1;
                 }
+                break;
             }
 
             case stageSecondKiller:
@@ -118,6 +114,7 @@ Move MovePicker::NextMove(Position* pos, int ply) {
                     currentMoveStage = stageSecondKiller;
                     return killer2;
                 }
+                break;
             }
 
             case stageGenQuiet:
@@ -155,11 +152,9 @@ Move MovePicker::NextMove(Position* pos, int ply) {
 
             case stagePrepareBad:
             {
+                PrepareNoisyList(pos, badNoisyList, badNoisyLength, badNoisyCnt);
                 stage = stageReturnBad;
                 currentMoveStage = stageReturnBad;
-                badNoisyList.ScoreNoisy(pos);
-                badNoisyLength = badNoisyList.GetLength();
-                badNoisyCnt = 0;
                 break;
             }
 
@@ -182,9 +177,18 @@ Move MovePicker::NextMove(Position* pos, int ply) {
     }
 }
 
-// Is a killer move acceptable as such
-// in the current position?
-bool MovePicker::IsAcceptableKiller(Position* pos, Move killer) {
+// Scores a noisy move list and initializes counters.
+// Used for both goodNoisyList and badNoisyList.
+void MovePicker::PrepareNoisyList(Position* pos, MoveList& list, int& length, int& cnt) {
+
+    list.ScoreNoisy(pos);
+    length = list.GetLength();
+    cnt = 0;
+}
+
+// Can we accept a killer move? Is it a quiet move, 
+// legal and untried so far?
+bool MovePicker::IsAcceptableKiller(Position* pos, const Move killer) {
     
     return (killer && 
             killer != moveFromTT && 
