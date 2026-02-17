@@ -8,8 +8,8 @@
 // In the quiescence search nodes where checks 
 // are generated, algorithm tries to be clever, 
 // and throws quiet moves from the transposition
-// table and killer moves in the mix (switching 
-// this feature off failed a SPRT test).
+// table and killer moves in the mix (removing 
+// this feature failed a SPRT test).
 
 #include "types.h"
 #include "position.h"

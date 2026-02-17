@@ -11,7 +11,7 @@
 
 const int maxHist = 16384;
 
-// buckets are used to compress refutation table;
+// Buckets are used to compress refutation table;
 // instead of [squareFrom][squareTo] we will use
 // [bucketOfSquareFrom] [squareTo]
 const int bucket[64] = {
@@ -82,7 +82,6 @@ bool HistoryData::Update(Position* pos, const Move move, const Move refuted, con
     // Init table indices
     Color side = pos->GetSideToMove();
     int refIndex = RefIndex(refuted);
-
     Square fromSquare = GetFromSquare(move);
     int fromBucket = bucket[fromSquare];
     Square toSquare = GetToSquare(move);
@@ -111,7 +110,7 @@ void HistoryData::UpdateTries(Position* pos, const Move move, const Move refuted
     Square toSquare = GetToSquare(move);
     ColoredPiece piece = pos->GetPiece(fromSquare);
 
-    int bonus = Inc(depth);
+    int bonus = Dec(depth);
 
     ApplyHistoryDelta(cutoffHistory[piece][fromSquare][toSquare], -bonus);
     ApplyHistoryDelta(refutation[side][refIndex][piece][fromBucket][toSquare], -bonus);
@@ -143,8 +142,14 @@ int HistoryData::GetScore(Position* pos, const Move move, const Move refuted) {
          + refutation[side][refIndex][piece][fromBucket][toSquare];
 }
 
+// Bonus for a beta cutoff
 int HistoryData::Inc(const int depth) {
     return std::clamp(128 * depth - 96, 0, 2000);
+}
+
+// Penalty for all the moves that failed to produce a beta cutoff
+int HistoryData::Dec(const int depth) {
+    return std::clamp(112 * depth - 88, 0, 2000);
 }
 
 // Update  value in a history array; the nice thing about this  function

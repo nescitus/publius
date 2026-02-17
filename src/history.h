@@ -32,6 +32,7 @@ public:
 private:
 
     int Inc(const int depth);
+    int Dec(const int depth);
     void ApplyHistoryDelta(int16_t& entry, int delta);
 
     // History data
