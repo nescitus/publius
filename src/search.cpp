@@ -514,18 +514,23 @@ int Search(Position* pos, SearchContext* context, int ply, int alpha, int beta, 
         // Beta cutoff
         if (score >= beta) {
 
-            // Beta cutoff means that a move is good.
-            // Update history table and killer moves
-            // so that the move will be sorted higher
-            // next time we encounter it.
+            // Beta cutoff means that a move is good. We update
+            // history table and killer moves for quiet moves 
+            // that caused a cutoff, so that such moves will be 
+            // sorted higher next time we encounter them.
             History.Update(pos, move, onePlyAgo.move, depth, ply);
-            //if (!IsMoveNoisy(pos, move)) 
-            {
-                for (int i = 0; i < movesTried; i++) {
-                    if (listOfTriedMoves[i] != move)
-                       History.UpdateTries(pos, listOfTriedMoves[i], onePlyAgo.move, depth);
-                }
+
+            // Additionally, we decrease value of all the quiet
+            // moves tried before one that caused a beta cutoff.
+            // We do it whether the move that caused a  cutoff
+            // was  quiet  or not. This  seems  illogical, but
+            // changing that brought no gain. Also, if we penalize
+            // a quiet move, we know that no good or equal capture worked.
+            for (int i = 0; i < movesTried; i++) {
+                if (listOfTriedMoves[i] != move)
+                   History.UpdateTries(pos, listOfTriedMoves[i], onePlyAgo.move, depth);
             }
+            
 
             // Store move in the transposition table
             if (!isExcluded)

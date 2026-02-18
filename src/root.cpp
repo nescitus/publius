@@ -23,7 +23,7 @@ void Think(Position* pos) {
     // Init
     ClearSearchContext(context);
     Pv.Clear();
-    History.Clear();
+    History.ClearOnNewSearch();
     TT.Age();
     Timer.Start();
 

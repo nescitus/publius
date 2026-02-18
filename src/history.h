@@ -12,8 +12,8 @@ public:
     HistoryData();
 
     // Clears history tables and killers
-    void Clear(void);
-    void ClearRefutation(void);
+    void ClearOnNewSearch(void);
+    void ClearOnNewGame(void);
 
     // Update history on a quiet beta cutoff.
     // Returns true if quiet history was updated (i.e. move was quiet).

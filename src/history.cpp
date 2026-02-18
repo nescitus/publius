@@ -9,8 +9,6 @@
 #include "move.h"
 #include "history.h"
 
-const int maxHist = 16384;
-
 // Buckets are used to compress refutation table;
 // instead of [squareFrom][squareTo] we will use
 // [bucketOfSquareFrom] [squareTo]
@@ -25,6 +23,7 @@ const int bucket[64] = {
    12, 12, 13, 13, 14, 14, 15, 15
 };
 
+static constexpr int maxHist = 16384;
 static constexpr int refCount = 16 * 64;   // 1024 real contexts
 static constexpr int refNull = refCount;   // 1024 = dedicated null/none slot
 
@@ -41,22 +40,44 @@ static inline int RefIndex(Move refuted) {
     return rf * 64 + rt; // 0..1023
 }
 
+// HistKey struct contains data for indexing history tables
+struct HistKey {
+    Color side;
+    int refIndex;
+    Square from;
+    int fromBucket;
+    Square to;
+    ColoredPiece piece;
+};
+
+// Initialize data for indexing the history tables
+static inline HistKey MakeHistKey(Position* pos, Move move, Move refuted) {
+    HistKey k;
+    k.side = pos->GetSideToMove();
+    k.refIndex = RefIndex(refuted);
+    k.from = GetFromSquare(move);
+    k.fromBucket = bucket[k.from];
+    k.to = GetToSquare(move);
+    k.piece = pos->GetPiece(k.from);
+    return k;
+}
+
 // Constructor
 HistoryData::HistoryData() {
-    Clear();
-    ClearRefutation();
+    ClearOnNewGame();
 }
 
-void HistoryData::ClearRefutation() {
-    std::memset(refutation, 0, sizeof(refutation));
+// Clears all the history data
+void HistoryData::ClearOnNewGame() {
+    ClearOnNewSearch();                             // cutoffHistory, killers
+    std::memset(refutation, 0, sizeof(refutation)); // refutation table
 }
 
-
-// Clear all values
-void HistoryData::Clear(void) {
+// ClearOnNewSearch() resets cutoff history 
+// and killer moves, refutation table stays as is.
+ void HistoryData::ClearOnNewSearch(void) {
 
     std::memset(cutoffHistory, 0, sizeof(cutoffHistory));
-   // std::memset(refutation, 0, sizeof(refutation)); // only on new game
 
     for (int ply = 0; ply < SearchTreeSize; ply++)
         killer1[ply] = killer2[ply] = 0;
@@ -79,67 +100,52 @@ bool HistoryData::Update(Position* pos, const Move move, const Move refuted, con
         killer1[ply] = move;
     }
 
-    // Init table indices
-    Color side = pos->GetSideToMove();
-    int refIndex = RefIndex(refuted);
-    Square fromSquare = GetFromSquare(move);
-    int fromBucket = bucket[fromSquare];
-    Square toSquare = GetToSquare(move);
-    ColoredPiece piece = pos->GetPiece(fromSquare);
-
+    HistKey k = MakeHistKey(pos, move, refuted);
     int bonus = Inc(depth);
 
-    ApplyHistoryDelta(cutoffHistory[piece][fromSquare][toSquare], +bonus);
-    ApplyHistoryDelta(refutation[side][refIndex][piece][fromBucket][toSquare], +bonus);
+    ApplyHistoryDelta(cutoffHistory[k.piece][k.from][k.to], +bonus);
+    ApplyHistoryDelta(refutation[k.side][k.refIndex][k.piece][k.fromBucket][k.to], +bonus);
 
 
     return true;
 }
 
+// Negative update for the moves that did not cause a beta cutoff
 void HistoryData::UpdateTries(Position* pos, const Move move, const Move refuted, const int depth) {
 
     // Update only for quiet moves
     if (IsMoveNoisy(pos, move))
         return;
 
-    // Init table indices
-    Color side = pos->GetSideToMove();
-    int refIndex = RefIndex(refuted);
-    Square fromSquare = GetFromSquare(move);
-    int fromBucket = bucket[fromSquare];
-    Square toSquare = GetToSquare(move);
-    ColoredPiece piece = pos->GetPiece(fromSquare);
-
+    HistKey k = MakeHistKey(pos, move, refuted);
     int bonus = Dec(depth);
 
-    ApplyHistoryDelta(cutoffHistory[piece][fromSquare][toSquare], -bonus);
-    ApplyHistoryDelta(refutation[side][refIndex][piece][fromBucket][toSquare], -bonus);
+    ApplyHistoryDelta(cutoffHistory[k.piece][k.from][k.to], -bonus);
+    ApplyHistoryDelta(refutation[k.side][k.refIndex][k.piece][k.fromBucket][k.to], -bonus);
 }
 
+// Is a move the killer move for the current ply?
 bool HistoryData::IsKiller(const Move move, const int ply) {
     return (move == killer1[ply] || move == killer2[ply]);
 }
 
+// Get first killer move
 Move HistoryData::GetKiller1(const int ply) {
     return killer1[ply];
 }
 
+// Get second killer move
 Move HistoryData::GetKiller2(const int ply) {
     return killer2[ply];
 }
 
+// Get score (cutoff history + refutation history)
 int HistoryData::GetScore(Position* pos, const Move move, const Move refuted) {
 
-    // Init table indices
-    Color side = pos->GetSideToMove();
-    int refIndex = RefIndex(refuted);
-    Square fromSquare = GetFromSquare(move);
-    int fromBucket = bucket[fromSquare];
-    Square toSquare = GetToSquare(move);
-    ColoredPiece piece = pos->GetPiece(fromSquare);
+    HistKey k = MakeHistKey(pos, move, refuted);
 
-    return cutoffHistory[piece][fromSquare][toSquare]
-         + refutation[side][refIndex][piece][fromBucket][toSquare];
+    return cutoffHistory[k.piece][k.from][k.to]
+         + refutation[k.side][k.refIndex][k.piece][k.fromBucket][k.to];
 }
 
 // Bonus for a beta cutoff
@@ -160,11 +166,8 @@ void HistoryData::ApplyHistoryDelta(int16_t& entry, int delta) {
     // delta may be positive (reward) or negative (penalty)
     int bonus = (delta >= 0) ? delta : -delta;
 
-    int old = (int)entry;
-    int value = old;
-
-    // Basic update
-    value += delta;
+    int old = (int)entry;    // save for diminising returns calculation
+    int value = old + delta; // basic updata
 
     // Diminishing returns
     value -= int((int64_t)old * bonus / maxHist);

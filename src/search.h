@@ -4,6 +4,10 @@
 #pragma once
 
 #include "move.h"
+#include <vector>
+#include <string>
+#include <iostream>
+#include <algorithm>
 
 // Struct for saving search data related to a given depth
 struct Stack {
@@ -41,11 +45,6 @@ struct ExcludedMoves {
         return false;
     }
 };
-
-#include <vector>
-#include <string>
-#include <iostream>
-#include <algorithm>
 
 // Manages, saves and returns stuff needed for running multiPV search
 struct MultiPVLines {

@@ -262,8 +262,7 @@ void OnPerftCommand(std::istringstream& stream, Position* pos) {
 
 void OnNewGame(void) {
 
-    History.Clear();
-    History.ClearRefutation();
+    History.ClearOnNewGame();
     TT.Clear();
     EvalHash.Clear();
 }
