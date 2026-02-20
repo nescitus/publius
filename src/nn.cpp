@@ -4,7 +4,7 @@
 // NNUE evaluation. Net architecture and constants make it
 // equivalent to the simple example provided by the bullet trainer:
 // https://github.com/jw1912/bullet/blob/main/examples/simple.rs
-// The architecture is (768 -> N from 16 to 256)x2 -> 1.
+// The architecture is 768 -> (N from 16 to 256)x2 -> 1.
 // Publius is able to use neworks with hidden neuron count
 // from 16 to 256, as long as it is a multiple of 16.
 
@@ -71,10 +71,10 @@
 
         // Pick N (any multiple of 16, 16..256) with smallest extra bytes
         constexpr size_t padding = 64; // allowed trailing padding/noise
-        networkWidth = 256;
+        networkWidth = HIDDEN_SIZE;
         size_t bestExtra = (size_t)-1;
 
-        for (size_t width = 16; width <= 256; width += 16) {
+        for (size_t width = 16; width <= HIDDEN_SIZE; width += 16) {
             size_t need = packedBytes(width);
             if (fileBytes < need) continue;
 
@@ -99,17 +99,20 @@
             }
         }
 
+        // Read input biases
         if (!ReadI16(f, &PARAMS.inputBiases[0], width)) {
             std::fclose(f);
             return false;
         }
 
+        // Read output weights
         if (!ReadI16(f, &PARAMS.outputWeights[0][0], width) ||
             !ReadI16(f, &PARAMS.outputWeights[1][0], width)) {
             std::fclose(f);
             return false;
         }
 
+        // Read output bias
         if (std::fread(&PARAMS.outputBias, sizeof(i16), 1, f) != 1) {
             std::fclose(f);
             return false;
@@ -124,6 +127,7 @@
         // Clear history and all the transposition tables
         OnNewGame();
 
+        // Everything worked, the net has been read
         return true;
     }
 
