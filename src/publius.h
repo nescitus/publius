@@ -23,15 +23,14 @@
 // uncomment this when compiling for modern Windows systems
 // to gain a little speedup.
 
-// #define HCE_ONLY
+ //#define HCE_ONLY
 // turn that on if you want a version that uses only handcrafted
 // evaluation function and does not load a NNUE
 
 inline constexpr const char* engineName = "Publius";
 inline constexpr const char* engineAuthor = "Pawel Koziol";
-inline constexpr const char* engineVersion = "1.1.13"; // bump on releases
-inline constexpr const char* netPath = "publius_net256_1.bin";
-//inline constexpr const char* netPath = "publius_net32_4.bin";
+inline constexpr const char* engineVersion = "1.1.15"; // bump on releases
+inline constexpr const char* netPath = "publius_net256_2.bin";
 
 // Engine's name will contain information about unusual
 // compile-time settings

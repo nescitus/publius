@@ -9,7 +9,8 @@
 #include "piece.h"
 #include "util.h"
 
-// does this move change material balance?
+// Does this move change material balance?
+// (is it a capture, a promotion or an en passant capture?)
 bool IsMoveNoisy(Position* pos, const Move move) {
 
     return (pos->GetPiece(GetToSquare(move)) != noPiece ||
@@ -77,4 +78,3 @@ Move StringToMove(Position* pos, const std::string& moveString) {
 
     return CreateMove(fromSquare, toSquare, moveFlag);
 }
-

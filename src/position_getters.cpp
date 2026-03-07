@@ -11,7 +11,7 @@
 #include "position.h"
 #include "bitboard.h"
 
-// Map squares occupied by pieces of a given color
+// Map squares occupied by pieces (including pawns) of a given color
 Bitboard Position::Pieces(const Color color) const {
 
     return Map(color, Pawn) | Map(color, Knight) | Map(color, Bishop)

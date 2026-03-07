@@ -46,7 +46,7 @@ int main() {
     isUci = false;
     isNNUEloaded = false;
     Params.Init();
-    nnueWeight = 80;
+    nnueWeight = 40;
     hceWeight = 0;
     TryLoadingNNUE(netPath);
     GenerateMoves.Init();

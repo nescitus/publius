@@ -20,8 +20,8 @@
 }
 
 [[nodiscard]] constexpr Move CreateMove(const Square fromSquare,
-    const Square toSquare,
-    const int flag) {
+                                        const Square toSquare,
+                                        const int flag) {
     return (flag << 12) | (toSquare << 6) | fromSquare;
 }
 
@@ -44,7 +44,7 @@ struct MoveDescription {
     const Square    toSquare;
     const PieceType hunter;   // piece on 'from' (may be noPieceType if illegal)
     const PieceType prey;     // piece on 'to'   (noPieceType if empty)
-    const int       type;     // your MoveType (tNormal, tCastle, ...)
+    const int       type;     // MoveType (tNormal, tCastle, ...)
 
     explicit MoveDescription(const Position& pos, Move m) noexcept
         : move(m)
